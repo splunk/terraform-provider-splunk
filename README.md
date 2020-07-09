@@ -12,10 +12,14 @@ Clone the repository: https://git.splunk.com/projects/GSA/repos/terraform-provid
 
 Create go src directory and setup $GOPATH
 
-Build the provider: `go build -o terraform-provider-splunk .`
+Build the provider: `make build`
+
+### Testing The Provider
+To run unit tests: `make test`
+To run acceptance tests: `set TF_ACC=1`
 
 ### Using the provider
 
 * Install `terraform`
-* Run `terraform plan`
+* `make default` or run `terraform plan` (Requires correct credentials to splunk instance)
 * Use the `example.tf` to run `terraform plan` and `terraform apply`

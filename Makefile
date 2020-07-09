@@ -12,16 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default: build plan
-
-deps:
-	go install github.com/hashicorp/terraform
+default: build init plan
 
 build:
 	go build -o terraform-provider-splunk .
 
 test:
-	go test -v .
+	go test ./...
+
+init:
+	@terraform init
 
 plan:
 	@terraform plan

@@ -2,8 +2,8 @@ package splunk
 
 import (
 	"crypto/tls"
-	"github.com/hashicorp/terraform/helper/schema"
-	"github.com/hashicorp/terraform/terraform"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"net/http"
 	"testing"
 	"time"

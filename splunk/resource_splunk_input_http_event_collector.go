@@ -3,7 +3,7 @@ package splunk
 import (
 	"encoding/json"
 	"errors"
-	"github.com/hashicorp/terraform/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"net/http"
 	"net/url"
 	"regexp"
