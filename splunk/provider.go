@@ -15,8 +15,14 @@ type SplunkProvider struct {
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
 		Schema:        providerSchema(),
+		DataSourcesMap:providerDataSources(),
 		ResourcesMap:  providerResources(),
 		ConfigureFunc: providerConfigure,
+	}
+}
+
+func providerDataSources() map[string]*schema.Resource {
+	return map[string]*schema.Resource{
 	}
 }
 
@@ -52,6 +58,7 @@ func providerSchema() map[string]*schema.Schema {
 // Returns a map of splunk resources for configuration
 func providerResources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
+		"splunk_global_http_event_collector": globalHttpEventCollector(),
 		"splunk_input_http_event_collector": inputHttpEventCollector(),
 	}
 }
@@ -71,7 +78,6 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		},
 	}))
 
-	_ = client.setSessionKey()
 	if err != nil {
 		return client, err
 	}

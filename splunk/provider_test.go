@@ -5,6 +5,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 )
@@ -38,4 +39,16 @@ func newTestClient() *SplunkClient {
 	client.Username = "admin"
 	client.Password = "changeme"
 	return client
+}
+
+func testAccPreCheck(t *testing.T) {
+	if v := os.Getenv("SPLUNK_URL"); v == "" {
+		t.Fatal("SPLUNK_URL must be set for acceptance tests")
+	}
+	if v := os.Getenv("SPLUNK_USERNAME"); v == "" {
+		t.Fatal("SPLUNK_USERNAME must be set for acceptance tests")
+	}
+	if v := os.Getenv("SPLUNK_PASSWORD"); v == "" {
+		t.Fatal("SPLUNK_PASSWORD must be set for acceptance tests")
+	}
 }

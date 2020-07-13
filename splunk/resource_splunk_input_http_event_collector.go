@@ -3,6 +3,7 @@ package splunk
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"net/http"
 	"net/url"
@@ -10,42 +11,15 @@ import (
 	"strconv"
 )
 
-const (
-  splunkHttpInputEndpoint = "/services/data/inputs/http/"
-)
-
 type SplunkHttpInputConfig struct {
 	Name        string
+	AppContext  string
 	Index       string
 	Source      string
 	Sourcetype  string
 	Disabled    bool
 	UseACK      bool
 	Token       string
-}
-
-type SuccessResponse struct {
-	Entry []Entry `json:"entry"`
-	Messages []ErrorMessage `json:"messages"`
-}
-
-type Entry struct {
-	Name    string  `json:"name"`
-	Content Content `json:"content"`
-}
-
-type Content struct {
-	Token string `json:"token"`
-	Index string `json:"index"`
-}
-
-type ErrorMessage struct {
-	Type   string `json:"type"`
-	Text   string `json:"text"`
-}
-
-type ErrorResponse struct {
-	Messages []ErrorMessage `json:"messages"`
 }
 
 func inputHttpEventCollector() *schema.Resource {
@@ -55,6 +29,18 @@ func inputHttpEventCollector() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "HTTP Event Collector Token name",
+			},
+			"token": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "HTTP Event Collector Token name",
+			},
+			"app_context": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Default:     "splunk_httpinput",
+				Description: "App context for the input (App must exist before creating an input)",
+				ForceNew:    true,
 			},
 			"index": {
 				Type:        schema.TypeString,
@@ -89,7 +75,6 @@ func inputHttpEventCollector() *schema.Resource {
 		Create:httpEventCollectorInputCreate,
 		Delete:httpEventCollectorInputDelete,
 		Update:httpEventCollectorInputUpdate,
-		Exists:httpEventCollectorInputExists,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -100,15 +85,19 @@ func httpEventCollectorInputRead(d *schema.ResourceData, meta interface{}) error
 	provider := meta.(*SplunkProvider)
 	input := SplunkHttpInputConfig{
 		Name: d.Get("name").(string),
+		AppContext: d.Get("app_context").(string),
 	}
 
-	createdSplunkHttpInput, err := (*provider.Client).doGetHttpInput(&input)
+	httpConfigObj, err := (*provider.Client).doGetHttpInput(&input)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(createdSplunkHttpInput.Name)
-	_ = d.Set("token", createdSplunkHttpInput.Token)
+	d.SetId(httpConfigObj.Name)
+	err = d.Set("token", httpConfigObj.Token)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -116,6 +105,7 @@ func httpEventCollectorInputCreate(d *schema.ResourceData, meta interface{}) err
 	provider := meta.(*SplunkProvider)
 	input := SplunkHttpInputConfig{
 		Name: d.Get("name").(string),
+		AppContext: d.Get("app_context").(string),
 		Index:d.Get("index").(string),
 		Source:d.Get("source").(string),
 		Sourcetype:d.Get("sourcetype").(string),
@@ -123,13 +113,16 @@ func httpEventCollectorInputCreate(d *schema.ResourceData, meta interface{}) err
 		UseACK:d.Get("use_ack").(bool),
 	}
 
-	createdSplunkHttpInput, err := (*provider.Client).doCreateHttpInput(&input)
+	httpConfigObj, err := (*provider.Client).doCreateHttpInput(&input)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(createdSplunkHttpInput.Name)
-	_ = d.Set("token", createdSplunkHttpInput.Token)
+	d.SetId(httpConfigObj.Name)
+	err = d.Set("token", httpConfigObj.Token)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -137,6 +130,7 @@ func httpEventCollectorInputDelete(d *schema.ResourceData, meta interface{}) err
 	provider := meta.(*SplunkProvider)
 	input := SplunkHttpInputConfig{
 		Name: d.Get("name").(string),
+		AppContext: d.Get("app_context").(string),
 	}
 
 	err := (*provider.Client).doDeleteHttpInput(&input)
@@ -146,14 +140,11 @@ func httpEventCollectorInputDelete(d *schema.ResourceData, meta interface{}) err
 	return nil
 }
 
-func httpEventCollectorInputExists(d *schema.ResourceData, meta interface{}) (bool, error) {
-	return true, nil
-}
-
 func httpEventCollectorInputUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	input := SplunkHttpInputConfig{
 		Name: d.Get("name").(string),
+		AppContext: d.Get("app_context").(string),
 		Index:d.Get("index").(string),
 		Source:d.Get("source").(string),
 		Sourcetype:d.Get("sourcetype").(string),
@@ -161,20 +152,24 @@ func httpEventCollectorInputUpdate(d *schema.ResourceData, meta interface{}) err
 		UseACK:d.Get("use_ack").(bool),
 	}
 
-	createdSplunkHttpInput, err := (*provider.Client).doUpdateHttpInput(&input)
+	httpConfigObj, err := (*provider.Client).doUpdateHttpInput(&input)
 	if err != nil {
 		return err
 	}
 
-	d.SetId(createdSplunkHttpInput.Name)
-	_ = d.Set("token", createdSplunkHttpInput.Token)
+	d.SetId(httpConfigObj.Name)
+	err = d.Set("token", httpConfigObj.Token)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-// Make requests
+// Calls
 
 func (c *SplunkClient) doGetHttpInput(m *SplunkHttpInputConfig) (*SplunkHttpInputConfig, error) {
 	httpInputEndpoint := splunkHttpInputEndpoint + m.Name
+	httpInputEndpoint = fmt.Sprintf(httpInputEndpoint, m.AppContext)
 	values := url.Values{}
 	values.Add("name", m.Name)
 	resp, err := c.doRequest("GET", httpInputEndpoint, values)
@@ -189,14 +184,14 @@ func (c *SplunkClient) doGetHttpInput(m *SplunkHttpInputConfig) (*SplunkHttpInpu
 
 	switch resp.StatusCode {
 	case 200, 201:
-		splunkHttpInputConfig, err := unmarshalSuccessReponse(resp)
+		splunkHttpInputConfig, err := unmarshalSplunkHttpInputResponse(resp)
 		if err != nil {
 			return nil, err
 		}
 		return splunkHttpInputConfig, nil
 
 	default:
-		errorResponse := &ErrorResponse{}
+		errorResponse := &Response{}
 		_ = json.NewDecoder(resp.Body).Decode(errorResponse)
 		err = errors.New(errorResponse.Messages[0].Text)
 		return nil, err
@@ -205,6 +200,7 @@ func (c *SplunkClient) doGetHttpInput(m *SplunkHttpInputConfig) (*SplunkHttpInpu
 
 func (c *SplunkClient) doCreateHttpInput(m *SplunkHttpInputConfig) (*SplunkHttpInputConfig, error) {
 	httpInputEndpoint := splunkHttpInputEndpoint
+	httpInputEndpoint = fmt.Sprintf(httpInputEndpoint, m.AppContext)
 	values := url.Values{}
 	values.Add("name", m.Name)
 	values.Add("index", m.Index)
@@ -220,7 +216,7 @@ func (c *SplunkClient) doCreateHttpInput(m *SplunkHttpInputConfig) (*SplunkHttpI
 
 	switch resp.StatusCode {
 	case 200, 201:
-		splunkHttpInputConfig, err := unmarshalSuccessReponse(resp)
+		splunkHttpInputConfig, err := unmarshalSplunkHttpInputResponse(resp)
 		if err != nil {
 			return nil, err
 		}
@@ -228,7 +224,7 @@ func (c *SplunkClient) doCreateHttpInput(m *SplunkHttpInputConfig) (*SplunkHttpI
 		return splunkHttpInputConfig, nil
 
 	default:
-		errorResponse := &ErrorResponse{}
+		errorResponse := &Response{}
 		_ = json.NewDecoder(resp.Body).Decode(errorResponse)
 		err = errors.New(errorResponse.Messages[0].Text)
 		return nil, err
@@ -237,6 +233,7 @@ func (c *SplunkClient) doCreateHttpInput(m *SplunkHttpInputConfig) (*SplunkHttpI
 
 func (c *SplunkClient) doUpdateHttpInput(m *SplunkHttpInputConfig) (*SplunkHttpInputConfig, error) {
 	httpInputEndpoint := splunkHttpInputEndpoint + m.Name
+	httpInputEndpoint = fmt.Sprintf(httpInputEndpoint, m.AppContext)
 	values := url.Values{}
 	values.Add("index", m.Index)
 	values.Add("source", m.Source)
@@ -251,7 +248,7 @@ func (c *SplunkClient) doUpdateHttpInput(m *SplunkHttpInputConfig) (*SplunkHttpI
 
 	switch resp.StatusCode {
 	case 200, 201:
-		splunkHttpInputConfig, err := unmarshalSuccessReponse(resp)
+		splunkHttpInputConfig, err := unmarshalSplunkHttpInputResponse(resp)
 		if err != nil {
 			return nil, err
 		}
@@ -259,7 +256,7 @@ func (c *SplunkClient) doUpdateHttpInput(m *SplunkHttpInputConfig) (*SplunkHttpI
 		return splunkHttpInputConfig, nil
 
 	default:
-		errorResponse := &ErrorResponse{}
+		errorResponse := &Response{}
 		_ = json.NewDecoder(resp.Body).Decode(errorResponse)
 		err = errors.New(errorResponse.Messages[0].Text)
 		return nil, err
@@ -269,6 +266,7 @@ func (c *SplunkClient) doUpdateHttpInput(m *SplunkHttpInputConfig) (*SplunkHttpI
 
 func (c *SplunkClient) doDeleteHttpInput(m *SplunkHttpInputConfig) error {
 	httpInputEndpoint := splunkHttpInputEndpoint + m.Name
+	httpInputEndpoint = fmt.Sprintf(httpInputEndpoint, m.AppContext)
 	values := url.Values{}
 	_, err := c.doRequest("DELETE", httpInputEndpoint, values)
 	if err != nil {
@@ -277,9 +275,9 @@ func (c *SplunkClient) doDeleteHttpInput(m *SplunkHttpInputConfig) error {
 	return nil
 }
 
-func unmarshalSuccessReponse(response *http.Response) (*SplunkHttpInputConfig, error) {
+func unmarshalSplunkHttpInputResponse(response *http.Response) (*SplunkHttpInputConfig, error) {
 	splunkHttpInputConfig := &SplunkHttpInputConfig{}
-	successResponse := &SuccessResponse{}
+	successResponse := &Response{}
 	_ = json.NewDecoder(response.Body).Decode(&successResponse)
 	re := regexp.MustCompile(`http://(.*)`)
 	splunkHttpInputConfig.Name = re.FindStringSubmatch(successResponse.Entry[0].Name)[1]

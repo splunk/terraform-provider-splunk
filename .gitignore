@@ -1,4 +1,5 @@
 # Ignore dist file
+.idea
 .terraform
 terraform-provider-splunk
 terraform.tfstate

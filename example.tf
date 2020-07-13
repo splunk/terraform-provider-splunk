@@ -19,6 +19,12 @@ provider "splunk" {
   insecure_skip_verify = true
 }
 
+resource "splunk_global_http_event_collector" "http" {
+  disabled    = false
+  enable_ssl  = true
+  port        = 8088
+}
+
 resource "splunk_input_http_event_collector" "hec-token" {
   name       = "new-token"
   index      = "main"
@@ -26,4 +32,6 @@ resource "splunk_input_http_event_collector" "hec-token" {
   sourcetype = "new-sourcetype"
   disabled   = false
   use_ack    = false
+
+  depends_on = ["splunk_global_http_event_collector.http"]
 }

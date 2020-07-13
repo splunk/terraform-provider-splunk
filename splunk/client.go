@@ -22,10 +22,6 @@ type SplunkClient struct {
 	OutputMode         string
 }
 
-type Response struct {
-	SessionKey    string `json:"sessionKey"`
-}
-
 type ClientParams func(*SplunkClient) error
 
 func NewClient(url string, username string, password string, opts... ClientParams) (*SplunkClient, error) {
@@ -72,14 +68,16 @@ func (s *SplunkClient) setSessionKey() (e error) {
 	req, err := http.NewRequest("POST", u.String(), strings.NewReader(values.Encode()))
 	req.SetBasicAuth(s.Username, s.Password)
 	res, err := s.HttpClient.Do(req)
-	defer res.Body.Close()
 	if err != nil {
 		return err
 	}
+	defer res.Body.Close()
 
 	switch res.StatusCode {
 	case 200:
-		decoded := Response{}
+		decoded := struct {
+			SessionKey    string `json:"sessionKey"`
+		}{}
 		_ = json.NewDecoder(res.Body).Decode(&decoded)
 		s.SessionKey = decoded.SessionKey
 	default:
