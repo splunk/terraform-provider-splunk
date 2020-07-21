@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"net/http"
 	"testing"
 )
 
@@ -62,11 +63,10 @@ func testAccSplunkHttpEventCollectorInputDestroyResources(s *terraform.State) er
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
 		default:
-			splunkHttpInputConfig, err := client.doGetHttpInput(&SplunkHttpInputConfig{
-				Name: rs.Primary.ID,
-			})
-			if splunkHttpInputConfig != nil {
-				return fmt.Errorf("found deleted token: %s: %s", rs.Primary.ID, err)
+			endpoint := client.BuildSplunkdURL(nil, "servicesNS", "nobody", "search", "data", "inputs", "http", rs.Primary.ID)
+			resp, err := client.Get(endpoint)
+			if resp.StatusCode != http.StatusNotFound {
+				return fmt.Errorf("error: %s: %s", rs.Primary.ID, err)
 			}
 		}
 	}

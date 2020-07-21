@@ -214,6 +214,11 @@ github.com/posener/complete/match
 # github.com/spf13/afero v1.2.2
 github.com/spf13/afero
 github.com/spf13/afero/mem
+# github.com/splunk/go-splunkd v0.0.3
+## explicit
+github.com/splunk/go-splunkd/model
+github.com/splunk/go-splunkd/service
+github.com/splunk/go-splunkd/util
 # github.com/ulikunitz/xz v0.5.5
 github.com/ulikunitz/xz
 github.com/ulikunitz/xz/internal/hash

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 provider "splunk" {
-  url                  = "https://localhost:8089"
+  url                  = "localhost:8089"
   username             = "admin"
   password             = "changeme"
   insecure_skip_verify = true

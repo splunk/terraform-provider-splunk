@@ -1,10 +1,9 @@
 package splunk
 
 import (
-	"crypto/tls"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"net/http"
+	"github.com/splunk/go-splunkd/service"
 	"os"
 	"testing"
 	"time"
@@ -27,17 +26,9 @@ func init() {
 }
 
 
-func newTestClient() *SplunkClient {
-	client := &SplunkClient{}
-	client.HttpClient = &http.Client{
-		Timeout: time.Second * 30,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
-	client.Url = "https://localhost:8089"
-	client.Username = "admin"
-	client.Password = "changeme"
+func newTestClient() *service.Client {
+	client := service.NewSplunkdClient("", [2]string{"admin", "changeme"}, "localhost:8089",
+		service.NewSplunkdHTTPClient(5*time.Second, true))
 	return client
 }
 

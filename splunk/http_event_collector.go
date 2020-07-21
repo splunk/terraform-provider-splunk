@@ -1,10 +1,5 @@
 package splunk
 
-const (
-	splunkGlobalHttpInputEndpoint = `/services/data/inputs/http/`
-	splunkHttpInputEndpoint = `/servicesNS/nobody/%v/data/inputs/http/`
-)
-
 // HTTP Input Response Schema
 type Response struct {
 	Entry []Entry `json:"entry"`

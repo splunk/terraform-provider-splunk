@@ -1,15 +1,14 @@
 package splunk
 
 import (
-	"crypto/tls"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"net/http"
+	"github.com/splunk/go-splunkd/service"
 	"time"
 )
 
 type SplunkProvider struct {
-	Client *SplunkClient
+	Client *service.Client
 }
 
 func Provider() terraform.ResourceProvider {
@@ -67,16 +66,9 @@ func providerResources() map[string]*schema.Resource {
 // to our provider which we will use to initialise splunk client that
 // interacts with the API.
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	client, err := NewClient(
-		d.Get("url").(string),
-		d.Get("username").(string),
-		d.Get("password").(string),
-		httpClient(&http.Client{
-		Timeout: time.Second * 30,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: d.Get("insecure_skip_verify").(bool)},
-		},
-	}))
+	client := service.NewSplunkdClient("", [2]string{d.Get("username").(string), d.Get("password").(string)},
+	d.Get("url").(string), service.NewSplunkdHTTPClient(time.Second * 30, d.Get("insecure_skip_verify").(bool)))
+	_, err := client.AuthorizationService.Login()
 
 	if err != nil {
 		return client, err

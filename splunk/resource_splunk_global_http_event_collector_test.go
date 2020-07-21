@@ -22,7 +22,7 @@ func TestAccGlobalSplunkHttpEventCollectorInput(t *testing.T) {
 			testAccPreCheck(t)
 		},
 		Providers: testAccProviders,
-		CheckDestroy: testAccGlobalSplunkHttpInputDestroyResources,
+		CheckDestroy: testAccSplunkGlobalHttpInputDestroyResources,
 		Steps: []resource.TestStep{
 			{
 				Config:globalHttpInputConfig,
@@ -31,12 +31,13 @@ func TestAccGlobalSplunkHttpEventCollectorInput(t *testing.T) {
 	})
 }
 
-func testAccGlobalSplunkHttpInputDestroyResources(s *terraform.State) error {
+func testAccSplunkGlobalHttpInputDestroyResources(s *terraform.State) error {
 	client := newTestClient()
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
 		default:
-			_, err := client.doGetGlobalHttpInput(&SplunkGlobalHttpInputConfig{Name: rs.Primary.ID})
+			endpoint := client.BuildSplunkdURL(nil, "services", "data", "inputs", "http", rs.Primary.ID)
+			_, err := client.Get(endpoint)
 			if err != nil {
 				return fmt.Errorf("error: %s: %s", rs.Primary.ID, err)
 			}
