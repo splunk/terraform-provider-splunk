@@ -3,8 +3,8 @@ package splunk
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/splunk/go-splunkd/service"
 	"os"
+	"terraform-provider-splunk/client"
 	"testing"
 	"time"
 )
@@ -25,10 +25,9 @@ func init() {
 	}
 }
 
-
-func newTestClient() *service.Client {
-	client := service.NewSplunkdClient("", [2]string{"admin", "changeme"}, "localhost:8089",
-		service.NewSplunkdHTTPClient(5*time.Second, true))
+func newTestClient() *client.Client {
+	client := client.NewSplunkdClient("", [2]string{"admin", "changeme"}, "localhost:8089",
+		client.NewSplunkdHTTPClient(30*time.Second, true))
 	return client
 }
 

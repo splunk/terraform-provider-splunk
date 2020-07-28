@@ -2,8 +2,8 @@ package util
 
 import (
 	"fmt"
-	"net/http"
 	"io/ioutil"
+	"net/http"
 )
 
 // HTTPError is raised when status code is not 2xx
@@ -21,7 +21,7 @@ func (he *HTTPError) Error() string {
 
 // ParseHTTPStatusCodeInResponse creates a HTTPError from http status code and message
 func ParseHTTPStatusCodeInResponse(response *http.Response) (*http.Response, error) {
-	if response != nil && (response.StatusCode < 200 || response.StatusCode >= 400){
+	if response != nil && (response.StatusCode < 200 || response.StatusCode >= 400) {
 		httpErr := &HTTPError{
 			Status:  response.StatusCode,
 			Message: response.Status,

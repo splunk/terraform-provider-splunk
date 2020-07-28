@@ -3,26 +3,25 @@ package splunk
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/splunk/go-splunkd/service"
+	"terraform-provider-splunk/client"
 	"time"
 )
 
 type SplunkProvider struct {
-	Client *service.Client
+	Client *client.Client
 }
 
 func Provider() terraform.ResourceProvider {
 	return &schema.Provider{
-		Schema:        providerSchema(),
-		DataSourcesMap:providerDataSources(),
-		ResourcesMap:  providerResources(),
-		ConfigureFunc: providerConfigure,
+		Schema:         providerSchema(),
+		DataSourcesMap: providerDataSources(),
+		ResourcesMap:   providerResources(),
+		ConfigureFunc:  providerConfigure,
 	}
 }
 
 func providerDataSources() map[string]*schema.Resource {
-	return map[string]*schema.Resource{
-	}
+	return map[string]*schema.Resource{}
 }
 
 func providerSchema() map[string]*schema.Schema {
@@ -30,7 +29,7 @@ func providerSchema() map[string]*schema.Schema {
 		"url": {
 			Type:        schema.TypeString,
 			Required:    true,
-			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_URL", "https://localhost:8089"),
+			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_URL", "localhost:8089"),
 			Description: "Splunk instance URL",
 		},
 		"username": {
@@ -58,7 +57,7 @@ func providerSchema() map[string]*schema.Schema {
 func providerResources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
 		"splunk_global_http_event_collector": globalHttpEventCollector(),
-		"splunk_input_http_event_collector": inputHttpEventCollector(),
+		"splunk_input_http_event_collector":  inputHttpEventCollector(),
 	}
 }
 
@@ -66,9 +65,9 @@ func providerResources() map[string]*schema.Resource {
 // to our provider which we will use to initialise splunk client that
 // interacts with the API.
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	client := service.NewSplunkdClient("", [2]string{d.Get("username").(string), d.Get("password").(string)},
-	d.Get("url").(string), service.NewSplunkdHTTPClient(time.Second * 30, d.Get("insecure_skip_verify").(bool)))
-	_, err := client.AuthorizationService.Login()
+	client := client.NewSplunkdClient("", [2]string{d.Get("username").(string), d.Get("password").(string)},
+		d.Get("url").(string), client.NewSplunkdHTTPClient(time.Second*30, d.Get("insecure_skip_verify").(bool)))
+	err := client.Login()
 
 	if err != nil {
 		return client, err

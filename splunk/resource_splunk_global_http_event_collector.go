@@ -5,93 +5,98 @@ import (
 	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"net/http"
-	"net/url"
-	"strconv"
+	"terraform-provider-splunk/client/models"
 )
 
 type GlobalHttpInputConfig struct {
-	Name        string
-	Disabled    bool
-	EnableSSL   bool
-	Port        int
+	Name      string
+	Disabled  bool
+	EnableSSL bool
+	Port      int
 }
-
 
 func globalHttpEventCollector() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:        schema.TypeString,
-				Optional:     true,
-				Default:     "http",
-			},
 			"disabled": {
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
 			},
 			"port": {
-			Type:        schema.TypeInt,
-			Optional:    true,
-			Default:     8088,
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  8088,
 			},
 			"enable_ssl": {
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Default:     false,
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
+			},
+			"dedicated_io_threads": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  2,
+			},
+			"max_sockets": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  0,
+			},
+			"max_threads": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Default:  0,
+			},
+			"use_deployment_server": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  false,
 			},
 		},
-		Read:globalHttpInputRead,
-		Create:globalHttpInputCreate,
-		Delete:globalHttpInputDelete,
-		Update:globalHttpInputUpdate,
+		Read:   globalHttpInputRead,
+		Create: globalHttpInputCreate,
+		Delete: globalHttpInputDelete,
+		Update: globalHttpInputUpdate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
 	}
 }
 
-func globalHttpInputRead(d *schema.ResourceData, meta interface{}) error {
+// Functions
+func globalHttpInputCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
-	name := d.Get("name").(string)
-	values := url.Values{}
-	values.Add("name", name)
-	endpoint := (*provider.Client).BuildSplunkdURL(nil, "services", "data", "inputs", "http", name)
-	resp, err := (*provider.Client).Get(endpoint)
+	httpInputConfigObj := createGlobalHttpInputConfigObject(d)
+	resp, err := (*provider.Client).CreateGlobalHttpEventCollectorObject(*httpInputConfigObj)
+	if err != nil {
+		return err
+	}
 	defer resp.Body.Close()
+
+	_, err = unmarshalGlobalHttpInputResponse(resp)
 	if err != nil {
 		return err
 	}
 
-	globalHttpInputConfig, err := unmarshalGlobalHttpInputResponse(resp)
-	if err != nil {
-		return err
-	}
-
-	d.SetId(globalHttpInputConfig.Name)
+	d.SetId("http")
 	return nil
 }
 
-func globalHttpInputCreate(d *schema.ResourceData, meta interface{}) error {
+func globalHttpInputRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
-	name := d.Get("name").(string)
-	values := url.Values{}
-	values.Add("disabled", strconv.FormatBool(d.Get("disabled").(bool)))
-	values.Add("enableSSL", strconv.FormatBool(d.Get("enable_ssl").(bool)))
-	values.Add("port", strconv.Itoa(d.Get("port").(int)))
-	endpoint := (*provider.Client).BuildSplunkdURL(nil, "services", "data", "inputs", "http", name)
-	resp, err := (*provider.Client).Post(endpoint, values)
+	resp, err := (*provider.Client).ReadGlobalHttpEventCollectorObject()
+	if err != nil {
+		return err
+	}
 	defer resp.Body.Close()
+
+	_, err = unmarshalGlobalHttpInputResponse(resp)
 	if err != nil {
 		return err
 	}
 
-	globalHttpInputConfig, err := unmarshalGlobalHttpInputResponse(resp)
-	if err != nil {
-		return err
-	}
-
-	d.SetId(globalHttpInputConfig.Name)
+	d.SetId("http")
 	return nil
 }
 
@@ -102,43 +107,45 @@ func globalHttpInputDelete(d *schema.ResourceData, meta interface{}) error {
 
 func globalHttpInputUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
-	name := d.Get("name").(string)
-	values := url.Values{}
-	values.Add("disabled", strconv.FormatBool(d.Get("disabled").(bool)))
-	values.Add("enableSSL", strconv.FormatBool(d.Get("enable_ssl").(bool)))
-	values.Add("port", strconv.Itoa(d.Get("port").(int)))
-	endpoint := (*provider.Client).BuildSplunkdURL(nil, "services", "data", "inputs", "http", name)
-	resp, err := (*provider.Client).Post(endpoint, values)
+	httpInputConfigObj := createGlobalHttpInputConfigObject(d)
+	resp, err := (*provider.Client).CreateGlobalHttpEventCollectorObject(*httpInputConfigObj)
+	if err != nil {
+		return err
+	}
 	defer resp.Body.Close()
+
+	_, err = unmarshalGlobalHttpInputResponse(resp)
 	if err != nil {
 		return err
 	}
 
-	globalHttpInputConfig, err := unmarshalGlobalHttpInputResponse(resp)
-	if err != nil {
-		return err
-	}
-
-	d.SetId(globalHttpInputConfig.Name)
+	d.SetId("http")
 	return nil
 }
 
-func unmarshalGlobalHttpInputResponse(response *http.Response) (*GlobalHttpInputConfig, error) {
-	switch response.StatusCode {
-	case 200, 201:
-		globalHttpInputConfig := &GlobalHttpInputConfig{}
-		successResponse := &Response{}
-		_ = json.NewDecoder(response.Body).Decode(&successResponse)
-		globalHttpInputConfig.Name = successResponse.Entry[0].Name
-		return globalHttpInputConfig, nil
-
-	default:
-		errorResponse := &Response{}
-		_ = json.NewDecoder(response.Body).Decode(errorResponse)
-		err := errors.New(errorResponse.Messages[0].Text)
-		return nil, err
-	}
+// Helpers
+func createGlobalHttpInputConfigObject(d *schema.ResourceData) (globalHttpInputConfigObject *models.GlobalHttpEventCollectorObject) {
+	globalHttpInputConfigObject = &models.GlobalHttpEventCollectorObject{}
+	globalHttpInputConfigObject.Disabled = d.Get("disabled").(bool)
+	globalHttpInputConfigObject.Port = d.Get("port").(int)
+	globalHttpInputConfigObject.EnableSSL = d.Get("enable_ssl").(bool)
+	globalHttpInputConfigObject.DedicatedIoThreads = d.Get("dedicated_io_threads").(int)
+	globalHttpInputConfigObject.MaxSockets = d.Get("max_sockets").(int)
+	globalHttpInputConfigObject.MaxThreads = d.Get("max_threads").(int)
+	globalHttpInputConfigObject.UseDeploymentServer = d.Get("use_deployment_server").(bool)
+	return globalHttpInputConfigObject
 }
 
+func unmarshalGlobalHttpInputResponse(httpResponse *http.Response) (globalHttpEventCollectorObject *models.GlobalHttpEventCollectorObject, err error) {
+	response := &models.GlobalHECResponse{}
+	switch httpResponse.StatusCode {
+	case 200, 201:
+		_ = json.NewDecoder(httpResponse.Body).Decode(&response)
+		return &response.Entry[0].Content, nil
 
-
+	default:
+		_ = json.NewDecoder(httpResponse.Body).Decode(response)
+		err := errors.New(response.Messages[0].Text)
+		return globalHttpEventCollectorObject, err
+	}
+}

@@ -1,60 +1,44 @@
-/*
-Package service implements a service client which is used to communicate
-with Splunkd endpoints as well as a collection of services that group
-logically related Splunkd endpoints.
-*/
-package service
+package client
 
 import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"reflect"
 	"strconv"
-	"strings"
+	"terraform-provider-splunk/client/util"
 	"time"
-
-	"fmt"
-
-	"github.com/splunk/go-splunkd/util"
 )
 
 // Declare constants for service package
 const (
-	defaultTimeOut = time.Second * 5
-	defaultHost    = "localhost:8089"
-	defaultScheme  = "https"
-	MethodGet      = "GET"
-	MethodPost     = "POST"
-	MethodPut      = "PUT"
-	MethodPatch    = "PATCH"
-	MethodDelete   = "DELETE"
+	defaultTimeOut   = time.Second * 30
+	defaultHost      = "localhost:8089"
+	defaultScheme    = "https"
+	MethodGet        = "GET"
+	MethodPost       = "POST"
+	MethodPut        = "PUT"
+	MethodPatch      = "PATCH"
+	MethodDelete     = "DELETE"
+	envVarHTTPScheme = "HTTPScheme"
 )
 
 var defaultAuth = [2]string{"admin", "changeme"}
 
 // A Client is used to communicate with Splunkd endpoints
 type Client struct {
-	// Splunk session key
-	SessionKey string
-	// Basic Auth with username and password
-	Auth [2]string
-	// Host name
-	Host string
-	// HTTP Client used to interact with endpoints
-	httpClient *http.Client
-	// Services designed to talk to different parts of Splunk
-	AuthorizationService *AuthorizationService
-	SearchService        *SearchService
-}
-
-// service provides the interface between client and services
-type service struct {
-	client *Client
+	SessionKey         string
+	Auth               [2]string
+	Host               string
+	httpClient         *http.Client
+	InsecureSkipVerify bool
 }
 
 // NewRequest creates a new HTTP Request and set proper header
@@ -72,8 +56,16 @@ func (c *Client) NewRequest(httpMethod, url string, body io.Reader) (*http.Reque
 	return request, nil
 }
 
-// BuildSplunkdURL creates full Splunkd URL
-func (c *Client) BuildSplunkdURL(queryValues url.Values, urlPathParts ...string) url.URL {
+func getEnv(key, defaultValue string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		if value == "http" {
+			return value
+		}
+	}
+	return defaultValue
+}
+
+func (c *Client) BuildSplunkURL(queryValues url.Values, urlPathParts ...string) url.URL {
 	buildPath := ""
 	for _, pathPart := range urlPathParts {
 		buildPath = path.Join(buildPath, url.PathEscape(pathPart))
@@ -83,8 +75,10 @@ func (c *Client) BuildSplunkdURL(queryValues url.Values, urlPathParts ...string)
 	}
 	// Always set json as output format for now
 	queryValues.Set("output_mode", "json")
+	httpScheme := getEnv(envVarHTTPScheme, defaultScheme)
+
 	return url.URL{
-		Scheme:   defaultScheme,
+		Scheme:   httpScheme,
 		Host:     c.Host,
 		Path:     buildPath,
 		RawQuery: queryValues.Encode(),
@@ -148,6 +142,37 @@ func (c *Client) DoRequest(method string, requestURL url.URL, body interface{}) 
 	return util.ParseHTTPStatusCodeInResponse(response)
 }
 
+func (c *Client) Login() (e error) {
+	loginURL := c.BuildSplunkURL(nil, "services", "auth", "login")
+	bodyValues := map[string]string{
+		"username": c.Auth[0],
+		"password": c.Auth[1],
+	}
+	response, err := c.Post(loginURL, bodyValues)
+	if response != nil {
+		defer response.Body.Close()
+	}
+	if err != nil {
+		return err
+	}
+
+	switch response.StatusCode {
+	case 200:
+		decoded := struct {
+			SessionKey string `json:"sessionKey"`
+		}{}
+		_ = json.NewDecoder(response.Body).Decode(&decoded)
+		c.SessionKey = decoded.SessionKey
+	default:
+		buf := new(bytes.Buffer)
+		_, _ = buf.ReadFrom(response.Body)
+		responseBody := buf.String()
+		err = errors.New(responseBody)
+
+	}
+	return err
+}
+
 // EncodeRequestBody takes a json string or object and serializes it to be used in request body
 func (c *Client) EncodeRequestBody(content interface{}) ([]byte, error) {
 	if content != nil {
@@ -177,7 +202,7 @@ func (c *Client) EncodeObject(content interface{}) ([]byte, error) {
 		return nil, err
 	}
 	for k, v := range valueMap {
-		k = strings.ToLower(k)
+		//k = strings.ToLower(k)
 		switch val := v.(type) {
 		case []interface{}:
 			for _, ele := range val {
@@ -221,9 +246,6 @@ func encodeValue(v interface{}) (string, error) {
 func NewDefaultSplunkdClient() *Client {
 	httpClient := NewSplunkdHTTPClient(defaultTimeOut, true)
 	c := &Client{Auth: defaultAuth, Host: defaultHost, httpClient: httpClient}
-	c.AuthorizationService = &AuthorizationService{client: c}
-	c.SearchService = &SearchService{client: c}
-
 	return c
 }
 
@@ -241,10 +263,18 @@ func NewSplunkdClient(sessionKey string, auth [2]string, host string, httpClient
 
 // NewSplunkdHTTPClient returns a HTTP Client with timeout and tls validation setup
 func NewSplunkdHTTPClient(timeout time.Duration, skipValidateTLS bool) *http.Client {
+	httpScheme := getEnv(envVarHTTPScheme, defaultScheme)
+	if httpScheme == "http" {
+		return &http.Client{
+			Timeout: timeout,
+		}
+	}
+
 	return &http.Client{
 		Timeout: timeout,
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: skipValidateTLS},
 		},
 	}
+
 }

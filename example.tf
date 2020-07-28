@@ -28,10 +28,17 @@ resource "splunk_global_http_event_collector" "http" {
 resource "splunk_input_http_event_collector" "hec-token" {
   name       = "new-token"
   index      = "main"
+  indexes    = ["main", "history"]
   source     = "new-source"
   sourcetype = "new-sourcetype"
   disabled   = false
-  use_ack    = false
+  use_ack    = true
+
+  acl {
+    sharing = "global"
+    read = ["admin"]
+    write = ["admin"]
+  }
 
   depends_on = ["splunk_global_http_event_collector.http"]
 }
