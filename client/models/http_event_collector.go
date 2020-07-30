@@ -8,6 +8,7 @@ type HECResponse struct {
 
 type HECEntry struct {
 	Name    string                   `json:"name"`
+	ACL     ACLObject                `json:"acl"`
 	Content HttpEventCollectorObject `json:"content"`
 }
 
@@ -18,6 +19,6 @@ type HttpEventCollectorObject struct {
 	Source     string        `json:"source,omitempty" url:"source,omitempty"`
 	SourceType string        `json:"sourcetype,omitempty" url:"sourcetype,omitempty"`
 	Token      string        `json:"token,omitempty" url:"token,omitempty"`
-	Disabled   bool          `json:"disabled,omitempty" url:"disabled"`
-	UseACK     bool          `json:"useACK,omitempty" url:"useACK"`
+	Disabled   bool          `json:"disabled,omitempty" url:"disabled,omitempty"`
+	UseACK     string        `json:"useACK,omitempty" url:"useACK,omitempty"`
 }

@@ -11,22 +11,19 @@ import (
 const newHttpEventCollectorInput = `
 resource "splunk_global_http_event_collector" "http" {
   disabled     = false
-  enable_ssl   = false
+  enable_ssl   = 1
   port         = 8088
 }
 
-resource "splunk_input_http_event_collector" "token" {
-    name = "new_token"
-    index = "main"
+resource "splunk_input_http_event_collector" "new-token" {
+    name = "new-token"
     source = "new"
-    disabled = true
-    use_ack = false
+    disabled = false
+    use_ack = 0
 
     acl {
-      owner = "splunker"
-      sharing = "app"
-      read = ["admin", "splunker"]
-      write = ["admin"]
+      app = "launcher"
+      sharing = "global"
     }
 
     depends_on = ["splunk_global_http_event_collector.http"]
@@ -36,24 +33,24 @@ resource "splunk_input_http_event_collector" "token" {
 const updateHttpEventCollectorInput = `
 resource "splunk_global_http_event_collector" "http" {
   disabled     = false
-  enable_ssl   = false
+  enable_ssl   = 1
   port         = 8088
 }
 
-resource "splunk_input_http_event_collector" "token" {
-    name = "new_token"
+resource "splunk_input_http_event_collector" "new-token" {
+    name = "new-token"
     index = "main"
     indexes = ["main", "history"]
     source = "new"
     sourcetype = "new"
     disabled = false
-    use_ack = true
+    use_ack = 1
 
     acl {
-      owner = "splunker"
+      app = "launcher"
       sharing = "global"
-      read = ["admin", "splunker"]
-      write = ["admin", "splunker"]
+      read = ["admin"]
+      write = ["admin"]
     }
 
     depends_on = ["splunk_global_http_event_collector.http"]
@@ -61,6 +58,7 @@ resource "splunk_input_http_event_collector" "token" {
 `
 
 func TestAccCreateSplunkHttpEventCollectorInput(t *testing.T) {
+	resourceName := "splunk_input_http_event_collector.new-token"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -70,9 +68,46 @@ func TestAccCreateSplunkHttpEventCollectorInput(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: newHttpEventCollectorInput,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "source", "new"),
+					resource.TestCheckResourceAttr(resourceName, "index", "default"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "use_ack", "0"),
+					resource.TestCheckResourceAttr(resourceName, "acl.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "launcher"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "nobody"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.sharing", "global"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.read.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.read.0", "admin"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.write.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.write.0", "admin"),
+				),
 			},
 			{
 				Config: updateHttpEventCollectorInput,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "source", "new"),
+					resource.TestCheckResourceAttr(resourceName, "index", "main"),
+					resource.TestCheckResourceAttr(resourceName, "sourcetype", "new"),
+					resource.TestCheckResourceAttr(resourceName, "indexes.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "indexes.0", "main"),
+					resource.TestCheckResourceAttr(resourceName, "indexes.1", "history"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "use_ack", "1"),
+					resource.TestCheckResourceAttr(resourceName, "acl.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "launcher"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "nobody"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.sharing", "global"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.read.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.read.0", "admin"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.write.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.write.0", "admin"),
+				),
+			},
+			{
+				ResourceName:      "splunk_input_http_event_collector.new-token",
+				ImportState:       true,
+				ImportStateVerify: true,
 			},
 		},
 	})

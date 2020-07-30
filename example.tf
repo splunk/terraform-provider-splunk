@@ -25,14 +25,14 @@ resource "splunk_global_http_event_collector" "http" {
   port        = 8088
 }
 
-resource "splunk_input_http_event_collector" "hec-token" {
+resource "splunk_input_http_event_collector" "new-token" {
   name       = "new-token"
   index      = "main"
   indexes    = ["main", "history"]
   source     = "new-source"
   sourcetype = "new-sourcetype"
   disabled   = false
-  use_ack    = true
+  use_ack    = 1
 
   acl {
     sharing = "global"

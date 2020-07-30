@@ -8,13 +8,6 @@ import (
 	"terraform-provider-splunk/client/models"
 )
 
-type GlobalHttpInputConfig struct {
-	Name      string
-	Disabled  bool
-	EnableSSL bool
-	Port      int
-}
-
 func globalHttpEventCollector() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
@@ -24,34 +17,34 @@ func globalHttpEventCollector() *schema.Resource {
 				Default:  false,
 			},
 			"port": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default:  8088,
+				Default:  "8088",
 			},
 			"enable_ssl": {
-				Type:     schema.TypeBool,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default:  false,
+				Default:  "1",
 			},
 			"dedicated_io_threads": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default:  2,
+				Default:  "2",
 			},
 			"max_sockets": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default:  0,
+				Default:  "0",
 			},
 			"max_threads": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default:  0,
+				Default:  "0",
 			},
 			"use_deployment_server": {
-				Type:     schema.TypeBool,
+				Type:     schema.TypeString,
 				Optional: true,
-				Default:  false,
+				Default:  "0",
 			},
 		},
 		Read:   globalHttpInputRead,
@@ -74,13 +67,8 @@ func globalHttpInputCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 	defer resp.Body.Close()
 
-	_, err = unmarshalGlobalHttpInputResponse(resp)
-	if err != nil {
-		return err
-	}
-
 	d.SetId("http")
-	return nil
+	return globalHttpInputRead(d, meta)
 }
 
 func globalHttpInputRead(d *schema.ResourceData, meta interface{}) error {
@@ -91,12 +79,39 @@ func globalHttpInputRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	defer resp.Body.Close()
 
-	_, err = unmarshalGlobalHttpInputResponse(resp)
+	content, err := unmarshalGlobalHttpInputResponse(resp)
 	if err != nil {
 		return err
 	}
 
-	d.SetId("http")
+	if err = d.Set("port", content.Port); err != nil {
+		return err
+	}
+
+	if err = d.Set("dedicated_io_threads", content.DedicatedIoThreads); err != nil {
+		return err
+	}
+
+	if err = d.Set("max_sockets", content.MaxSockets); err != nil {
+		return err
+	}
+
+	if err = d.Set("max_threads", content.MaxThreads); err != nil {
+		return err
+	}
+
+	if err = d.Set("disabled", content.Disabled); err != nil {
+		return err
+	}
+
+	if err = d.Set("enable_ssl", content.EnableSSL); err != nil {
+		return err
+	}
+
+	if err = d.Set("use_deployment_server", content.UseDeploymentServer); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -114,25 +129,19 @@ func globalHttpInputUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 	defer resp.Body.Close()
 
-	_, err = unmarshalGlobalHttpInputResponse(resp)
-	if err != nil {
-		return err
-	}
-
-	d.SetId("http")
-	return nil
+	return globalHttpInputRead(d, meta)
 }
 
 // Helpers
 func createGlobalHttpInputConfigObject(d *schema.ResourceData) (globalHttpInputConfigObject *models.GlobalHttpEventCollectorObject) {
 	globalHttpInputConfigObject = &models.GlobalHttpEventCollectorObject{}
 	globalHttpInputConfigObject.Disabled = d.Get("disabled").(bool)
-	globalHttpInputConfigObject.Port = d.Get("port").(int)
-	globalHttpInputConfigObject.EnableSSL = d.Get("enable_ssl").(bool)
-	globalHttpInputConfigObject.DedicatedIoThreads = d.Get("dedicated_io_threads").(int)
-	globalHttpInputConfigObject.MaxSockets = d.Get("max_sockets").(int)
-	globalHttpInputConfigObject.MaxThreads = d.Get("max_threads").(int)
-	globalHttpInputConfigObject.UseDeploymentServer = d.Get("use_deployment_server").(bool)
+	globalHttpInputConfigObject.EnableSSL = d.Get("enable_ssl").(string)
+	globalHttpInputConfigObject.Port = d.Get("port").(string)
+	globalHttpInputConfigObject.DedicatedIoThreads = d.Get("dedicated_io_threads").(string)
+	globalHttpInputConfigObject.MaxSockets = d.Get("max_sockets").(string)
+	globalHttpInputConfigObject.MaxThreads = d.Get("max_threads").(string)
+	globalHttpInputConfigObject.UseDeploymentServer = d.Get("use_deployment_server").(string)
 	return globalHttpInputConfigObject
 }
 
