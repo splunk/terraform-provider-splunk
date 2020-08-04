@@ -70,7 +70,7 @@ func TestAccCreateSplunkHttpEventCollectorInput(t *testing.T) {
 				Config: newHttpEventCollectorInput,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "source", "new"),
-					resource.TestCheckResourceAttr(resourceName, "index", "main"),
+					resource.TestCheckResourceAttr(resourceName, "index", "default"),
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
 					resource.TestCheckResourceAttr(resourceName, "use_ack", "0"),
 					resource.TestCheckResourceAttr(resourceName, "acl.#", "1"),

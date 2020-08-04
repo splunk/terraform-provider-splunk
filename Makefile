@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-default: build init plan
+default: build
 
 build:
 	go build -o terraform-provider-splunk .
@@ -20,8 +20,14 @@ build:
 test:
 	go test ./...
 
+testacc:
+	TF_ACC=1 go test ./... -v
+
 init:
 	@terraform init
 
 plan:
 	@terraform plan
+
+apply:
+	@terraform apply -auto-approve

@@ -3,6 +3,7 @@ package splunk
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"net/http"
 	"regexp"
@@ -163,6 +164,10 @@ func inputsScriptRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
+	if entry == nil {
+		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+	}
+
 	// Now we read the input configuration with proper owner and app
 	resp, err = (*provider.Client).ReadScriptedInput(name, entry.ACL.Owner, entry.ACL.App)
 	if err != nil {
@@ -173,6 +178,10 @@ func inputsScriptRead(d *schema.ResourceData, meta interface{}) error {
 	entry, err = getScriptedInputsConfigByName(name, resp)
 	if err != nil {
 		return err
+	}
+
+	if entry == nil {
+		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
 	}
 
 	if err = d.Set("name", d.Id()); err != nil {
