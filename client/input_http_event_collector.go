@@ -6,20 +6,17 @@ import (
 	"terraform-provider-splunk/client/models"
 )
 
-func (client *Client) CreateHttpEventCollectorObject(name string, owner string, app string, httpInputConfigObj *models.HttpEventCollectorObject) (*http.Response, error) {
+func (client *Client) CreateHttpEventCollectorObject(name string, owner string, app string, httpInputConfigObj *models.HttpEventCollectorObject) error {
 	values, err := query.Values(httpInputConfigObj)
 	values.Add("name", name)
-	if err != nil {
-		return nil, err
-	}
-
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "http", name)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
-		return nil, err
+		return err
 	}
+	defer resp.Body.Close()
 
-	return resp, nil
+	return nil
 }
 
 func (client *Client) ReadHttpEventCollectorObject(name, owner, app string) (*http.Response, error) {
@@ -32,15 +29,16 @@ func (client *Client) ReadHttpEventCollectorObject(name, owner, app string) (*ht
 	return resp, nil
 }
 
-func (client *Client) UpdateHttpEventCollectorObject(name string, owner string, app string, httpInputConfigObj *models.HttpEventCollectorObject) (*http.Response, error) {
+func (client *Client) UpdateHttpEventCollectorObject(name string, owner string, app string, httpInputConfigObj *models.HttpEventCollectorObject) error {
 	values, err := query.Values(&httpInputConfigObj)
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "http", name)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
-		return nil, err
+		return err
 	}
+	defer resp.Body.Close()
 
-	return resp, nil
+	return nil
 }
 
 func (client *Client) DeleteHttpEventCollectorObject(name, owner, app string) (*http.Response, error) {

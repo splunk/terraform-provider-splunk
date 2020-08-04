@@ -9,13 +9,13 @@ import (
 	"terraform-provider-splunk/client/models"
 )
 
-func inputHttpEventCollector() *schema.Resource {
+func inputsHttpEventCollector() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
+				Required:    true,
+				ForceNew:    true,
 				Description: "HTTP Event Collector Token name",
 			},
 			"token": {
@@ -123,19 +123,24 @@ func httpEventCollectorInputCreate(d *schema.ResourceData, meta interface{}) err
 	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
 	httpInputConfigObj := getHttpEventCollectorConfig(d)
-	aclObject := getACLConfig(d.Get("acl").([]interface{}))
-	resp, err := (*provider.Client).CreateHttpEventCollectorObject(name, aclObject.Owner, aclObject.App, httpInputConfigObj)
+	aclObject := &models.ACLObject{}
+	if r, ok := d.GetOk("acl"); ok {
+		aclObject = getACLConfig(r.([]interface{}))
+	} else {
+		aclObject.App = "splunk_httpinput"
+		aclObject.Owner = "nobody"
+		aclObject.Sharing = "app"
+	}
+	err := (*provider.Client).CreateHttpEventCollectorObject(name, aclObject.Owner, aclObject.App, httpInputConfigObj)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
 
 	if _, ok := d.GetOk("acl"); ok {
-		resp, err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, "http", name, aclObject)
+		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, "http", name, aclObject)
 		if err != nil {
 			return err
 		}
-		defer resp.Body.Close()
 	}
 
 	d.SetId(name)
@@ -152,7 +157,7 @@ func httpEventCollectorInputRead(d *schema.ResourceData, meta interface{}) error
 	}
 	defer resp.Body.Close()
 
-	entry, err := getConfigByName(name, resp)
+	entry, err := getHECConfigByName(name, resp)
 	if err != nil {
 		return err
 	}
@@ -164,7 +169,7 @@ func httpEventCollectorInputRead(d *schema.ResourceData, meta interface{}) error
 	}
 	defer resp.Body.Close()
 
-	entry, err = getConfigByName(name, resp)
+	entry, err = getHECConfigByName(name, resp)
 	if err != nil {
 		return err
 	}
@@ -217,18 +222,16 @@ func httpEventCollectorInputUpdate(d *schema.ResourceData, meta interface{}) err
 	provider := meta.(*SplunkProvider)
 	httpInputConfigObj := getHttpEventCollectorConfig(d)
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
-	resp, err := (*provider.Client).UpdateHttpEventCollectorObject(d.Id(), aclObject.Owner, aclObject.App, httpInputConfigObj)
+	err := (*provider.Client).UpdateHttpEventCollectorObject(d.Id(), aclObject.Owner, aclObject.App, httpInputConfigObj)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
 
 	//ACL update
-	resp, err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, "http", d.Id(), aclObject)
+	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, "http", d.Id(), aclObject)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
 
 	return httpEventCollectorInputRead(d, meta)
 }
@@ -257,6 +260,7 @@ func httpEventCollectorInputDelete(d *schema.ResourceData, meta interface{}) err
 // Helpers
 func getHttpEventCollectorConfig(d *schema.ResourceData) (httpInputConfigObject *models.HttpEventCollectorObject) {
 	httpInputConfigObject = &models.HttpEventCollectorObject{}
+	httpInputConfigObject.Index = d.Get("host").(string)
 	httpInputConfigObject.Index = d.Get("index").(string)
 	httpInputConfigObject.Indexes = d.Get("indexes").([]interface{})
 	httpInputConfigObject.Source = d.Get("source").(string)
@@ -286,7 +290,7 @@ func getACLConfig(r []interface{}) (acl *models.ACLObject) {
 		if a["sharing"] != "" {
 			acl.Sharing = a["sharing"].(string)
 		} else {
-			acl.Sharing = "global"
+			acl.Sharing = "app"
 		}
 
 		for _, v := range a["read"].([]interface{}) {
@@ -301,7 +305,7 @@ func getACLConfig(r []interface{}) (acl *models.ACLObject) {
 	return acl
 }
 
-func getConfigByName(name string, httpResponse *http.Response) (hecEntry *models.HECEntry, err error) {
+func getHECConfigByName(name string, httpResponse *http.Response) (hecEntry *models.HECEntry, err error) {
 	response := &models.HECResponse{}
 	switch httpResponse.StatusCode {
 	case 200, 201:

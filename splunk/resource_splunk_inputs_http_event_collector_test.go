@@ -15,7 +15,7 @@ resource "splunk_global_http_event_collector" "http" {
   port         = 8088
 }
 
-resource "splunk_input_http_event_collector" "new-token" {
+resource "splunk_inputs_http_event_collector" "new-token" {
     name = "new-token"
     source = "new"
     disabled = false
@@ -37,7 +37,7 @@ resource "splunk_global_http_event_collector" "http" {
   port         = 8088
 }
 
-resource "splunk_input_http_event_collector" "new-token" {
+resource "splunk_inputs_http_event_collector" "new-token" {
     name = "new-token"
     index = "main"
     indexes = ["main", "history"]
@@ -58,7 +58,7 @@ resource "splunk_input_http_event_collector" "new-token" {
 `
 
 func TestAccCreateSplunkHttpEventCollectorInput(t *testing.T) {
-	resourceName := "splunk_input_http_event_collector.new-token"
+	resourceName := "splunk_inputs_http_event_collector.new-token"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -70,7 +70,7 @@ func TestAccCreateSplunkHttpEventCollectorInput(t *testing.T) {
 				Config: newHttpEventCollectorInput,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "source", "new"),
-					resource.TestCheckResourceAttr(resourceName, "index", "default"),
+					resource.TestCheckResourceAttr(resourceName, "index", "main"),
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
 					resource.TestCheckResourceAttr(resourceName, "use_ack", "0"),
 					resource.TestCheckResourceAttr(resourceName, "acl.#", "1"),
@@ -105,7 +105,7 @@ func TestAccCreateSplunkHttpEventCollectorInput(t *testing.T) {
 				),
 			},
 			{
-				ResourceName:      "splunk_input_http_event_collector.new-token",
+				ResourceName:      "splunk_inputs_http_event_collector.new-token",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},

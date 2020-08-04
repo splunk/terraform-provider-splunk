@@ -32,6 +32,9 @@ func newTestClient() *client.Client {
 }
 
 func testAccPreCheck(t *testing.T) {
+	if v := os.Getenv("SPLUNK_HOME"); v == "" {
+		t.Fatal("SPLUNK_HOME must be set for acceptance tests")
+	}
 	if v := os.Getenv("SPLUNK_URL"); v == "" {
 		t.Fatal("SPLUNK_URL must be set for acceptance tests")
 	}

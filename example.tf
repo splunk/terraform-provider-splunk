@@ -25,7 +25,7 @@ resource "splunk_global_http_event_collector" "http" {
   port        = 8088
 }
 
-resource "splunk_input_http_event_collector" "new-token" {
+resource "splunk_inputs_http_event_collector" "hec" {
   name       = "new-token"
   index      = "main"
   indexes    = ["main", "history"]

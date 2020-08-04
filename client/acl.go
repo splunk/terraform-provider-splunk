@@ -18,7 +18,7 @@ func (client *Client) GetAcl(owner, app, resource, name string) (*http.Response,
 	return resp, nil
 }
 
-func (client *Client) UpdateAcl(owner, app, resource, name string, acl *models.ACLObject) (*http.Response, error) {
+func (client *Client) UpdateAcl(owner, app, resource, name string, acl *models.ACLObject) error {
 	values, err := query.Values(&acl)
 	// remove app from url values during POST
 	values.Del("app")
@@ -30,19 +30,19 @@ func (client *Client) UpdateAcl(owner, app, resource, name string, acl *models.A
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", resource, name, "acl")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	return resp, nil
+	defer resp.Body.Close()
+	return nil
 }
 
-func (client *Client) Move(owner, app, resource, name string, acl *models.ACLObject) (*http.Response, error) {
+func (client *Client) Move(owner, app, resource, name string, acl *models.ACLObject) error {
 	values, err := query.Values(&acl)
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "http", resource, name, "move")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	return resp, nil
+	defer resp.Body.Close()
+	return nil
 }

@@ -21,5 +21,10 @@ To run acceptance tests: `set TF_ACC=1`
 ### Using the provider
 
 * Install `terraform`
-* `make default` or run `terraform plan` (Requires correct credentials to splunk instance)
-* Use the `example.tf` to run `terraform plan` and `terraform apply`
+* `make build`
+* `terraform init`
+* Use the `example.tf` to run `terraform plan` and `terraform apply` to apply configuration
+* For importing existing resources use `terraform import`
+  * Example: `terraform import splunk_input_http_event_collector.foo <hec-token>`
+  * NOTE: Create a resource block first before importing resources (USAGE: https://www.terraform.io/docs/import/usage.html)
+  
