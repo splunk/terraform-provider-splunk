@@ -1,12 +1,12 @@
 package models
 
 // Scripted Input Response Schema
-type ScriptedInputResponse struct {
-	Entry    []ScriptedInputEntry `json:"entry"`
-	Messages []ErrorMessage       `json:"messages"`
+type InputsScriptResponse struct {
+	Entry    []InputsScriptEntry `json:"entry"`
+	Messages []ErrorMessage      `json:"messages"`
 }
 
-type ScriptedInputEntry struct {
+type InputsScriptEntry struct {
 	Name    string             `json:"name"`
 	ACL     ACLObject          `json:"acl"`
 	Content InputsScriptObject `json:"content"`
@@ -19,6 +19,6 @@ type InputsScriptObject struct {
 	SourceType   string `json:"sourcetype,omitempty" url:"sourcetype,omitempty"`
 	RenameSource string `json:"rename-source,omitempty" url:"rename-source,omitempty"`
 	PassAuth     string `json:"passAuth,omitempty" url:"passAuth,omitempty"`
-	Disabled     bool   `json:"disabled,omitempty" url:"disabled,omitempty"`
+	Disabled     bool   `json:"disabled,omitempty" url:"disabled"`
 	Interval     int    `json:"interval,omitempty" url:"interval,omitempty"`
 }

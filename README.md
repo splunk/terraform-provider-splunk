@@ -21,11 +21,20 @@ Build the provider: `make build`
 
 ### Using the provider
 
-* Install `terraform`
-* `make build`
-* `terraform init`
-* Use the `example.tf` to run `terraform plan` and `terraform apply` to apply configuration
+* Install Terraform
+* Build the binary by `make build`
+* Initialize terraform by `terraform init`
+* Run `terraform plan` and `terraform apply` to apply configurations
+* To update `terraform plan` has to be run first before applying
 * For importing existing resources use `terraform import`
-  * Example: `terraform import splunk_inputs_http_event_collector.foo <hec-token>`
-  * NOTE: Create a resource block first before importing resources (USAGE: https://www.terraform.io/docs/import/usage.html)
   
+#### Examples
+* Use the `example.tf` provided in the repo to run `terraform plan` and `terraform apply` to apply configuration
+  * Modify `provider "splunk"` resource block with proper instance details
+* To update values modify the `example.tf` file and execute `terraform plan` and `terraform apply` 
+* Examples to import existing configuration:
+  * `terraform import splunk_inputs_http_event_collector.foo <hec-token-name>`
+  * `terraform import splunk_inputs_script.foo "\$SPLUNK_HOME/etc/apps/splunk_instrumentation/bin/instrumentation.py"`
+    * NOTE: Create a resource block first before importing resources (USAGE: https://www.terraform.io/docs/import/usage.html)
+    * Example: `resource "splunk_inputs_http_event_collector" "foo" { }`
+    `resource "splunk_inputs_scripts" "bar" { }`

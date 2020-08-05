@@ -273,8 +273,8 @@ func getInputsScriptConfig(d *schema.ResourceData) (inputsScriptObj *models.Inpu
 	return
 }
 
-func getScriptedInputsConfigByName(name string, httpResponse *http.Response) (entry *models.ScriptedInputEntry, err error) {
-	response := &models.ScriptedInputResponse{}
+func getScriptedInputsConfigByName(name string, httpResponse *http.Response) (entry *models.InputsScriptEntry, err error) {
+	response := &models.InputsScriptResponse{}
 	switch httpResponse.StatusCode {
 	case 200, 201:
 		err = json.NewDecoder(httpResponse.Body).Decode(&response)

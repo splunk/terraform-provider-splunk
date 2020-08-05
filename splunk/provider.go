@@ -59,6 +59,7 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_global_http_event_collector": globalHttpEventCollector(),
 		"splunk_inputs_http_event_collector": inputsHttpEventCollector(),
 		"splunk_inputs_script":               inputsScript(),
+		"splunk_inputs_monitor":              inputsMonitor(),
 	}
 }
 
