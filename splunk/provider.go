@@ -60,6 +60,7 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_inputs_http_event_collector": inputsHttpEventCollector(),
 		"splunk_inputs_script":               inputsScript(),
 		"splunk_inputs_monitor":              inputsMonitor(),
+		"splunk_inputs_udp":                  inputsUDP(),
 	}
 }
 

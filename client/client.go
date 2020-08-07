@@ -13,7 +13,7 @@ import (
 	"path"
 	"reflect"
 	"strconv"
-	"terraform-provider-splunk/client/util"
+	"terraform-provider-splunk/client/utils"
 	"time"
 )
 
@@ -139,7 +139,7 @@ func (c *Client) DoRequest(method string, requestURL url.URL, body interface{}) 
 	if err != nil {
 		return nil, err
 	}
-	return util.ParseHTTPStatusCodeInResponse(response)
+	return utils.ParseHTTPStatusCodeInResponse(response)
 }
 
 func (c *Client) Login() (e error) {
@@ -184,7 +184,7 @@ func (c *Client) EncodeRequestBody(content interface{}) ([]byte, error) {
 		case reflect.Struct:
 			return c.EncodeObject(value.Interface())
 		default:
-			return nil, &util.HTTPError{Status: 400, Message: "Bad Request"}
+			return nil, &utils.HTTPError{Status: 400, Message: "Bad Request"}
 		}
 	}
 	return nil, nil

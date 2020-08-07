@@ -117,7 +117,7 @@ func testAccSplunkHttpEventCollectorInputDestroyResources(s *terraform.State) er
 	client := newTestClient()
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
-		case "splunk_input_http_event_collector":
+		case "splunk_inputs_http_event_collector":
 			endpoint := client.BuildSplunkURL(nil, "servicesNS", "nobody", "splunk_httpinput", "data", "inputs", "http", rs.Primary.ID)
 			resp, err := client.Get(endpoint)
 			if resp.StatusCode != http.StatusNotFound {
