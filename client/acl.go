@@ -18,7 +18,7 @@ func (client *Client) GetAcl(owner, app, resource, name string) (*http.Response,
 	return resp, nil
 }
 
-func (client *Client) UpdateAcl(owner, app, resource, name string, acl *models.ACLObject) error {
+func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, resources ...string) error {
 	values, err := query.Values(&acl)
 	// remove app from url values during POST
 	values.Del("app")
@@ -27,7 +27,11 @@ func (client *Client) UpdateAcl(owner, app, resource, name string, acl *models.A
 	// Flatten []string
 	values.Set("perms.read", strings.Join(acl.Perms.Read, ","))
 	values.Set("perms.write", strings.Join(acl.Perms.Write, ","))
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", resource, name, "acl")
+	// Adding resources
+	resourcePath := []string{"servicesNS", owner, app}
+	resourcePath = append(resourcePath, resources...)
+	resourcePath = append(resourcePath, name, "acl")
+	endpoint := client.BuildSplunkURL(nil, resourcePath...)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -36,9 +40,13 @@ func (client *Client) UpdateAcl(owner, app, resource, name string, acl *models.A
 	return nil
 }
 
-func (client *Client) Move(owner, app, resource, name string, acl *models.ACLObject) error {
+func (client *Client) Move(owner, app, name string, acl *models.ACLObject, resources ...string) error {
 	values, err := query.Values(&acl)
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "http", resource, name, "move")
+	// Adding resources
+	resourcePath := []string{"servicesNS", owner, app}
+	resourcePath = append(resourcePath, resources...)
+	resourcePath = append(resourcePath, name, "move")
+	endpoint := client.BuildSplunkURL(nil, resourcePath...)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err

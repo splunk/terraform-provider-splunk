@@ -98,7 +98,7 @@ func httpEventCollectorInputCreate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	if _, ok := d.GetOk("acl"); ok {
-		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, "http", name, aclObject)
+		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "inputs", "http")
 		if err != nil {
 			return err
 		}
@@ -197,7 +197,7 @@ func httpEventCollectorInputUpdate(d *schema.ResourceData, meta interface{}) err
 	}
 
 	//ACL update
-	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, "http", d.Id(), aclObject)
+	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, d.Id(), aclObject, "data", "inputs", "http")
 	if err != nil {
 		return err
 	}

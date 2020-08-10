@@ -115,7 +115,7 @@ func inputsUDPCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if _, ok := d.GetOk("acl"); ok {
-		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, "udp", name, aclObject)
+		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "inputs", "udp")
 		if err != nil {
 			return err
 		}
@@ -222,7 +222,7 @@ func inputsUDPUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	//ACL update
-	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, "udp", d.Id(), aclObject)
+	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, d.Id(), aclObject, "data", "inputs", "udp")
 	if err != nil {
 		return err
 	}
