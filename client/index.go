@@ -9,7 +9,7 @@ import (
 func (client *Client) CreateIndexObject(name string, owner string, app string, indexConfigObj *models.IndexObject) error {
 	values, err := query.Values(indexConfigObj)
 	values.Add("name", name)
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "indexes", name)
+	endpoint := client.BuildSplunkURL(nil, "services", "data", "indexes", name)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -20,7 +20,7 @@ func (client *Client) CreateIndexObject(name string, owner string, app string, i
 }
 
 func (client *Client) ReadIndexObject(name, owner, app string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "indexes", name)
+	endpoint := client.BuildSplunkURL(nil, "services", "data", "indexes", name)
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
@@ -31,7 +31,12 @@ func (client *Client) ReadIndexObject(name, owner, app string) (*http.Response, 
 
 func (client *Client) UpdateIndexObject(name string, owner string, app string, indexConfigObj *models.IndexObject) error {
 	values, err := query.Values(&indexConfigObj)
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "indexes", name)
+	values.Del("coldPath")
+	values.Del("datatype")
+	values.Del("homePath")
+	values.Del("thawedPath")
+	values.Del("tstatsHomePath")
+	endpoint := client.BuildSplunkURL(nil, "services", "data", "indexes", name)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -42,7 +47,7 @@ func (client *Client) UpdateIndexObject(name string, owner string, app string, i
 }
 
 func (client *Client) DeleteIndexObject(name, owner, app string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "indexes", name)
+	endpoint := client.BuildSplunkURL(nil, "services", "data", "indexes", name)
 	resp, err := client.Delete(endpoint)
 	if err != nil {
 		return nil, err

@@ -23,7 +23,7 @@ func index() *schema.Resource {
 			"bucket_rebuild_memory_hint": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "auto",
+				Computed:    true,
 				Description: `Suggestion for the bucket rebuild process for the size of the time-series (tsidx) file to make.
 				Caution: This is an advanced parameter. Inappropriate use of this parameter causes splunkd to not start if rebuild is required. Do not set this parameter unless instructed by Splunk Support.
 				
@@ -231,8 +231,8 @@ func index() *schema.Resource {
 			},
 			"name": {
 				Type:        schema.TypeString,
-				Optional:    false,
-				Computed:    true,
+				Required:    true,
+				ForceNew:    true,
 				Description: `The name of the index to create.`,
 			},
 			"partial_service_meta_period": {
@@ -281,7 +281,7 @@ func index() *schema.Resource {
 			"rep_factor": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Default:     "0",
+				Computed:    true,
 				Description: `Index replication control. This parameter applies to only clustering slaves.
 				auto = Use the master index replication configuration value.
 				
@@ -343,48 +343,7 @@ func index() *schema.Resource {
 				
 				Caution: Migrating data across filesystems is now handled natively by splunkd. If you specify a script here, the script becomes responsible for moving the event data, and Splunk-native data migration is not used.`,
 			},
-			"acl": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"app": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-							ForceNew: true,
-						},
-						"owner": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-						},
-						"sharing": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-						},
-						"read": {
-							Type:     schema.TypeList,
-							Optional: true,
-							Computed: true,
-							Elem: &schema.Schema{
-								Type: schema.TypeString,
-							},
-						},
-						"write": {
-							Type:     schema.TypeList,
-							Optional: true,
-							Computed: true,
-							Elem: &schema.Schema{
-								Type: schema.TypeString,
-							},
-						},
-					},
-				},
-			},
+			"acl": aclSchema(),
 		},
 		Read:   indexRead,
 		Create: indexCreate,
@@ -401,20 +360,19 @@ func indexCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
 	indexConfigObj := getIndexConfig(d)
-	aclObject := getACLConfig(d.Get("acl").([]interface{}))
+	aclObject := &models.ACLObject{}
 	if r, ok := d.GetOk("acl"); ok {
 		aclObject = getACLConfig(r.([]interface{}))
 	} else {
-		aclObject.App = "search"
 		aclObject.Owner = "nobody"
-		aclObject.Sharing = "app"
+		aclObject.App = "search"
 	}
 	err := (*provider.Client).CreateIndexObject(name, aclObject.Owner, aclObject.App, indexConfigObj)
 	if err != nil {
 		return err
 	}
 	if _, ok := d.GetOk("acl"); ok {
-		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, "indexes", name, aclObject)
+		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "indexes")
 		if err != nil {
 			return err
 		}
@@ -551,7 +509,7 @@ func indexRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if err = d.Set("name", entry.Content.Name); err != nil {
+	if err = d.Set("name", d.Id()); err != nil {
 		return err
 	}
 
@@ -625,7 +583,7 @@ func indexUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	//ACL update
-	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, "indexes", d.Id(), aclObject)
+	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, d.Id(), aclObject, "data", "indexes")
 	if err != nil {
 		return err
 	}
@@ -656,6 +614,7 @@ func indexDelete(d *schema.ResourceData, meta interface{}) error {
 
 // Helpers
 func getIndexConfig(d *schema.ResourceData) (indexConfigObject *models.IndexObject) {
+	indexConfigObject = &models.IndexObject{}
 	indexConfigObject.BlockSignSize = d.Get("block_sign_size").(int)
 	indexConfigObject.BucketRebuildMemoryHint = d.Get("bucket_rebuild_memory_hint").(string)
 	indexConfigObject.ColdPath = d.Get("cold_path").(string)
@@ -680,7 +639,6 @@ func getIndexConfig(d *schema.ResourceData) (indexConfigObject *models.IndexObje
 	indexConfigObject.MaxWarmDBCount = d.Get("max_warm_db_count").(int)
 	indexConfigObject.MinRawFileSyncSecs = d.Get("min_raw_file_sync_secs").(string)
 	indexConfigObject.MinStreamGroupQueueSize = d.Get("min_stream_group_queue_size").(int)
-	indexConfigObject.Name = d.Get("name").(string)
 	indexConfigObject.PartialServiceMetaPeriod = d.Get("partial_service_meta_period").(int)
 	indexConfigObject.ProcessTrackerServiceInterval = d.Get("process_tracker_service_interval").(int)
 	indexConfigObject.QuarantineFutureSecs = d.Get("quarantine_future_secs").(int)
@@ -702,7 +660,7 @@ func getConfigByName(name string, httpResponse *http.Response) (indexEntry *mode
 	switch httpResponse.StatusCode {
 	case 200, 201:
 		_ = json.NewDecoder(httpResponse.Body).Decode(&response)
-		re := regexp.MustCompile(`http://(.*)`)
+		re := regexp.MustCompile(`(.*)`)
 		for _, entry := range response.Entry {
 			if name == re.FindStringSubmatch(entry.Name)[1] {
 				return &entry, nil
