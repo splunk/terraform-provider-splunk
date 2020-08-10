@@ -26,7 +26,7 @@ func init() {
 }
 
 func newTestClient() *client.Client {
-	client := client.NewSplunkdClient("", [2]string{"admin", "changeme"}, "localhost:8089",
+	client := client.NewSplunkdClient("", [2]string{"admin", "password"}, "localhost:8089",
 		client.NewSplunkdHTTPClient(30*time.Second, true))
 	return client
 }
