@@ -67,48 +67,7 @@ func inputsScript() *schema.Resource {
 				Default:     60,
 				Description: "Specify an integer or cron schedule. This parameter specifies how often to execute the specified script, in seconds or a valid cron schedule. If you specify a cron schedule, the script is not executed on start-up.",
 			},
-			"acl": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"app": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-							ForceNew: true,
-						},
-						"owner": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-						},
-						"sharing": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-						},
-						"read": {
-							Type:     schema.TypeList,
-							Optional: true,
-							Computed: true,
-							Elem: &schema.Schema{
-								Type: schema.TypeString,
-							},
-						},
-						"write": {
-							Type:     schema.TypeList,
-							Optional: true,
-							Computed: true,
-							Elem: &schema.Schema{
-								Type: schema.TypeString,
-							},
-						},
-					},
-				},
-			},
+			"acl": aclSchema(),
 		},
 		Read:   inputsScriptRead,
 		Create: inputsScriptCreate,

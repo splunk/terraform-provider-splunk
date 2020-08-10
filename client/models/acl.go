@@ -9,7 +9,6 @@ type ACLObject struct {
 	CanShareGlobal bool        `json:"can_share_global,omitempty" url:"can_share_global,omitempty"`
 	CanShareUser   bool        `json:"can_share_user,omitempty" url:"can_share_user,omitempty"`
 	CanWrite       bool        `json:"can_write,omitempty" url:"can_write,omitempty"`
-	Modifiable     bool        `json:"modifiable,omitempty" url:"modifiable,omitempty"`
 	Owner          string      `json:"owner,omitempty" url:"owner,omitempty"`
 	Removable      bool        `json:"removable,omitempty" url:"removable,omitempty"`
 	Sharing        string      `json:"sharing,omitempty" url:"sharing,omitempty"`

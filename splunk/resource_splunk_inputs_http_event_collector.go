@@ -17,12 +17,12 @@ func inputsHttpEventCollector() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: "HTTP Event Collector Token name",
+				Description: "Required. Token name (inputs.conf key)",
 			},
 			"token": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "HTTP Event Collector Token name",
+				Description: "Token value for sending data to collector/event endpoint.",
 			},
 			"index": {
 				Type:        schema.TypeString,
@@ -31,10 +31,11 @@ func inputsHttpEventCollector() *schema.Resource {
 				Description: "Index to store generated events",
 			},
 			"indexes": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				Elem:     &schema.Schema{Type: schema.TypeString},
+				Type:        schema.TypeList,
+				Optional:    true,
+				Computed:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "Set of indexes allowed for events with this token.",
 			},
 			"host": {
 				Type:        schema.TypeString,

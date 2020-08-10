@@ -84,48 +84,7 @@ func inputsUDP() *schema.Resource {
 				Computed:    true,
 				Description: "If set to true, Splunk software does not remove the priority field from incoming syslog events. ",
 			},
-			"acl": {
-				Type:     schema.TypeList,
-				Optional: true,
-				Computed: true,
-				MaxItems: 1,
-				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"app": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-							ForceNew: true,
-						},
-						"owner": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-						},
-						"sharing": {
-							Type:     schema.TypeString,
-							Optional: true,
-							Computed: true,
-						},
-						"read": {
-							Type:     schema.TypeList,
-							Optional: true,
-							Computed: true,
-							Elem: &schema.Schema{
-								Type: schema.TypeString,
-							},
-						},
-						"write": {
-							Type:     schema.TypeList,
-							Optional: true,
-							Computed: true,
-							Elem: &schema.Schema{
-								Type: schema.TypeString,
-							},
-						},
-					},
-				},
-			},
+			"acl": aclSchema(),
 		},
 		Read:   inputsUDPRead,
 		Create: inputsUDPCreate,
