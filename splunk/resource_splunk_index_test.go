@@ -11,23 +11,13 @@ import (
 const newIndex = `
 resource "splunk_index" "new-index" {
     name = "new-index"
-    acl {
-      app = "launcher"
-      sharing = "global"
-    }
 }
 `
 
 const updateIndex = `
 resource "splunk_index" "new-index" {
+	name = "new-index"
     max_time_unreplicated_no_acks = 301
-
-    acl {
-      app = "launcher"
-      sharing = "global"
-      read = ["admin"]
-      write = ["admin"]
-    }
 }
 `
 
@@ -43,13 +33,13 @@ func TestAccCreateSplunkIndex(t *testing.T) {
 			{
 				Config: newIndex,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "maxTimeUnreplicatedNoAcks", "300"),
+					resource.TestCheckResourceAttr(resourceName, "max_time_unreplicated_no_acks", "300"),
 				),
 			},
 			{
 				Config: updateIndex,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "maxTimeUnreplicatedNoAcks", "301"),
+					resource.TestCheckResourceAttr(resourceName, "max_time_unreplicated_no_acks", "301"),
 				),
 			},
 			{
@@ -66,7 +56,7 @@ func testAccSplunkIndexDestroyResources(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
 		case "splunk_index":
-			endpoint := client.BuildSplunkURL(nil, "servicesNS", "nobody", "search", "data", "indexes", rs.Primary.ID)
+			endpoint := client.BuildSplunkURL(nil, "services", "data", "indexes", rs.Primary.ID)
 			resp, err := client.Get(endpoint)
 			if resp.StatusCode != http.StatusNotFound {
 				return fmt.Errorf("error: %s: %s", rs.Primary.ID, err)
