@@ -69,6 +69,7 @@ func inputsTCPRaw() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
+				ForceNew:    true,
 				Description: "Allows for restricting this input to only accept data from the host specified here.",
 			},
 			"connection_host": {
@@ -133,37 +134,36 @@ func inputsTCPRawCreate(d *schema.ResourceData, meta interface{}) error {
 
 func inputsTCPRawRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
-	name := d.Id()
-	// We first get list of inputs to get Scriptowner and app name for the specific input
+	// We first get list of inputs to get owner and app name for the specific input
 	resp, err := (*provider.Client).ReadTCPRawInputs()
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	entry, err := getinputsTCPRawConfigByName(name, resp)
+	entry, err := getinputsTCPRawConfigByName(d.Id(), resp)
 	if err != nil {
 		return err
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return errors.New(fmt.Sprintf("Unable to find resource: %v", d.Id()))
 	}
 
 	// Now we read the input configuration with proper owner and app
-	resp, err = (*provider.Client).ReadTCPRawInput(name, entry.ACL.Owner, entry.ACL.App)
+	resp, err = (*provider.Client).ReadTCPRawInput(entry.Name, entry.ACL.Owner, entry.ACL.App)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	entry, err = getinputsTCPRawConfigByName(name, resp)
+	entry, err = getinputsTCPRawConfigByName(d.Id(), resp)
 	if err != nil {
 		return err
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return errors.New(fmt.Sprintf("Unable to find resource: %v", d.Id()))
 	}
 
 	if err = d.Set("name", d.Id()); err != nil {
@@ -218,13 +218,17 @@ func inputsTCPRawUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	inputsTCPRawConfig := getinputsTCPRawConfig(d)
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
-	err := (*provider.Client).UpdateTCPRawInput(d.Id(), aclObject.Owner, aclObject.App, inputsTCPRawConfig)
+	name := d.Id()
+	if r, ok := d.GetOk("restrict_to_host"); ok {
+		name = r.(string) + ":" + name
+	}
+	err := (*provider.Client).UpdateTCPRawInput(name, aclObject.Owner, aclObject.App, inputsTCPRawConfig)
 	if err != nil {
 		return err
 	}
 
 	//ACL update
-	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, d.Id(), aclObject, "data", "inputs", "tcp", "raw")
+	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "inputs", "tcp", "raw")
 	if err != nil {
 		return err
 	}
@@ -234,8 +238,12 @@ func inputsTCPRawUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func inputsTCPRawDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
+	name := d.Id()
+	if r, ok := d.GetOk("restrict_to_host"); ok {
+		name = r.(string) + ":" + name
+	}
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
-	resp, err := (*provider.Client).DeleteTCPRawInput(d.Id(), aclObject.Owner, aclObject.App)
+	resp, err := (*provider.Client).DeleteTCPRawInput(name, aclObject.Owner, aclObject.App)
 	if err != nil {
 		return err
 	}
@@ -273,7 +281,7 @@ func getinputsTCPRawConfigByName(name string, httpResponse *http.Response) (entr
 	switch httpResponse.StatusCode {
 	case 200, 201:
 		err = json.NewDecoder(httpResponse.Body).Decode(&response)
-		re := regexp.MustCompile(`(.*)`)
+		re := regexp.MustCompile(`(\d+)$`)
 		for _, e := range response.Entry {
 			if name == re.FindStringSubmatch(e.Name)[1] {
 				return &e, nil
