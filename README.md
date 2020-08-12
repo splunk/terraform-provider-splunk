@@ -3,7 +3,7 @@
 
 ### Requirements
 
--	[Terraform](https://www.terraform.io/downloads.html) v0.11.8
+-	[Terraform](https://www.terraform.io/downloads.html) v0.12
 -	[Go](https://golang.org/doc/install) go1.14.4 (to build the provider plugin)
 
 ### Building The Provider
@@ -27,11 +27,11 @@ Build the provider: `make build`
 * Run `terraform plan` and `terraform apply` to apply configurations
 * To update `terraform plan` has to be run first before applying
 * For importing existing resources use `terraform import`
-  
+
 #### Examples
 * Use the `example.tf` provided in the repo to run `terraform plan` and `terraform apply` to apply configuration
   * Modify `provider "splunk"` resource block with proper instance details
-* To update values modify the `example.tf` file and execute `terraform plan` and `terraform apply` 
+* To update values modify the `example.tf` file and execute `terraform plan` and `terraform apply`
 * Examples to import existing configuration:
   * `terraform import splunk_inputs_http_event_collector.foo <hec-token-name>`
   * `terraform import splunk_inputs_script.bar "\$SPLUNK_HOME/etc/apps/splunk_instrumentation/bin/instrumentation.py"`

@@ -10,25 +10,26 @@ provider "splunk" {
 }
 
 resource "splunk_global_http_event_collector" "http" {
-  disabled    = false
-  enable_ssl  = true
-  port        = 8088
+  disabled   = false
+  enable_ssl = true
+  port       = 8088
 }
 
 resource "splunk_inputs_http_event_collector" "hec" {
   name       = "new-token"
   index      = "main"
   indexes    = ["main", "history"]
-  source     = "new-source"
-  sourcetype = "new-sourcetype"
+  source     = "new:source"
+  sourcetype = "new:sourcetype"
   disabled   = false
   use_ack    = 1
 
   acl {
     sharing = "global"
-    read = ["admin"]
-    write = ["admin"]
+    read    = ["admin"]
+    write   = ["admin"]
   }
 
-  depends_on = ["splunk_global_http_event_collector.http"]
+  depends_on = [splunk_global_http_event_collector.http]
 }
+
