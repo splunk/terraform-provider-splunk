@@ -34,7 +34,7 @@ Build the provider: `make build`
 * To update values modify the `example.tf` file and execute `terraform plan` and `terraform apply` 
 * Examples to import existing configuration:
   * `terraform import splunk_inputs_http_event_collector.foo <hec-token-name>`
-  * `terraform import splunk_inputs_script.foo "\$SPLUNK_HOME/etc/apps/splunk_instrumentation/bin/instrumentation.py"`
+  * `terraform import splunk_inputs_script.bar "\$SPLUNK_HOME/etc/apps/splunk_instrumentation/bin/instrumentation.py"`
     * NOTE: Create a resource block first before importing resources (USAGE: https://www.terraform.io/docs/import/usage.html)
     * Example: `resource "splunk_inputs_http_event_collector" "foo" { }`
     `resource "splunk_inputs_scripts" "bar" { }`

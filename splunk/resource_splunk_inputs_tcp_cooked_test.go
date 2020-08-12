@@ -25,7 +25,7 @@ resource "splunk_inputs_tcp_cooked" "test" {
 }
 `
 
-func TestAccCreateSplunkTCPCookedInput(t *testing.T) {
+func TestAccSplunkTCPCookedInput(t *testing.T) {
 	resourceName := "splunk_inputs_tcp_cooked.test"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

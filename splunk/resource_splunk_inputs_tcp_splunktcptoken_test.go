@@ -15,7 +15,7 @@ resource "splunk_inputs_tcp_splunk_tcp_token" "test" {
 }
 `
 
-func TestAccCreateSplunkSplunkTCPTokenInput(t *testing.T) {
+func TestAccSplunkTCPTokenInput(t *testing.T) {
 	resourceName := "splunk_inputs_tcp_splunk_tcp_token.test"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
