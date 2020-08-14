@@ -55,7 +55,7 @@ func (client *Client) DeleteTCPCookedInput(name, owner, app string) (*http.Respo
 
 // services/data/inputs/tcp/cooked
 func (client *Client) ReadTCPCookedInputs() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "tcp", "cooked")
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "inputs", "tcp", "cooked")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err

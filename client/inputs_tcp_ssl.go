@@ -22,7 +22,7 @@ func (client *Client) CreateTCPSSLInput(inputsTCPSSLObject *models.InputsTCPSSLO
 }
 
 func (client *Client) ReadTCPSSLInput() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "tcp", "ssl", "ssl")
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "inputs", "tcp", "ssl", "ssl")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err

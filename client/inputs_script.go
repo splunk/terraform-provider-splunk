@@ -55,7 +55,7 @@ func (client *Client) DeleteScriptedInput(name, owner, app string) (*http.Respon
 
 // services/data/inputs/script
 func (client *Client) ReadScriptedInputs() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "script")
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "inputs", "script")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err

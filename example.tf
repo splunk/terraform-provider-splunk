@@ -1,6 +1,7 @@
 # Example Splunk Terraform Configuration
 # Set correct Splunk instance credentials under the provider splunk resource block
-# This basic example.tf creates a HEC token with indexer acknowledgement enabled
+# This basic example.tf enables HEC, creates a HEC token with indexer acknowledgement enabled
+# And creates a saved search to search for events received using token
 
 provider "splunk" {
   url                  = "localhost:8089"
@@ -33,3 +34,7 @@ resource "splunk_inputs_http_event_collector" "hec" {
   depends_on = [splunk_global_http_event_collector.http]
 }
 
+resource "splunk_saved_searches" "new-search" {
+  name   = "new-search"
+  search = "index=main source=http:new-token"
+}

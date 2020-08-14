@@ -55,7 +55,7 @@ func (client *Client) DeleteSplunkTCPTokenInput(name, owner, app string) (*http.
 
 // services/data/inputs/tcp/splunktcptoken
 func (client *Client) ReadSplunkTCPTokenInputs() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "tcp", "splunktcptoken")
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "inputs", "tcp", "splunktcptoken")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err

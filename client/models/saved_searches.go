@@ -1,0 +1,137 @@
+package models
+
+type SavedSearchesResponse struct {
+	Entry    []SavedSearchesEntry `json:"entry"`
+	Messages []ErrorMessage       `json:"messages"`
+}
+
+type SavedSearchesEntry struct {
+	Name    string            `json:"name"`
+	ACL     ACLObject         `json:"acl"`
+	Content SavedSearchObject `json:"content"`
+}
+
+type SavedSearchObject struct {
+	Actions                            string  `json:"actions,omitempty" url:"actions,omitempty"`
+	ActionEmail                        bool    `json:"action.email,omitempty" url:"action.email"`
+	ActionEmailAuthPassword            string  `json:"action.email.auth_password,omitempty" url:"action.email.auth_password"`
+	ActionEmailAuthUsername            string  `json:"action.email.auth_username,omitempty" url:"action.email.auth_username"`
+	ActionEmailBCC                     string  `json:"action.email.bcc,omitempty" url:"action.email.bcc"`
+	ActionEmailCC                      string  `json:"action.email.cc,omitempty" url:"action.email.cc"`
+	ActionEmailCommand                 string  `json:"action.email.command,omitempty" url:"action.email.command"`
+	ActionEmailFormat                  string  `json:"action.email.format,omitempty" url:"action.email.format"`
+	ActionEmailFrom                    string  `json:"action.email.from,omitempty" url:"action.email.from"`
+	ActionEmailHostname                string  `json:"action.email.hostname,omitempty" url:"action.email.hostname"`
+	ActionEmailInline                  bool    `json:"action.email.inline" url:"action.email.inline"`
+	ActionEmailMailserver              string  `json:"action.email.mailserver,omitempty" url:"action.email.mailserver"`
+	ActionEmailMaxResults              int     `json:"action.email.maxresults,omitempty" url:"action.email.maxresults"`
+	ActionEmailMaxTime                 string  `json:"action.email.maxtime,omitempty" url:"action.email.maxtime"`
+	ActionEmailPDFView                 string  `json:"action.email.pdfview,omitempty" url:"action.email.pdfview"`
+	ActionEmailPreprocessResults       string  `json:"action.email.preprocess_results,omitempty" url:"action.email.preprocess_results"`
+	ActionEmailReportCIDFontList       string  `json:"action.email.reportCIDFontList,omitempty" url:"action.email.reportCIDFontList"`
+	ActionEmailReportIncludeSplunkLogo bool    `json:"action.email.reportIncludeSplunkLogo" url:"action.email.reportIncludeSplunkLogo"`
+	ActionEmailReportPaperOrientation  string  `json:"action.email.reportPaperOrientation,omitempty" url:"action.email.reportPaperOrientation"`
+	ActionEmailReportPaperSize         string  `json:"action.email.reportPaperSize,omitempty" url:"action.email.reportPaperSize"`
+	ActionEmailReportServerEnabled     bool    `json:"action.email.reportServerEnabled" url:"action.email.reportServerEnabled"`
+	ActionEmailReportServerURL         string  `json:"action.email.reportServerURL,omitempty" url:"action.email.reportServerURL"`
+	ActionEmailSendPDF                 bool    `json:"action.email.sendpdf" url:"action.email.sendpdf"`
+	ActionEmailSendResults             bool    `json:"action.email.sendresults" url:"action.email.sendresults"`
+	ActionEmailSubject                 string  `json:"action.email.subject,omitempty" url:"action.email.subject"`
+	ActionEmailTo                      string  `json:"action.email.to,omitempty" url:"action.email.to"`
+	ActionEmailTrackAlert              bool    `json:"action.email.track_alert" url:"action.email.track_alert"`
+	ActionEmailTTL                     string  `json:"action.email.ttl,omitempty" url:"action.email.ttl"`
+	ActionEmailUseSSL                  bool    `json:"action.email.use_ssl" url:"action.email.use_ssl"`
+	ActionEmailUseTLS                  bool    `json:"action.email.use_tls" url:"action.email.use_tls"`
+	ActionEmailWidthSortColumns        bool    `json:"action.email.width_sort_columns" url:"action.email.width_sort_columns"`
+	ActionPopulateLookup               bool    `json:"action.populate_lookup" url:"action.populate_lookup"`
+	ActionPopulateLookupCommand        string  `json:"action.populate_lookup.command,omitempty" url:"action.populate_lookup.command"`
+	ActionPopulateLookupDest           string  `json:"action.populate_lookup.dest,omitempty" url:"action.populate_lookup.dest"`
+	ActionPopulateLookupHostname       string  `json:"action.populate_lookup.hostname,omitempty" url:"action.populate_lookup.hostname"`
+	ActionPopulateLookupMaxResults     int     `json:"action.populate_lookup.maxresults,omitempty" url:"action.populate_lookup.maxresults"`
+	ActionPopulateLookupMaxTime        int     `json:"action.populate_lookup.maxtime,omitempty" url:"action.populate_lookup.maxtime,omitempty"`
+	ActionPopulateLookupTrackAlert     bool    `json:"action.populate_lookup.track_alert" url:"action.populate_lookup.track_alert"`
+	ActionPopulateLookupTTL            string  `json:"action.populate_lookup.ttl,omitempty" url:"action.populate_lookup.ttl"`
+	ActionRSS                          bool    `json:"-" url:"action.rss"`
+	ActionRSSCommand                   string  `json:"action.rss.command,omitempty" url:"action.rss.command"`
+	ActionRSSHostname                  string  `json:"action.rss.hostname,omitempty" url:"action.rss.hostname"`
+	ActionRSSMaxResults                int     `json:"action.rss.maxresults,omitempty" url:"action.rss.maxresults"`
+	ActionRSSMaxTime                   int     `json:"action.rss.maxtime,omitempty" url:"action.rss.maxtime,omitempty"`
+	ActionRSSTrackAlert                bool    `json:"action.rss.track_alert" url:"action.rss.track_alert"`
+	ActionRSSTTL                       string  `json:"action.rss.ttl,omitempty" url:"action.rss.ttl"`
+	ActionScript                       bool    `json:"-" url:"action.script"`
+	ActionScriptCommand                string  `json:"action.script.command,omitempty" url:"action.script.command"`
+	ActionScriptFilename               string  `json:"action.script.filename,omitempty" url:"action.script.filename"`
+	ActionScriptHostname               string  `json:"action.script.hostname,omitempty" url:"action.script.hostname"`
+	ActionScriptMaxResults             int     `json:"action.script.maxresults,omitempty" url:"action.script.maxresults"`
+	ActionScriptMaxTime                int     `json:"action.script.maxtime,omitempty" url:"action.script.maxtime,omitempty"`
+	ActionScriptTrackAlert             bool    `json:"action.script.track_alert" url:"action.script.track_alert"`
+	ActionScriptTTL                    string  `json:"action.script.ttl,omitempty" url:"action.script.ttl"`
+	ActionSummaryIndex                 bool    `json:"action.summary_index,omitempty" url:"action.summary_index"`
+	ActionSummaryIndexName             string  `json:"action.summary_index._name,omitempty" url:"action.summary_index._name"`
+	ActionSummaryIndexCommand          string  `json:"action.summary_index.command,omitempty" url:"action.summary_index.command"`
+	ActionSummaryIndexHostname         string  `json:"action.summary_index.hostname,omitempty" url:"action.summary_index.hostname"`
+	ActionSummaryIndexInline           bool    `json:"action.summary_index.inline" url:"action.summary_index.inline"`
+	ActionSummaryIndexMaxResults       int     `json:"action.summary_index.maxresults,omitempty" url:"action.summary_index.maxresults"`
+	ActionSummaryIndexMaxTime          int     `json:"action.summary_index.maxtime,omitempty" url:"action.summary_index.maxtime,omitempty"`
+	ActionSummaryIndexTrackAlert       bool    `json:"action.summary_index.track_alert" url:"action.summary_index.track_alert"`
+	ActionSummaryIndexTTL              string  `json:"action.summary_index.ttl,omitempty" url:"action.summary_index.ttl"`
+	AlertDigestMode                    bool    `json:"alert.digest_mode" url:"alert.digest_mode"`
+	AlertExpires                       string  `json:"alert.expires,omitempty" url:"alert.expires"`
+	AlertSeverity                      int     `json:"alert.severity,omitempty" url:"alert.severity,omitempty"`
+	AlertSuppress                      bool    `json:"alert.suppress" url:"alert.suppress"`
+	AlertSuppressFields                string  `json:"alert.suppress.fields,omitempty" url:"alert.suppress.fields"`
+	AlertSuppressPeriod                string  `json:"alert.suppress.period,omitempty" url:"alert.suppress.period"`
+	AlertTrack                         string  `json:"alert.track,omitempty" url:"alert.track"`
+	AlertComparator                    string  `json:"alert_comparator,omitempty" url:"alert_comparator"`
+	AlertCondition                     string  `json:"alert_condition,omitempty" url:"alert_condition"`
+	AlertThreshold                     string  `json:"alert_threshold,omitempty" url:"alert_threshold"`
+	AlertType                          string  `json:"alert_type,omitempty" url:"alert_type"`
+	AllowSkew                          string  `json:"allow_skew,omitempty" url:"allow_skew"`
+	AutoSummarize                      bool    `json:"auto_summarize" url:"auto_summarize"`
+	AutoSummarizeCommand               string  `json:"auto_summarize.command,omitempty" url:"auto_summarize.command"`
+	AutoSummarizeCronSchedule          string  `json:"auto_summarize.cron_schedule,omitempty" url:"auto_summarize.cron_schedule"`
+	AutoSummarizeDispatchEarliestTime  string  `json:"auto_summarize.dispatch.earliest_time,omitempty" url:"auto_summarize.dispatch.earliest_time"`
+	AutoSummarizeDispatchLatestTime    string  `json:"auto_summarize.dispatch.latest_time,omitempty" url:"auto_summarize.dispatch.latest_time"`
+	AutoSummarizeDispatchTimeFormat    string  `json:"auto_summarize.dispatch.time_format,omitempty" url:"auto_summarize.dispatch.time_format"`
+	AutoSummarizeDispatchTTL           string  `json:"auto_summarize.dispatch.ttl,omitempty" url:"auto_summarize.dispatch.ttl"`
+	AutoSummarizeMaxDisabledBuckets    int     `json:"auto_summarize.max_disabled_buckets,omitempty" url:"auto_summarize.max_disabled_buckets"`
+	AutoSummarizeMaxSummaryRatio       float64 `json:"auto_summarize.max_summary_ratio,omitempty" url:"auto_summarize.max_summary_ratio"`
+	AutoSummarizeMaxSummarySize        int     `json:"auto_summarize.max_summary_size,omitempty" url:"auto_summarize.max_summary_size"`
+	AutoSummarizeMaxTime               int     `json:"auto_summarize.max_time,omitempty" url:"auto_summarize.max_time"`
+	AutoSummarizeSuspendPeriod         string  `json:"auto_summarize.suspend_period,omitempty" url:"auto_summarize.suspend_period"`
+	AutoSummarizeTimespan              string  `json:"auto_summarize.timespan,omitempty" url:"auto_summarize.timespan"`
+	CronSchedule                       string  `json:"cron_schedule,omitempty" url:"cron_schedule"`
+	Description                        string  `json:"description,omitempty" url:"description"`
+	Disabled                           bool    `json:"disabled" url:"disabled"`
+	DispatchBuckets                    int     `json:"dispatch.buckets,omitempty" url:"dispatch.buckets"`
+	DispatchEarliestTime               string  `json:"dispatch.earliest_time,omitempty" url:"dispatch.earliest_time"`
+	DispatchIndexedRealtime            bool    `json:"dispatch.indexedRealtime" url:"dispatch.indexedRealtime"`
+	DispatchIndexedRealtimeOffset      int     `json:"dispatch.indexedRealtimeOffset" url:"dispatch.indexedRealtimeOffset"`
+	DispatchIndexedRealtimeMinspan     int     `json:"dispatch.indexedRealtimeMinspan" url:"dispatch.indexedRealtimeMinspan"`
+	DispatchLatestTime                 string  `json:"dispatch.latest_time,omitempty" url:"dispatch.latest_time"`
+	DispatchLookups                    bool    `json:"dispatch.lookups" url:"dispatch.lookups"`
+	DispatchMaxCount                   int     `json:"dispatch.max_count,omitempty" url:"dispatch.max_count"`
+	DispatchMaxTime                    int     `json:"dispatch.max_time,omitempty" url:"dispatch.max_time"`
+	DispatchReduceFreq                 int     `json:"dispatch.reduce_freq,omitempty" url:"dispatch.reduce_freq"`
+	DispatchRtBackfill                 bool    `json:"dispatch.rt_backfill" url:"dispatch.rt_backfill"`
+	DispatchRtMaximumSpan              int     `json:"dispatch.rt_maxtimespan" url:"dispatch.rt_maxtimespan,omitempty"`
+	DispatchSpawnProcess               bool    `json:"dispatch.spawn_process" url:"dispatch.spawn_process"`
+	DispatchTimeFormat                 string  `json:"dispatch.time_format,omitempty" url:"dispatch.time_format"`
+	DispatchTTL                        string  `json:"dispatch.ttl,omitempty" url:"dispatch.ttl"`
+	DisplayView                        string  `json:"displayview,omitempty" url:"displayview"`
+	IsScheduled                        bool    `json:"is_scheduled" url:"is_scheduled"`
+	IsVisible                          bool    `json:"is_visible" url:"is_visible"`
+	MaxConcurrent                      int     `json:"max_concurrent,omitempty" url:"max_concurrent"`
+	NextScheduledTime                  string  `json:"next_scheduled_time,omitempty" url:"next_scheduled_time"`
+	QualifiedSearch                    string  `json:"qualifiedSearch,omitempty" url:"qualifiedSearch"`
+	RealtimeSchedule                   bool    `json:"realtime_schedule" url:"realtime_schedule"`
+	RequestUIDispatchApp               string  `json:"request.ui_dispatch_app,omitempty" url:"request.ui_dispatch_app"`
+	RequestUIDispatchView              string  `json:"request.ui_dispatch_view,omitempty" url:"request.ui_dispatch_view"`
+	RestartOnSearchPeerAdd             bool    `json:"restart_on_searchpeer_add" url:"restart_on_searchpeer_add"`
+	RunOnStartup                       bool    `json:"run_on_startup" url:"run_on_startup"`
+	ScheduleWindow                     string  `json:"schedule_window,omitempty" url:"schedule_window,omitempty"`
+	SchedulePriority                   string  `json:"schedule_priority,omitempty" url:"schedule_priority,omitempty"`
+	Search                             string  `json:"search,omitempty" url:"search,omitempty"`
+	VSID                               string  `json:"vsid,omitempty" url:"vsid"`
+	WorkloadPool                       string  `json:"workload_pool,omitempty" url:"workload_pool,omitempty"`
+}

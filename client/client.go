@@ -73,8 +73,9 @@ func (c *Client) BuildSplunkURL(queryValues url.Values, urlPathParts ...string) 
 	if queryValues == nil {
 		queryValues = url.Values{}
 	}
-	// Always set json as output format for now
+
 	queryValues.Set("output_mode", "json")
+	queryValues.Set("count", "-1") // To avoid http response truncation
 	httpScheme := getEnv(envVarHTTPScheme, defaultScheme)
 
 	return url.URL{

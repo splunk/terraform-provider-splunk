@@ -55,7 +55,7 @@ func (client *Client) DeleteTCPRawInput(name, owner, app string) (*http.Response
 
 // services/data/inputs/tcp/raw
 func (client *Client) ReadTCPRawInputs() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "tcp", "raw")
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "inputs", "tcp", "raw")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
