@@ -34,11 +34,12 @@ var defaultAuth = [2]string{"admin", "changeme"}
 
 // A Client is used to communicate with Splunkd endpoints
 type Client struct {
-	SessionKey         string
-	Auth               [2]string
-	Host               string
+	sessionKey         string
+	auth               [2]string
+	host               string
 	httpClient         *http.Client
-	InsecureSkipVerify bool
+	insecureSkipVerify bool
+	userAgent          string
 }
 
 // NewRequest creates a new HTTP Request and set proper header
@@ -47,12 +48,13 @@ func (c *Client) NewRequest(httpMethod, url string, body io.Reader) (*http.Reque
 	if err != nil {
 		return nil, err
 	}
-	if c.SessionKey != "" {
-		request.Header.Add("Authorization", "Splunk "+c.SessionKey)
+	if c.sessionKey != "" {
+		request.Header.Add("authorization", "Splunk "+c.sessionKey)
 	} else {
-		request.SetBasicAuth(c.Auth[0], c.Auth[1])
+		request.SetBasicAuth(c.auth[0], c.auth[1])
 	}
 	request.Header.Set("Accept", "application/json")
+	request.Header.Set("User-Agent", c.userAgent)
 	return request, nil
 }
 
@@ -80,7 +82,7 @@ func (c *Client) BuildSplunkURL(queryValues url.Values, urlPathParts ...string) 
 
 	return url.URL{
 		Scheme:   httpScheme,
-		Host:     c.Host,
+		Host:     c.host,
 		Path:     buildPath,
 		RawQuery: queryValues.Encode(),
 	}
@@ -146,8 +148,8 @@ func (c *Client) DoRequest(method string, requestURL url.URL, body interface{}) 
 func (c *Client) Login() (e error) {
 	loginURL := c.BuildSplunkURL(nil, "services", "auth", "login")
 	bodyValues := map[string]string{
-		"username": c.Auth[0],
-		"password": c.Auth[1],
+		"username": c.auth[0],
+		"password": c.auth[1],
 	}
 	response, err := c.Post(loginURL, bodyValues)
 	if response != nil {
@@ -160,10 +162,10 @@ func (c *Client) Login() (e error) {
 	switch response.StatusCode {
 	case 200:
 		decoded := struct {
-			SessionKey string `json:"sessionKey"`
+			sessionKey string `json:"sessionKey"`
 		}{}
 		_ = json.NewDecoder(response.Body).Decode(&decoded)
-		c.SessionKey = decoded.SessionKey
+		c.sessionKey = decoded.sessionKey
 	default:
 		buf := new(bytes.Buffer)
 		_, _ = buf.ReadFrom(response.Body)
@@ -246,16 +248,16 @@ func encodeValue(v interface{}) (string, error) {
 // NewDefaultSplunkdClient creates a Client with default values
 func NewDefaultSplunkdClient() *Client {
 	httpClient := NewSplunkdHTTPClient(defaultTimeOut, true)
-	c := &Client{Auth: defaultAuth, Host: defaultHost, httpClient: httpClient}
+	c := &Client{auth: defaultAuth, host: defaultHost, httpClient: httpClient, userAgent: "splunk-simple-go-client"}
 	return c
 }
 
 // NewSplunkdClient creates a Client with custom values passed in
 func NewSplunkdClient(sessionKey string, auth [2]string, host string, httpClient *http.Client) *Client {
 	c := NewDefaultSplunkdClient()
-	c.Host = host
-	c.SessionKey = sessionKey
-	c.Auth = auth
+	c.host = host
+	c.sessionKey = sessionKey
+	c.auth = auth
 	if httpClient != nil {
 		c.httpClient = httpClient
 	}

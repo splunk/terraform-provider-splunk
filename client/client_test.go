@@ -107,6 +107,7 @@ func TestNewRequest(t *testing.T) {
 	client := NewDefaultSplunkdClient()
 	body := []byte(`{"test":"This is a test body"}`)
 	expectedBasicAuth := []string{"Basic YWRtaW46Y2hhbmdlbWU="}
+	expectedUserAgent := []string{"splunk-simple-go-client"}
 	requestBody := bytes.NewBuffer(body)
 	tests := []struct {
 		method string
@@ -133,6 +134,9 @@ func TestNewRequest(t *testing.T) {
 		if got, want := req.Header["Authorization"], expectedBasicAuth; !reflect.DeepEqual(got, want) {
 			t.Errorf("NewRequest authorization is %v, want %v", got, want)
 		}
+		if got, want := req.Header["User-Agent"], expectedUserAgent; !reflect.DeepEqual(got, want) {
+			t.Errorf("NewRequest user agent is %v, want %v", got, want)
+		}
 		if test.method == MethodGet || test.method == MethodDelete {
 			t.Skipf("Skip NewRequest body test for %v and %v method", MethodGet, MethodDelete)
 		} else {
@@ -144,7 +148,7 @@ func TestNewRequest(t *testing.T) {
 	}
 }
 
-func TestNewRequesthBasicAuthHeader(t *testing.T) {
+func TestNewRequestBasicAuthHeader(t *testing.T) {
 	client := NewDefaultSplunkdClient()
 	req, err := client.NewRequest(MethodGet, testURL, nil)
 	if err != nil {
@@ -156,14 +160,26 @@ func TestNewRequesthBasicAuthHeader(t *testing.T) {
 	}
 }
 
-func TestNewRequestSessionKey(t *testing.T) {
+func TestNewRequestUserAgentHeader(t *testing.T) {
 	client := NewDefaultSplunkdClient()
-	client.SessionKey = testSessionKey
 	req, err := client.NewRequest(MethodGet, testURL, nil)
 	if err != nil {
 		t.Errorf("NewRequest returns unexpected error %v", err)
 	}
-	expectedBasicAuth := []string{"Splunk " + client.SessionKey}
+	expectedUserAgent := []string{"splunk-simple-go-client"}
+	if got, want := req.Header["User-Agent"], expectedUserAgent; !reflect.DeepEqual(got, want) {
+		t.Errorf("NewRequest authorization is %v, want %v", got, want)
+	}
+}
+
+func TestNewRequestSessionKey(t *testing.T) {
+	client := NewDefaultSplunkdClient()
+	client.sessionKey = testSessionKey
+	req, err := client.NewRequest(MethodGet, testURL, nil)
+	if err != nil {
+		t.Errorf("NewRequest returns unexpected error %v", err)
+	}
+	expectedBasicAuth := []string{"Splunk " + client.sessionKey}
 	if got, want := req.Header["Authorization"], expectedBasicAuth; !reflect.DeepEqual(got, want) {
 		t.Errorf("NewRequest authorization is %v, want %v", got, want)
 	}
@@ -171,7 +187,7 @@ func TestNewRequestSessionKey(t *testing.T) {
 
 func TestNewRequestError(t *testing.T) {
 	client := NewDefaultSplunkdClient()
-	client.SessionKey = testSessionKey
+	client.sessionKey = testSessionKey
 	_, err := client.NewRequest("#~/", testURL, nil)
 	if err == nil {
 		t.Errorf("NewRequest expected to return error, got %v", err)

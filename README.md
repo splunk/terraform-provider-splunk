@@ -25,8 +25,9 @@ Build the provider: `make build`
 * Build the binary by `make build`
 * Initialize terraform by `terraform init`
 * Run `terraform plan` and `terraform apply` to apply configurations
-* To update `terraform plan` has to be run first before applying
+* To update run `terraform plan` first to check config diff
 * For importing existing resources use `terraform import`
+* To remove all terraform managed resources use `terraform destroy`
 
 #### Examples
 * Use the `example.tf` provided in the repo to run `terraform plan` and `terraform apply` to apply configuration

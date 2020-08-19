@@ -818,8 +818,7 @@ func savedSearches() *schema.Resource {
 			},
 			"search": {
 				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
+				Required:    true,
 				Description: "Required when creating a new search",
 			},
 			"vsid": {
