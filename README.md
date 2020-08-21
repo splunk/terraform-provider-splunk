@@ -14,6 +14,9 @@ Create go src directory and setup $GOPATH
 
 Build the provider: `make build`
 
+### Developing The Provider
+Splunk REST API manual: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTprolog
+
 ### Testing The Provider
 * To run unit tests: `make test`
 * To run acceptance tests: `make testacc`
