@@ -56,7 +56,8 @@ func providerSchema() map[string]*schema.Schema {
 // Returns a map of splunk resources for configuration
 func providerResources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
-		"splunk_authentication_user":         authenticationUsers(),
+		"splunk_authentication_users":        authenticationUsers(),
+		"splunk_authorization_roles":         authorizationRoles(),
 		"splunk_global_http_event_collector": globalHttpEventCollector(),
 		"splunk_inputs_http_event_collector": inputsHttpEventCollector(),
 		"splunk_inputs_script":               inputsScript(),

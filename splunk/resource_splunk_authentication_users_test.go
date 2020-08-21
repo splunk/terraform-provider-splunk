@@ -9,7 +9,7 @@ import (
 )
 
 const authenticationUserInput = `
-resource "splunk_authentication_user" "user" {
+resource "splunk_authentication_users" "user" {
   name = "new-user"
   password = "changeme"
   force_change_pass = true
@@ -18,7 +18,7 @@ resource "splunk_authentication_user" "user" {
 `
 
 const updateAuthenticationUserInput = `
-resource "splunk_authentication_user" "user" {
+resource "splunk_authentication_users" "user" {
   name = "new-user"
   default_app = "search"
   force_change_pass = true
@@ -27,31 +27,37 @@ resource "splunk_authentication_user" "user" {
 }
 `
 
-func TestAccSplunkAuthenticationUser(t *testing.T) {
-	resourceName := "splunk_authentication_user.user"
+func TestAccSplunkAuthenticationUsers(t *testing.T) {
+	resourceName := "splunk_authentication_users.user"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testAccSplunkAuthenticationUserInputDestroyResources,
+		CheckDestroy: testAccSplunkAuthenticationUsersInputDestroyResources,
 		Steps: []resource.TestStep{
 			{
 				Config: authenticationUserInput,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", "new-user"),
+					resource.TestCheckResourceAttr(resourceName, "force_change_pass", "true"),
 					resource.TestCheckResourceAttr(resourceName, "roles.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "roles.0", "admin"),
 				),
 			},
 			{
 				Config: updateAuthenticationUserInput,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", "new-user"),
+					resource.TestCheckResourceAttr(resourceName, "default_app", "search"),
+					resource.TestCheckResourceAttr(resourceName, "force_change_pass", "true"),
 					resource.TestCheckResourceAttr(resourceName, "roles.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "roles.0", "admin"),
+					resource.TestCheckResourceAttr(resourceName, "roles.1", "user"),
 				),
 			},
 			{
-				ResourceName:            "splunk_authentication_user.user",
+				ResourceName:            "splunk_authentication_users.user",
 				ImportState:             true,
 				ImportStateVerify:       true,
 				ImportStateVerifyIgnore: []string{"password", "force_change_pass"},
@@ -60,11 +66,11 @@ func TestAccSplunkAuthenticationUser(t *testing.T) {
 	})
 }
 
-func testAccSplunkAuthenticationUserInputDestroyResources(s *terraform.State) error {
+func testAccSplunkAuthenticationUsersInputDestroyResources(s *terraform.State) error {
 	client := newTestClient()
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
-		case "splunk_authentication_user":
+		case "splunk_authentication_users":
 			endpoint := client.BuildSplunkURL(nil, "services", "authentication", "user", rs.Primary.ID)
 			resp, err := client.Get(endpoint)
 			if resp.StatusCode != http.StatusNotFound {
