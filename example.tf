@@ -7,7 +7,7 @@
 provider "splunk" {
   url                  = "localhost:8089"
   username             = "admin"
-  password             = "changeme"
+  password             = "password"
   insecure_skip_verify = true
 }
 
@@ -78,4 +78,14 @@ resource "splunk_saved_searches" "new-search-01" {
   depends_on = [
     splunk_authentication_users.user01,
   ]
+}
+
+resource "splunk_index" "foo" {
+  name = "foo"
+  max_hot_buckets = 4
+}
+
+resource "splunk_index" "bar" {
+  name = "summary"
+  max_hot_buckets = 4
 }

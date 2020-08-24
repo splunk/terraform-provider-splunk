@@ -4,3 +4,4 @@
 terraform-provider-splunk
 terraform.tfstate
 terraform.tfstate.backup
+.log
