@@ -55,7 +55,7 @@ func (client *Client) DeleteMonitorInput(name, owner, app string) (*http.Respons
 
 // services/data/inputs/monitor
 func (client *Client) ReadMonitorInputs() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "monitor")
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "inputs", "monitor")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err

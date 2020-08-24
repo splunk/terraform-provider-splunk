@@ -29,7 +29,7 @@ resource "splunk_inputs_tcp_raw" "test" {
 }
 `
 
-func TestAccCreateSplunkTCPRawInput(t *testing.T) {
+func TestAccSplunkTCPRawInput(t *testing.T) {
 	resourceName := "splunk_inputs_tcp_raw.test"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

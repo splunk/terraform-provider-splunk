@@ -27,7 +27,7 @@ resource "splunk_inputs_udp" "test" {
 }
 `
 
-func TestAccCreateSplunkUDPInput(t *testing.T) {
+func TestAccSplunkUDPInput(t *testing.T) {
 	resourceName := "splunk_inputs_udp.test"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

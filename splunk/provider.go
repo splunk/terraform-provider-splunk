@@ -56,6 +56,8 @@ func providerSchema() map[string]*schema.Schema {
 // Returns a map of splunk resources for configuration
 func providerResources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
+		"splunk_authentication_users":        authenticationUsers(),
+		"splunk_authorization_roles":         authorizationRoles(),
 		"splunk_global_http_event_collector": globalHttpEventCollector(),
 		"splunk_inputs_http_event_collector": inputsHttpEventCollector(),
 		"splunk_inputs_script":               inputsScript(),
@@ -63,8 +65,16 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_inputs_udp":                  inputsUDP(),
 		"splunk_inputs_tcp_raw":              inputsTCPRaw(),
 		"splunk_inputs_tcp_cooked":           inputsTCPCooked(),
+		"splunk_inputs_tcp_splunk_tcp_token": inputsTCPSplunkTCPToken(),
+		"splunk_inputs_tcp_ssl":              inputsTCPSSL(),
+		"splunk_saved_searches":              savedSearches(),
+		"splunk_outputs_tcp_default":         outputsTCPDefault(),
+		"splunk_outputs_tcp_server":          outputsTCPServer(),
+		"splunk_outputs_tcp_group":           outputsTCPGroup(),
+		"splunk_outputs_tcp_syslog":          outputsTCPSyslog(),
 		"splunk_index":                       index(),
 		"splunk_conf_stanza":                 confStanza(),
+
 	}
 }
 

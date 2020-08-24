@@ -14,6 +14,10 @@
 
 default: build
 
+fmt:
+	go fmt ./...
+	@terraform fmt
+
 build:
 	go build -o terraform-provider-splunk .
 

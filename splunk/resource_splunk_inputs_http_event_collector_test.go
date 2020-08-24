@@ -57,7 +57,7 @@ resource "splunk_inputs_http_event_collector" "new-token" {
 }
 `
 
-func TestAccCreateSplunkHttpEventCollectorInput(t *testing.T) {
+func TestAccSplunkHttpEventCollectorInput(t *testing.T) {
 	resourceName := "splunk_inputs_http_event_collector.new-token"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {

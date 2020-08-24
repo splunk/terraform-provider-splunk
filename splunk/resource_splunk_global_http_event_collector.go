@@ -65,8 +65,8 @@ func globalHttpEventCollector() *schema.Resource {
 		},
 		Read:   globalHttpInputRead,
 		Create: globalHttpInputCreate,
-		Delete: globalHttpInputDelete,
 		Update: globalHttpInputUpdate,
+		Delete: globalHttpInputDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -77,11 +77,10 @@ func globalHttpEventCollector() *schema.Resource {
 func globalHttpInputCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	httpInputConfigObj := createGlobalHttpInputConfigObject(d)
-	resp, err := (*provider.Client).CreateGlobalHttpEventCollectorObject(*httpInputConfigObj)
+	err := (*provider.Client).CreateGlobalHttpEventCollectorObject(*httpInputConfigObj)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
 
 	d.SetId("http")
 	return globalHttpInputRead(d, meta)
@@ -131,21 +130,20 @@ func globalHttpInputRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func globalHttpInputDelete(d *schema.ResourceData, meta interface{}) error {
-	// Global Http input resource object cannot be deleted
-	return nil
-}
-
 func globalHttpInputUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	httpInputConfigObj := createGlobalHttpInputConfigObject(d)
-	resp, err := (*provider.Client).CreateGlobalHttpEventCollectorObject(*httpInputConfigObj)
+	err := (*provider.Client).CreateGlobalHttpEventCollectorObject(*httpInputConfigObj)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
 
 	return globalHttpInputRead(d, meta)
+}
+
+func globalHttpInputDelete(d *schema.ResourceData, meta interface{}) error {
+	// Global Http input resource object cannot be deleted
+	return nil
 }
 
 // Helpers

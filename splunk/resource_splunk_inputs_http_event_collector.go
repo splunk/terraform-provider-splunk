@@ -22,6 +22,7 @@ func inputsHttpEventCollector() *schema.Resource {
 			"token": {
 				Type:        schema.TypeString,
 				Computed:    true,
+				Optional:    true,
 				Description: "Token value for sending data to collector/event endpoint.",
 			},
 			"index": {
@@ -229,7 +230,7 @@ func httpEventCollectorInputDelete(d *schema.ResourceData, meta interface{}) err
 // Helpers
 func getHttpEventCollectorConfig(d *schema.ResourceData) (httpInputConfigObject *models.HttpEventCollectorObject) {
 	httpInputConfigObject = &models.HttpEventCollectorObject{}
-	httpInputConfigObject.Index = d.Get("host").(string)
+	httpInputConfigObject.Host = d.Get("host").(string)
 	httpInputConfigObject.Index = d.Get("index").(string)
 	httpInputConfigObject.Indexes = d.Get("indexes").([]interface{})
 	httpInputConfigObject.Source = d.Get("source").(string)

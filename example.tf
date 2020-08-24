@@ -1,16 +1,8 @@
-# Copyright 2015 Container Solutions
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Example Splunk Terraform Configuration
+# Set correct Splunk instance credentials under the provider splunk resource block
+# This basic example.tf creates a Splunk user and role, setup global HEC configuration,
+# creates a new HEC token with indexer acknowledgement enabled
+# creates a saved search to search for events received with above token as source
 
 provider "splunk" {
   url                  = "localhost:8089"
@@ -19,28 +11,61 @@ provider "splunk" {
   insecure_skip_verify = true
 }
 
-resource "splunk_global_http_event_collector" "http" {
-  disabled    = false
-  enable_ssl  = true
-  port        = 8088
+resource "splunk_authorization_roles" "role01" {
+  name           = "terraform-user01-role"
+  default_app    = "search"
+  imported_roles = ["power", "user"]
+  capabilities   = ["accelerate_datamodel", "change_authentication", "restart_splunkd"]
 }
 
-resource "splunk_inputs_http_event_collector" "hec" {
-  name       = "new-token"
-  index      = "main"
-  indexes    = ["main", "history"]
-  source     = "new-source"
-  sourcetype = "new-sourcetype"
+resource "splunk_authentication_users" "user01" {
+  name              = "user01"
+  email             = "user01@example.com"
+  password          = "password01"
+  force_change_pass = false
+  roles             = ["terraform-user01-role"]
+  depends_on = [
+    splunk_authorization_roles.role01
+  ]
+}
+
+resource "splunk_global_http_event_collector" "http" {
   disabled   = false
-  use_ack    = 1
+  enable_ssl = true
+  port       = 8088
+}
 
+resource "splunk_inputs_http_event_collector" "hec-token-01" {
+  name       = "hec-token-01"
+  index      = "main"
+  indexes    = ["main", "history", "summary"]
+  source     = "new:source"
+  sourcetype = "new:sourcetype"
+  disabled   = false
+  use_ack    = false
   acl {
+    owner   = "user01"
     sharing = "global"
-    read = ["admin"]
-    write = ["admin"]
+    read    = ["admin"]
+    write   = ["admin"]
   }
+  depends_on = [
+    splunk_authentication_users.user01,
+    splunk_global_http_event_collector.http
+  ]
+}
 
-  depends_on = ["splunk_global_http_event_collector.http"]
+resource "splunk_saved_searches" "new-search-01" {
+  name   = "new-search-01"
+  search = "index=main source=http:hec-token-01"
+  acl {
+    app     = "search"
+    owner   = "user01"
+    sharing = "global"
+  }
+  depends_on = [
+    splunk_authentication_users.user01,
+  ]
 }
 
 resource "splunk_index" "foo" {

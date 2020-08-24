@@ -205,7 +205,6 @@ func getinputsTCPCookedConfig(d *schema.ResourceData) (InputsTCPCookedObject *mo
 	InputsTCPCookedObject.Host = d.Get("host").(string)
 	InputsTCPCookedObject.Disabled = d.Get("disabled").(bool)
 	InputsTCPCookedObject.ConnectionHost = d.Get("connection_host").(string)
-	//InputsTCPCookedObject.Queue = d.Get("queue").(string)
 	InputsTCPCookedObject.RestrictToHost = d.Get("restrict_to_host").(string)
 	return
 }

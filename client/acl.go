@@ -8,8 +8,11 @@ import (
 )
 
 //https://docs.splunk.com/Documentation/Splunk/8.0.4/RESTUM/RESTusing#Access_Control_List
-func (client *Client) GetAcl(owner, app, resource, name string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", resource, name, "acl")
+func (client *Client) GetAcl(owner, app, name string, resources ...string) (*http.Response, error) {
+	resourcePath := []string{"services", owner, app}
+	resourcePath = append(resourcePath, resources...)
+	resourcePath = append(resourcePath, name, "acl")
+	endpoint := client.BuildSplunkURL(nil, resourcePath...)
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err

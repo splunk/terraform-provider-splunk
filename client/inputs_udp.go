@@ -55,7 +55,7 @@ func (client *Client) DeleteUDPInput(name, owner, app string) (*http.Response, e
 
 // services/data/inputs/udp
 func (client *Client) ReadUDPInputs() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "udp")
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "inputs", "udp")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err

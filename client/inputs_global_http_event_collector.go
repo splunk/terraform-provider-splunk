@@ -6,15 +6,16 @@ import (
 	"terraform-provider-splunk/client/models"
 )
 
-func (client *Client) CreateGlobalHttpEventCollectorObject(httpInputConfigObj models.GlobalHttpEventCollectorObject) (*http.Response, error) {
+func (client *Client) CreateGlobalHttpEventCollectorObject(httpInputConfigObj models.GlobalHttpEventCollectorObject) error {
 	values, err := query.Values(&httpInputConfigObj)
 	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "http", "http")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
-		return nil, err
+		return err
 	}
+	defer resp.Body.Close()
 
-	return resp, nil
+	return nil
 }
 
 func (client *Client) ReadGlobalHttpEventCollectorObject() (*http.Response, error) {
@@ -27,13 +28,14 @@ func (client *Client) ReadGlobalHttpEventCollectorObject() (*http.Response, erro
 	return resp, nil
 }
 
-func (client *Client) UpdateGlobalHttpEventCollectorObject(httpInputConfigObj models.GlobalHttpEventCollectorObject) (*http.Response, error) {
+func (client *Client) UpdateGlobalHttpEventCollectorObject(httpInputConfigObj models.GlobalHttpEventCollectorObject) error {
 	values, err := query.Values(&httpInputConfigObj)
 	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "http", "http")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
-		return nil, err
+		return err
 	}
+	defer resp.Body.Close()
 
-	return resp, nil
+	return nil
 }

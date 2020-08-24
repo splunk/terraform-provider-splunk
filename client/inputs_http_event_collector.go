@@ -53,7 +53,7 @@ func (client *Client) DeleteHttpEventCollectorObject(name, owner, app string) (*
 
 // services/data/inputs/http
 func (client *Client) ReadAllHttpEventCollectorObject() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "http")
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "inputs", "http")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
