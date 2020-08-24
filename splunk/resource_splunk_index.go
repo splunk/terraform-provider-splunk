@@ -365,7 +365,7 @@ func indexCreate(d *schema.ResourceData, meta interface{}) error {
 		aclObject = getACLConfig(r.([]interface{}))
 	} else {
 		aclObject.Owner = "nobody"
-		aclObject.App = "search"
+		aclObject.App = "system"
 	}
 	err := (*provider.Client).CreateIndexObject(name, aclObject.Owner, aclObject.App, indexConfigObj)
 	if err != nil {
@@ -392,7 +392,7 @@ func indexRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	defer resp.Body.Close()
 
-	entry, err := getConfigByName(name, resp)
+	entry, err := getIndexConfigByName(name, resp)
 	if err != nil {
 		return err
 	}
@@ -404,12 +404,8 @@ func indexRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	defer resp.Body.Close()
 
-	entry, err = getConfigByName(name, resp)
+	entry, err = getIndexConfigByName(name, resp)
 	if err != nil {
-		return err
-	}
-
-	if err = d.Set("name", d.Id()); err != nil {
 		return err
 	}
 
@@ -506,10 +502,6 @@ func indexRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if err = d.Set("min_stream_group_queue_size", entry.Content.MinStreamGroupQueueSize); err != nil {
-		return err
-	}
-
-	if err = d.Set("name", d.Id()); err != nil {
 		return err
 	}
 
@@ -655,7 +647,7 @@ func getIndexConfig(d *schema.ResourceData) (indexConfigObject *models.IndexObje
 	return indexConfigObject
 }
 
-func getConfigByName(name string, httpResponse *http.Response) (indexEntry *models.IndexEntry, err error) {
+func getIndexConfigByName(name string, httpResponse *http.Response) (indexEntry *models.IndexEntry, err error) {
 	response := &models.IndexResponse{}
 	switch httpResponse.StatusCode {
 	case 200, 201:

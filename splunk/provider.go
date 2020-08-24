@@ -64,6 +64,7 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_inputs_tcp_raw":              inputsTCPRaw(),
 		"splunk_inputs_tcp_cooked":           inputsTCPCooked(),
 		"splunk_index":                       index(),
+		"splunk_conf_stanza":                 confStanza(),
 	}
 }
 
