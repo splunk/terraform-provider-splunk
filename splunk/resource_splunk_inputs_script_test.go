@@ -13,6 +13,7 @@ import (
 const inputsScriptConfig = `
 resource "splunk_inputs_script" "script" {
   name     = "%v"
+  interval = 60
 }
 `
 

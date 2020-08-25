@@ -16,6 +16,7 @@ func inputsTCPSSL() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
+				Sensitive:   true,
 				Description: "Server certificate password, if any.",
 			},
 			"root_ca": {
@@ -33,13 +34,13 @@ func inputsTCPSSL() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "Indicates if input is disabled.",
 			},
 			"require_client_cert": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "Determines whether a client must authenticate.",
 			},
 		},

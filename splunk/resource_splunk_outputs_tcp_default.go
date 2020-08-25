@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"net/http"
 	"regexp"
 	"terraform-provider-splunk/client/models"
@@ -30,7 +31,7 @@ func outputsTCPDefault() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "Disables default tcpout settings",
 			},
 			"drop_events_on_queue_full": {
@@ -49,13 +50,13 @@ func outputsTCPDefault() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
-				Description: " 	How often (in seconds) to send a heartbeat packet to the receiving server." +
+				Description: "How often (in seconds) to send a heartbeat packet to the receiving server." +
 					"Heartbeats are only sent if sendCookedData=true. Defaults to 30 seconds. ",
 			},
 			"index_and_forward": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Computed: false,
+				Computed: true,
 				Description: "Specifies whether to index all data locally, in addition to forwarding it. " +
 					"Defaults to false." +
 					"This is known as an \"index-and-forward\" configuration. " +
@@ -64,9 +65,10 @@ func outputsTCPDefault() *schema.Resource {
 					"It cannot be overridden in a target group. ",
 			},
 			"max_queue_size": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Computed: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringMatch(validMaxQueueSize, "valid values: integer[KB|MB|GB]"),
 				Description: "Specify an integer or integer[KB|MB|GB]." +
 					"Sets the maximum size of the forwarder output queue. " +
 					"It also sets the maximum size of the wait queue to 3x this value, if you have enabled indexer acknowledgment (useACK=true)." +
@@ -101,6 +103,8 @@ func outputsTCPDefault() *schema.Resource {
 		},
 	}
 }
+
+var validMaxQueueSize = regexp.MustCompile("^\\d+[KB|MB|GB]+")
 
 // Functions
 func outputsTCPDefaultCreate(d *schema.ResourceData, meta interface{}) error {
@@ -250,7 +254,7 @@ func getOutputsTCPDefaultConfig(d *schema.ResourceData) (outputsTCPDefaultObj *m
 	outputsTCPDefaultObj.DefaultGroup = d.Get("default_group").(string)
 	outputsTCPDefaultObj.DropEventsOnQueueFull = d.Get("drop_events_on_queue_full").(int)
 	outputsTCPDefaultObj.HeartbeatFrequency = d.Get("heartbeat_frequency").(int)
-	outputsTCPDefaultObj.MaxQueueSize = d.Get("max_queue_size").(int)
+	outputsTCPDefaultObj.MaxQueueSize = d.Get("max_queue_size").(string)
 	outputsTCPDefaultObj.Disabled = d.Get("disabled").(bool)
 	outputsTCPDefaultObj.IndexAndForward = d.Get("index_and_forward").(bool)
 	outputsTCPDefaultObj.SendCookedData = d.Get("send_cooked_data").(bool)

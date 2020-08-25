@@ -26,13 +26,14 @@ func outputsTCPServer() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "Disables default tcpout settings",
 			},
 			"method": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"clone", "balance", "autobalance"}, false),
 				Description: "Valid values: (clone | balance | autobalance)" +
 					"The data distribution method used when two or more servers exist in the same forwarder group. ",
 			},

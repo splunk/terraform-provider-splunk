@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"net/http"
 	"regexp"
 	"terraform-provider-splunk/client/models"
@@ -58,14 +59,14 @@ func inputsScript() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "Specifies whether the input script is disabled.",
 			},
 			"interval": {
-				Type:        schema.TypeInt,
-				Optional:    true,
-				Default:     60,
-				Description: "Specify an integer or cron schedule. This parameter specifies how often to execute the specified script, in seconds or a valid cron schedule. If you specify a cron schedule, the script is not executed on start-up.",
+				Type:         schema.TypeInt,
+				Required:     true,
+				ValidateFunc: validation.IntAtLeast(60),
+				Description:  "Specify an integer or cron schedule. This parameter specifies how often to execute the specified script, in seconds or a valid cron schedule. If you specify a cron schedule, the script is not executed on start-up.",
 			},
 			"acl": aclSchema(),
 		},

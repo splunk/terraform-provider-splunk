@@ -17,7 +17,7 @@ type OutputsTCPGroupObject struct {
 	Disabled              bool     `json:"disabled,omitempty" url:"disabled"`
 	DropEventsOnQueueFull int      `json:"dropEventsOnQueueFull,omitempty" url:"dropEventsOnQueueFull,omitempty"`
 	HeartbeatFrequency    int      `json:"heartbeatFrequency,omitempty" url:"heartbeatFrequency,omitempty"`
-	MaxQueueSize          int      `json:"maxQueueSize,omitempty" url:"maxQueueSize,omitempty"`
+	MaxQueueSize          string   `json:"maxQueueSize,omitempty" url:"maxQueueSize,omitempty"`
 	Method                string   `json:"method,omitempty" url:"method,omitempty"`
 	SendCookedData        bool     `json:"sendCookedData,omitempty" url:"sendCookedData"`
 	Servers               []string `json:"servers,omitempty" url:"servers,omitempty"`

@@ -14,6 +14,7 @@ resource "splunk_outputs_tcp_group" "test" {
     disabled = false
     drop_events_on_queue_full = 60
     send_cooked_data = true
+    max_queue_size = "100KB"
     servers = ["1.1.1.1:1234", "2.2.2.2:1234"]
 }
 `
@@ -24,6 +25,7 @@ resource "splunk_outputs_tcp_group" "test" {
     disabled = false
     drop_events_on_queue_full = 60
     send_cooked_data = true
+    max_queue_size = "100KB"
     servers = ["1.1.1.1:1234", "2.2.2.2:1234", "3.3.3.3:1234"]
 }
 `
@@ -47,6 +49,7 @@ func TestAccSplunkTCPGroupOutput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "servers.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "servers.0", "1.1.1.1:1234"),
 					resource.TestCheckResourceAttr(resourceName, "servers.1", "2.2.2.2:1234"),
+					resource.TestCheckResourceAttr(resourceName, "max_queue_size", "100KB"),
 				),
 			},
 			{
@@ -60,6 +63,7 @@ func TestAccSplunkTCPGroupOutput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "servers.0", "1.1.1.1:1234"),
 					resource.TestCheckResourceAttr(resourceName, "servers.1", "2.2.2.2:1234"),
 					resource.TestCheckResourceAttr(resourceName, "servers.2", "3.3.3.3:1234"),
+					resource.TestCheckResourceAttr(resourceName, "max_queue_size", "100KB"),
 				),
 			},
 			{

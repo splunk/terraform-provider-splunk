@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"net/http"
 	"terraform-provider-splunk/client/models"
 )
@@ -14,47 +15,48 @@ func globalHttpEventCollector() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "Input disabled indicator: 0 = Input Not disabled, 1 = Input disabled.",
 			},
 			"port": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "8088",
-				Description: "HTTP data input IP port.",
+				Type:         schema.TypeInt,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.IntBetween(1024, 65536),
+				Description:  "HTTP data input IP port.",
 			},
 			"enable_ssl": {
-				Type:        schema.TypeString,
+				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     "1",
+				Computed:    true,
 				Description: "Enable SSL protocol for HTTP data input. 1 = SSL enabled, 0 = SSL disabled.",
 			},
 			"dedicated_io_threads": {
-				Type:        schema.TypeString,
+				Type:        schema.TypeInt,
 				Optional:    true,
-				Default:     "2",
+				Computed:    true,
 				Description: "Number of threads used by HTTP Input server.",
 			},
 			"max_sockets": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  "0",
+				Computed: true,
 				Description: "Maximum number of simultaneous HTTP connections accepted. " +
 					"Adjusting this value may cause server performance issues and is not generally recommended. " +
 					"Possible values for this setting vary by OS.",
 			},
 			"max_threads": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  "0",
+				Computed: true,
 				Description: "Maximum number of threads that can be used by active HTTP transactions. " +
 					"Adjusting this value may cause server performance issues and is not generally recommended. " +
 					"Possible values for this setting vary by OS.",
 			},
 			"use_deployment_server": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeBool,
 				Optional: true,
-				Default:  "0",
+				Computed: true,
 				Description: "Indicates whether the event collector input writes its configuration to a deployment server repository." +
 					"When this setting is set to 1 (enabled), the input writes its configuration to the directory specified as repositoryLocation in serverclass.conf." +
 					"Copy the full contents of the splunk_httpinput app directory to this directory for the configuration to work." +
@@ -133,7 +135,7 @@ func globalHttpInputRead(d *schema.ResourceData, meta interface{}) error {
 func globalHttpInputUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	httpInputConfigObj := createGlobalHttpInputConfigObject(d)
-	err := (*provider.Client).CreateGlobalHttpEventCollectorObject(*httpInputConfigObj)
+	err := (*provider.Client).UpdateGlobalHttpEventCollectorObject(*httpInputConfigObj)
 	if err != nil {
 		return err
 	}
@@ -150,12 +152,12 @@ func globalHttpInputDelete(d *schema.ResourceData, meta interface{}) error {
 func createGlobalHttpInputConfigObject(d *schema.ResourceData) (globalHttpInputConfigObject *models.GlobalHttpEventCollectorObject) {
 	globalHttpInputConfigObject = &models.GlobalHttpEventCollectorObject{}
 	globalHttpInputConfigObject.Disabled = d.Get("disabled").(bool)
-	globalHttpInputConfigObject.EnableSSL = d.Get("enable_ssl").(string)
-	globalHttpInputConfigObject.Port = d.Get("port").(string)
-	globalHttpInputConfigObject.DedicatedIoThreads = d.Get("dedicated_io_threads").(string)
-	globalHttpInputConfigObject.MaxSockets = d.Get("max_sockets").(string)
-	globalHttpInputConfigObject.MaxThreads = d.Get("max_threads").(string)
-	globalHttpInputConfigObject.UseDeploymentServer = d.Get("use_deployment_server").(string)
+	globalHttpInputConfigObject.EnableSSL = d.Get("enable_ssl").(bool)
+	globalHttpInputConfigObject.Port = d.Get("port").(int)
+	globalHttpInputConfigObject.DedicatedIoThreads = d.Get("dedicated_io_threads").(int)
+	globalHttpInputConfigObject.MaxSockets = d.Get("max_sockets").(int)
+	globalHttpInputConfigObject.MaxThreads = d.Get("max_threads").(int)
+	globalHttpInputConfigObject.UseDeploymentServer = d.Get("use_deployment_server").(bool)
 	return globalHttpInputConfigObject
 }
 
