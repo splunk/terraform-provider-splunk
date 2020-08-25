@@ -15,7 +15,11 @@ Create go src directory and setup $GOPATH
 Build the provider: `make build`
 
 ### Developing The Provider
-Splunk REST API manual: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTprolog
+* Use the Splunk REST API manual: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTprolog to design resource schemas for the provider.
+* Add a resource_x_test.go file to test the new resources' CRUD operations
+* Before merging your changes lint your code by running `make fmt`
+* Test the provider with the existing suite of provider tests before merging your changes
+* Build the provider and test the new resources' CRUD and import operations before merging your changes
 
 ### Testing The Provider
 * To run unit tests: `make test`
@@ -36,6 +40,7 @@ Splunk REST API manual: https://docs.splunk.com/Documentation/Splunk/latest/REST
 * Use the `example.tf` provided in the repo to run `terraform plan` and `terraform apply` to apply configuration
   * Modify `provider "splunk"` resource block with proper instance details
 * To update values modify the `example.tf` file and execute `terraform plan` and `terraform apply`
+* Resource examples are also available in their respective resource_x_test.go files
 * Examples to import existing configuration:
   * `terraform import splunk_inputs_http_event_collector.foo <hec-token-name>`
   * `terraform import splunk_inputs_script.bar "\$SPLUNK_HOME/etc/apps/splunk_instrumentation/bin/instrumentation.py"`
