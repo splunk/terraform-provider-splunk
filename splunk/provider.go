@@ -1,10 +1,11 @@
 package splunk
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"terraform-provider-splunk/client"
 	"time"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 type SplunkProvider struct {
@@ -56,6 +57,7 @@ func providerSchema() map[string]*schema.Schema {
 // Returns a map of splunk resources for configuration
 func providerResources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
+		"splunk_apps_local":                  appsLocal(),
 		"splunk_authentication_users":        authenticationUsers(),
 		"splunk_authorization_roles":         authorizationRoles(),
 		"splunk_global_http_event_collector": globalHttpEventCollector(),
@@ -67,11 +69,11 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_inputs_tcp_cooked":           inputsTCPCooked(),
 		"splunk_inputs_tcp_splunk_tcp_token": inputsTCPSplunkTCPToken(),
 		"splunk_inputs_tcp_ssl":              inputsTCPSSL(),
-		"splunk_saved_searches":              savedSearches(),
 		"splunk_outputs_tcp_default":         outputsTCPDefault(),
 		"splunk_outputs_tcp_server":          outputsTCPServer(),
 		"splunk_outputs_tcp_group":           outputsTCPGroup(),
 		"splunk_outputs_tcp_syslog":          outputsTCPSyslog(),
+		"splunk_saved_searches":              savedSearches(),
 		"splunk_index":                       index(),
 		"splunk_conf_stanza":                 confStanza(),
 	}

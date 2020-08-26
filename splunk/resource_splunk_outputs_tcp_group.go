@@ -24,7 +24,7 @@ func outputsTCPGroup() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "If true, disables the group.",
 			},
 			"drop_events_on_queue_full": {
@@ -47,9 +47,10 @@ func outputsTCPGroup() *schema.Resource {
 					"Heartbeats are only sent if sendCookedData=true. Defaults to 30 seconds. ",
 			},
 			"max_queue_size": {
-				Type:     schema.TypeInt,
-				Optional: true,
-				Computed: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringMatch(validMaxQueueSize, "valid values: integer[KB|MB|GB]"),
 				Description: "Specify an integer or integer[KB|MB|GB]." +
 					"Sets the maximum size of the forwarder output queue. " +
 					"It also sets the maximum size of the wait queue to 3x this value, if you have enabled indexer acknowledgment (useACK=true)." +
@@ -67,10 +68,11 @@ func outputsTCPGroup() *schema.Resource {
 					"Defaults to 500KB (which means a maximum size of 500KB for the output queue and 1500KB for the wait queue, if any). ",
 			},
 			"method": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Valid values: (tcpout | syslog). Specifies the type of output processor. ",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"tcpout", "syslog"}, false),
+				Description:  "Valid values: (tcpout | syslog). Specifies the type of output processor. ",
 			},
 			"name": {
 				Type:        schema.TypeString,
@@ -269,7 +271,7 @@ func getOutputsTCPGroupConfig(d *schema.ResourceData) (outputsTCPGroupObj *model
 	outputsTCPGroupObj.Disabled = d.Get("disabled").(bool)
 	outputsTCPGroupObj.DropEventsOnQueueFull = d.Get("drop_events_on_queue_full").(int)
 	outputsTCPGroupObj.HeartbeatFrequency = d.Get("heartbeat_frequency").(int)
-	outputsTCPGroupObj.MaxQueueSize = d.Get("max_queue_size").(int)
+	outputsTCPGroupObj.MaxQueueSize = d.Get("max_queue_size").(string)
 	outputsTCPGroupObj.Method = d.Get("method").(string)
 	outputsTCPGroupObj.SendCookedData = d.Get("send_cooked_data").(bool)
 	if val, ok := d.GetOk("servers"); ok {

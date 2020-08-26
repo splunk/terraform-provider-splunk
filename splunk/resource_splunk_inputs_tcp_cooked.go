@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"net/http"
 	"regexp"
 	"terraform-provider-splunk/client/models"
@@ -28,7 +29,7 @@ func inputsTCPCooked() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "Indicates if input is disabled.",
 			},
 			"restrict_to_host": {
@@ -39,9 +40,10 @@ func inputsTCPCooked() *schema.Resource {
 				Description: "Allows for restricting this input to only accept data from the host specified here.",
 			},
 			"connection_host": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"ip", "dns", "none"}, false),
 				Description: "Valid values: (ip | dns | none)" +
 					"Set the host for the remote server that is sending data." +
 					"ip sets the host to the IP address of the remote server sending data." +

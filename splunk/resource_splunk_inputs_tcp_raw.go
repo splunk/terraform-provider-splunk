@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"net/http"
 	"regexp"
 	"terraform-provider-splunk/client/models"
@@ -53,13 +54,14 @@ func inputsTCPRaw() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "Indicates if input is disabled.",
 			},
 			"queue": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"parsingQueue", "indexQueue"}, false),
 				Description: "Valid values: (parsingQueue | indexQueue) " +
 					"Specifies where the input processor should deposit the events it reads. Defaults to parsingQueue." +
 					"Set queue to parsingQueue to apply props.conf and other parsing rules to your data. " +
@@ -73,9 +75,10 @@ func inputsTCPRaw() *schema.Resource {
 				Description: "Allows for restricting this input to only accept data from the host specified here.",
 			},
 			"connection_host": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"ip", "dns", "none"}, false),
 				Description: "Valid values: (ip | dns | none)" +
 					"Set the host for the remote server that is sending data." +
 					"ip sets the host to the IP address of the remote server sending data." +
@@ -86,7 +89,7 @@ func inputsTCPRaw() *schema.Resource {
 			"raw_tcp_done_timeout": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				Default:  10,
+				Computed: true,
 				Description: " 	Specifies in seconds the timeout value for adding a Done-key. Default value is 10 seconds. " +
 					"If a connection over the port specified by name remains idle after receiving data for specified number of seconds, it adds a Done-key. " +
 					"This implies the last event is completely received. ",

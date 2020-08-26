@@ -17,6 +17,7 @@ resource "splunk_outputs_tcp_default" "test" {
     drop_events_on_queue_full = 60
     index_and_forward = true
     send_cooked_data = true
+    max_queue_size = "100KB"
 }
 `
 
@@ -27,6 +28,7 @@ resource "splunk_outputs_tcp_default" "test" {
     drop_events_on_queue_full = 60
     index_and_forward = true
     send_cooked_data = true
+    max_queue_size = "100KB"
 }
 `
 
@@ -47,6 +49,7 @@ func TestAccSplunkTCPDefaultOutput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "default_group", "test-indexers"),
 					resource.TestCheckResourceAttr(resourceName, "drop_events_on_queue_full", "60"),
 					resource.TestCheckResourceAttr(resourceName, "index_and_forward", "true"),
+					resource.TestCheckResourceAttr(resourceName, "max_queue_size", "100KB"),
 					resource.TestCheckResourceAttr(resourceName, "send_cooked_data", "true"),
 				),
 			},
@@ -58,6 +61,7 @@ func TestAccSplunkTCPDefaultOutput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "default_group", "test-indexers"),
 					resource.TestCheckResourceAttr(resourceName, "drop_events_on_queue_full", "60"),
 					resource.TestCheckResourceAttr(resourceName, "index_and_forward", "true"),
+					resource.TestCheckResourceAttr(resourceName, "max_queue_size", "100KB"),
 					resource.TestCheckResourceAttr(resourceName, "send_cooked_data", "true"),
 				),
 			},

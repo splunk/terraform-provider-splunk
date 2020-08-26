@@ -47,7 +47,6 @@ func TestAccSplunkTCPRawInput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "connection_host", "dns"),
 					resource.TestCheckResourceAttr(resourceName, "queue", "parsingQueue"),
 					resource.TestCheckResourceAttr(resourceName, "restrict_to_host", ""),
-					resource.TestCheckResourceAttr(resourceName, "raw_tcp_done_timeout", "10"),
 				),
 			},
 			{
@@ -60,7 +59,6 @@ func TestAccSplunkTCPRawInput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "queue", "indexQueue"),
 					resource.TestCheckResourceAttr(resourceName, "connection_host", "dns"),
 					resource.TestCheckResourceAttr(resourceName, "restrict_to_host", ""),
-					resource.TestCheckResourceAttr(resourceName, "raw_tcp_done_timeout", "10"),
 				),
 			},
 			{

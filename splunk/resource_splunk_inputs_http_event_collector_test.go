@@ -11,15 +11,14 @@ import (
 const newHttpEventCollectorInput = `
 resource "splunk_global_http_event_collector" "http" {
   disabled     = false
-  enable_ssl   = 1
-  port         = 8088
+  enable_ssl   = true
 }
 
 resource "splunk_inputs_http_event_collector" "new-token" {
     name = "new-token"
     source = "new"
     disabled = false
-    use_ack = 0
+    use_ack = false
 
     acl {
       app = "launcher"
@@ -33,7 +32,7 @@ resource "splunk_inputs_http_event_collector" "new-token" {
 const updateHttpEventCollectorInput = `
 resource "splunk_global_http_event_collector" "http" {
   disabled     = false
-  enable_ssl   = 1
+  enable_ssl   = true
   port         = 8088
 }
 
@@ -44,7 +43,7 @@ resource "splunk_inputs_http_event_collector" "new-token" {
     source = "new"
     sourcetype = "new"
     disabled = false
-    use_ack = 1
+    use_ack = true
 
     acl {
       app = "launcher"
@@ -72,7 +71,7 @@ func TestAccSplunkHttpEventCollectorInput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "source", "new"),
 					resource.TestCheckResourceAttr(resourceName, "index", "default"),
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
-					resource.TestCheckResourceAttr(resourceName, "use_ack", "0"),
+					resource.TestCheckResourceAttr(resourceName, "use_ack", "false"),
 					resource.TestCheckResourceAttr(resourceName, "acl.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "launcher"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "nobody"),
@@ -93,7 +92,7 @@ func TestAccSplunkHttpEventCollectorInput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "indexes.0", "main"),
 					resource.TestCheckResourceAttr(resourceName, "indexes.1", "history"),
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
-					resource.TestCheckResourceAttr(resourceName, "use_ack", "1"),
+					resource.TestCheckResourceAttr(resourceName, "use_ack", "true"),
 					resource.TestCheckResourceAttr(resourceName, "acl.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "launcher"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "nobody"),

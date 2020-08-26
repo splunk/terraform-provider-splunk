@@ -20,8 +20,8 @@ resource "splunk_inputs_monitor" "monitor" {
 const inputsMonitorUpdateConfig = `
 resource "splunk_inputs_monitor" "monitor" {
   name     = "%v"
+  recursive = true
   sourcetype = "text"
-  recursive = false
 }
 `
 
@@ -44,7 +44,8 @@ func TestAccSplunkInputsMonitor(t *testing.T) {
 				Config: config,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
-					resource.TestCheckResourceAttr(resourceName, "recursive", "true"),
+					resource.TestCheckResourceAttr(resourceName, "recursive", "false"),
+					resource.TestCheckResourceAttr(resourceName, "follow_tail", "false"),
 					resource.TestCheckResourceAttr(resourceName, "sourcetype", "text"),
 				),
 			},
@@ -52,7 +53,8 @@ func TestAccSplunkInputsMonitor(t *testing.T) {
 				Config: updatedConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
-					resource.TestCheckResourceAttr(resourceName, "recursive", "false"),
+					resource.TestCheckResourceAttr(resourceName, "recursive", "true"),
+					resource.TestCheckResourceAttr(resourceName, "follow_tail", "false"),
 					resource.TestCheckResourceAttr(resourceName, "sourcetype", "text"),
 				),
 			},

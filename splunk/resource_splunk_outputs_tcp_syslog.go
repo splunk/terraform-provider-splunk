@@ -17,7 +17,7 @@ func outputsTCPSyslog() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "Disables default tcpout settings",
 			},
 			"name": {

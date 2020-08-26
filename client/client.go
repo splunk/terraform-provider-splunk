@@ -13,6 +13,7 @@ import (
 	"path"
 	"reflect"
 	"strconv"
+	"strings"
 	"terraform-provider-splunk/client/utils"
 	"time"
 )
@@ -70,6 +71,7 @@ func getEnv(key, defaultValue string) string {
 func (c *Client) BuildSplunkURL(queryValues url.Values, urlPathParts ...string) url.URL {
 	buildPath := ""
 	for _, pathPart := range urlPathParts {
+		pathPart = strings.ReplaceAll(pathPart, " ", "+") // url parameters cannot have spaces
 		buildPath = path.Join(buildPath, url.PathEscape(pathPart))
 	}
 	if queryValues == nil {

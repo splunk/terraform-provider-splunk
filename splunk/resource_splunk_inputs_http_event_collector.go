@@ -59,13 +59,13 @@ func inputsHttpEventCollector() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "Input disabled indicator: 0 = Input Not disabled, 1 = Input disabled",
 			},
 			"use_ack": {
-				Type:        schema.TypeString,
+				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     "0",
+				Computed:    true,
 				Description: "Indexer acknowledgement for this token",
 			},
 			"acl": aclSchema(),
@@ -235,7 +235,7 @@ func getHttpEventCollectorConfig(d *schema.ResourceData) (httpInputConfigObject 
 	httpInputConfigObject.Indexes = d.Get("indexes").([]interface{})
 	httpInputConfigObject.Source = d.Get("source").(string)
 	httpInputConfigObject.SourceType = d.Get("sourcetype").(string)
-	httpInputConfigObject.UseACK = d.Get("use_ack").(string)
+	httpInputConfigObject.UseACK = d.Get("use_ack").(bool)
 	httpInputConfigObject.Disabled = d.Get("disabled").(bool)
 	return httpInputConfigObject
 }

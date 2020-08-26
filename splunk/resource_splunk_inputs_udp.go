@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"net/http"
 	"regexp"
 	"terraform-provider-splunk/client/models"
@@ -46,7 +47,7 @@ func inputsUDP() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "Indicates if input is disabled.",
 			},
 			"queue": {
@@ -62,9 +63,10 @@ func inputsUDP() *schema.Resource {
 				Description: "Restrict incoming connections on this port to the host specified here. If this is not set, the value specified in [udp://<remote server>:<port>] in inputs.conf is used.",
 			},
 			"connection_host": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"ip", "dns", "none"}, false),
 				Description: "Valid values: (ip | dns | none)" +
 					"Set the host for the remote server that is sending data." +
 					"ip sets the host to the IP address of the remote server sending data." +

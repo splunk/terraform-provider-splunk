@@ -16,7 +16,7 @@ type OutputsTCPDefaultObject struct {
 	DefaultGroup          string `json:"defaultGroup,omitempty" url:"defaultGroup,omitempty"`
 	DropEventsOnQueueFull int    `json:"dropEventsOnQueueFull,omitempty" url:"dropEventsOnQueueFull,omitempty"`
 	HeartbeatFrequency    int    `json:"heartbeatFrequency,omitempty" url:"heartbeatFrequency,omitempty"`
-	MaxQueueSize          int    `json:"maxQueueSize,omitempty" url:"maxQueueSize,omitempty"`
+	MaxQueueSize          string `json:"maxQueueSize,omitempty" url:"maxQueueSize,omitempty"`
 	Disabled              bool   `json:"disabled,omitempty" url:"disabled"`
 	IndexAndForward       bool   `json:"indexAndForward,omitempty" url:"indexAndForward"`
 	SendCookedData        bool   `json:"sendCookedData,omitempty" url:"sendCookedData"`

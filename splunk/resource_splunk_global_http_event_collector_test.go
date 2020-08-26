@@ -11,8 +11,7 @@ const globalHttpInputConfig = `
 
 resource "splunk_global_http_event_collector" "http" {
   disabled     = false
-  enable_ssl   = 0
-  port         = 8088
+  enable_ssl   = false
 }
 `
 
@@ -20,9 +19,9 @@ const globalUpdateHttpInputConfig = `
 
 resource "splunk_global_http_event_collector" "http" {
   disabled     = false
-  enable_ssl   = 1
+  enable_ssl   = true
   port         = 8088
-  dedicated_io_threads = 20
+  dedicated_io_threads = 2
 }
 `
 
@@ -39,26 +38,23 @@ func TestAccGlobalSplunkHttpEventCollectorInput(t *testing.T) {
 				Config: globalHttpInputConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "port", "8088"),
-					resource.TestCheckResourceAttr(resourceName, "enable_ssl", "0"),
+					resource.TestCheckResourceAttr(resourceName, "enable_ssl", "false"),
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
-					resource.TestCheckResourceAttr(resourceName, "dedicated_io_threads", "2"),
 					resource.TestCheckResourceAttr(resourceName, "max_threads", "0"),
 					resource.TestCheckResourceAttr(resourceName, "max_sockets", "0"),
-					resource.TestCheckResourceAttr(resourceName, "max_sockets", "0"),
-					resource.TestCheckResourceAttr(resourceName, "use_deployment_server", "0"),
+					resource.TestCheckResourceAttr(resourceName, "use_deployment_server", "false"),
 				),
 			},
 			{
 				Config: globalUpdateHttpInputConfig,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "port", "8088"),
-					resource.TestCheckResourceAttr(resourceName, "enable_ssl", "1"),
+					resource.TestCheckResourceAttr(resourceName, "enable_ssl", "true"),
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
-					resource.TestCheckResourceAttr(resourceName, "dedicated_io_threads", "20"),
+					resource.TestCheckResourceAttr(resourceName, "dedicated_io_threads", "2"),
 					resource.TestCheckResourceAttr(resourceName, "max_threads", "0"),
 					resource.TestCheckResourceAttr(resourceName, "max_sockets", "0"),
-					resource.TestCheckResourceAttr(resourceName, "max_sockets", "0"),
-					resource.TestCheckResourceAttr(resourceName, "use_deployment_server", "0"),
+					resource.TestCheckResourceAttr(resourceName, "use_deployment_server", "false"),
 				),
 			},
 			{

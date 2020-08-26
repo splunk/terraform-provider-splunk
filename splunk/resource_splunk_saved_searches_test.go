@@ -10,8 +10,19 @@ import (
 
 const newSavedSearches = `
 resource "splunk_saved_searches" "test" {
-    name = "test_search"
+    name = "Test New Alert"
     search = "index=main"
+    actions = "email"
+    action_email_format = "table"
+    action_email_max_time = "5m"
+    action_email_max_results = 10
+	action_email_send_results = false
+	action_email_subject = "Splunk Alert: $name$"
+	action_email_to = "splunk@splunk.com"
+	action_email_track_alert = true
+    dispatch_earliest_time = "rt-15m"
+    dispatch_latest_time = "rt-0m"
+    cron_schedule = "*/5 * * * *"
     acl {
       owner = "admin"
       sharing = "app"
@@ -22,8 +33,19 @@ resource "splunk_saved_searches" "test" {
 
 const updatedSavedSearches = `
 resource "splunk_saved_searches" "test" {
-    name = "test_search"
-    search = "index=main foo=bar"
+    name = "Test New Alert"
+    search = "index=main"
+    actions = "email"
+    action_email_format = "table"
+    action_email_max_time = "5m"
+    action_email_max_results = 100
+	action_email_send_results = false
+	action_email_subject = "Splunk Alert: $name$"
+	action_email_to = "splunk@splunk.com"
+	action_email_track_alert = true
+    dispatch_earliest_time = "rt-15m"
+    dispatch_latest_time = "rt-0m"
+    cron_schedule = "*/15 * * * *"
     acl {
       owner = "admin"
       sharing = "app"
@@ -44,13 +66,39 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 			{
 				Config: newSavedSearches,
 				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test New Alert"),
 					resource.TestCheckResourceAttr(resourceName, "search", "index=main"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "email"),
+					resource.TestCheckResourceAttr(resourceName, "action_email", "true"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_format", "table"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_max_time", "5m"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_max_results", "10"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_send_results", "false"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_subject", "Splunk Alert: $name$"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_to", "splunk@splunk.com"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_track_alert", "true"),
+					resource.TestCheckResourceAttr(resourceName, "dispatch_earliest_time", "rt-15m"),
+					resource.TestCheckResourceAttr(resourceName, "dispatch_latest_time", "rt-0m"),
+					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/5 * * * *"),
 				),
 			},
 			{
 				Config: updatedSavedSearches,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "search", "index=main foo=bar"),
+					resource.TestCheckResourceAttr(resourceName, "name", "Test New Alert"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "email"),
+					resource.TestCheckResourceAttr(resourceName, "action_email", "true"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_format", "table"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_max_time", "5m"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_max_results", "100"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_send_results", "false"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_subject", "Splunk Alert: $name$"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_to", "splunk@splunk.com"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_track_alert", "true"),
+					resource.TestCheckResourceAttr(resourceName, "dispatch_earliest_time", "rt-15m"),
+					resource.TestCheckResourceAttr(resourceName, "dispatch_latest_time", "rt-0m"),
+					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/15 * * * *"),
 				),
 			},
 			{

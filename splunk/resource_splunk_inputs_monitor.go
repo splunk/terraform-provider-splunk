@@ -40,7 +40,7 @@ func inputsMonitor() *schema.Resource {
 			"disabled": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     false,
+				Computed:    true,
 				Description: "Indicates if input monitoring is disabled.",
 			},
 			"rename_source": {
@@ -52,6 +52,7 @@ func inputsMonitor() *schema.Resource {
 			"blacklist": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Specify a regular expression for a file path. The file path that matches this regular expression is not indexed.",
 			},
 			"whitelist": {
@@ -69,32 +70,37 @@ func inputsMonitor() *schema.Resource {
 			"follow_tail": {
 				Type:        schema.TypeBool,
 				Optional:    true,
+				Computed:    true,
 				Description: "If set to true, files that are seen for the first time is read from the end.",
 			},
 			"recursive": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Default:     true,
+				Computed:    true,
 				Description: "Setting this to false prevents monitoring of any subdirectories encountered within this data input.",
 			},
 			"host_regex": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Specify a regular expression for a file path. If the path for a file matches this regular expression, the captured value is used to populate the host field for events from this data input. The regular expression must have one capture group.",
 			},
 			"host_segment": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "Use the specified slash-separate segment of the filepath as the host field value.",
 			},
 			"ignore_older_than": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Specify a time value. If the modification time of a file being monitored falls outside of this rolling time window, the file is no longer being monitored.",
 			},
 			"time_before_close": {
 				Type:        schema.TypeInt,
 				Optional:    true,
+				Computed:    true,
 				Description: "When Splunk software reaches the end of a file that is being read, the file is kept open for a minimum of the number of seconds specified in this value. After this period has elapsed, the file is checked again for more data.",
 			},
 			"acl": aclSchema(),
