@@ -8,8 +8,8 @@ import (
 	"testing"
 )
 
-const newConfStanza = `
-resource "splunk_conf_stanza" "tftest-stanza" {
+const newConfigsConf = `
+resource "splunk_configs_conf" "tftest-stanza" {
 	name = "tftest/tftest_stanza"
 	variables = {
 		"key": "value"
@@ -17,8 +17,8 @@ resource "splunk_conf_stanza" "tftest-stanza" {
 }
 `
 
-const updateConfStanza = `
-resource "splunk_conf_stanza" "tftest-stanza" {
+const updateConfigsConf = `
+resource "splunk_configs_conf" "tftest-stanza" {
 	name = "tftest/tftest_stanza"
 	variables = {
 		"key": "new-value"
@@ -26,31 +26,31 @@ resource "splunk_conf_stanza" "tftest-stanza" {
 }
 `
 
-func TestAccCreateSplunkConfStanza(t *testing.T) {
-	resourceName := "splunk_conf_stanza.tftest-stanza"
+func TestAccCreateSplunkConfigsConf(t *testing.T) {
+	resourceName := "splunk_configs_conf.tftest-stanza"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
 		},
 		Providers:    testAccProviders,
-		CheckDestroy: testAccSplunkConfStanzaDestroyResources,
+		CheckDestroy: testAccSplunkConfigsConfDestroyResources,
 		Steps: []resource.TestStep{
 			{
-				Config: newConfStanza,
+				Config: newConfigsConf,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "variables.%", "1"),
 					resource.TestCheckResourceAttr(resourceName, "variables.key", "value"),
 				),
 			},
 			{
-				Config: updateConfStanza,
+				Config: updateConfigsConf,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "variables.%", "1"),
 					resource.TestCheckResourceAttr(resourceName, "variables.key", "new-value"),
 				),
 			},
 			{
-				ResourceName:      "splunk_conf_stanza.tftest-stanza",
+				ResourceName:      "splunk_configs_conf.tftest-stanza",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -58,11 +58,11 @@ func TestAccCreateSplunkConfStanza(t *testing.T) {
 	})
 }
 
-func testAccSplunkConfStanzaDestroyResources(s *terraform.State) error {
+func testAccSplunkConfigsConfDestroyResources(s *terraform.State) error {
 	client := newTestClient()
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
-		case "splunk_conf_stanza":
+		case "splunk_configs_conf":
 			endpoint := client.BuildSplunkURL(nil, "services", "configs", "conf", rs.Primary.ID)
 			resp, err := client.Get(endpoint)
 			if resp.StatusCode != http.StatusNotFound {

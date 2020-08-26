@@ -11,7 +11,7 @@ import (
 	"terraform-provider-splunk/client/models"
 )
 
-func confStanza() *schema.Resource {
+func configsConf() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"variables": {
@@ -27,10 +27,10 @@ func confStanza() *schema.Resource {
 			},
 			"acl": aclSchema(),
 		},
-		Read:   confStanzaRead,
-		Create: confStanzaCreate,
-		Delete: confStanzaDelete,
-		Update: confStanzaUpdate,
+		Read:   configsConfRead,
+		Create: configsConfCreate,
+		Delete: configsConfDelete,
+		Update: configsConfUpdate,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
@@ -38,10 +38,10 @@ func confStanza() *schema.Resource {
 }
 
 // Functions
-func confStanzaCreate(d *schema.ResourceData, meta interface{}) error {
+func configsConfCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name:= d.Get("name").(string)
-	confStanzaConfigObj := getConfStanzaConfig(d)
+	configsConfConfigObj := getConfigsConfConfig(d)
 	aclObject := &models.ACLObject{}
 	if r, ok := d.GetOk("acl"); ok {
 		aclObject = getACLConfig(r.([]interface{}))
@@ -49,7 +49,7 @@ func confStanzaCreate(d *schema.ResourceData, meta interface{}) error {
 		aclObject.Owner = "nobody"
 		aclObject.App = "search"
 	}
-	err := (*provider.Client).CreateConfStanzaObject(name, aclObject.Owner, aclObject.App, confStanzaConfigObj)
+	err := (*provider.Client).CreateConfigsConfObject(name, aclObject.Owner, aclObject.App, configsConfConfigObj)
 	if err != nil {
 		return err
 	}
@@ -62,34 +62,34 @@ func confStanzaCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	d.SetId(name)
-	return confStanzaRead(d, meta)
+	return configsConfRead(d, meta)
 }
 
-func confStanzaRead(d *schema.ResourceData, meta interface{}) error {
+func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
 	_, stanza := (*provider.Client).SplitConfStanza(name)
 
 	// We first get list of stanzas in a conf file to get owner and app name for the specific stanza
-	resp, err := (*provider.Client).ReadAllConfStanzaObject(name)
+	resp, err := (*provider.Client).ReadAllConfigsConfObject(name)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	entry, err := getConfStanzaConfigByName(stanza, resp)
+	entry, err := getConfigsConfConfigByName(stanza, resp)
 	if err != nil {
 		return err
 	}
 
 	// Now we read the input configuration with proper owner and app
-	resp, err = (*provider.Client).ReadConfStanzaObject(name, entry.ACL.Owner, entry.ACL.App)
+	resp, err = (*provider.Client).ReadConfigsConfObject(name, entry.ACL.Owner, entry.ACL.App)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	contentResp, err := (*provider.Client).ReadConfStanzaObject(name, entry.ACL.Owner, entry.ACL.App)
+	contentResp, err := (*provider.Client).ReadConfigsConfObject(name, entry.ACL.Owner, entry.ACL.App)
 	if err != nil {
 		return err
 	}
@@ -111,7 +111,7 @@ func confStanzaRead(d *schema.ResourceData, meta interface{}) error {
 
 	delete(content, "disabled")
 
-	entry, err = getConfStanzaConfigByName(stanza, resp)
+	entry, err = getConfigsConfConfigByName(stanza, resp)
 	if err != nil {
 		return err
 	}
@@ -132,9 +132,9 @@ func confStanzaRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func confStanzaUpdate(d *schema.ResourceData, meta interface{}) error {
+func configsConfUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
-	confStanzaConfigObj := getConfStanzaConfig(d)
+	configsConfConfigObj := getConfigsConfConfig(d)
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
 	// Update will create a new resource with private `user` permissions if resource had shared permissions set
 	var owner string
@@ -146,7 +146,7 @@ func confStanzaUpdate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Id()
 	conf, stanza := (*provider.Client).SplitConfStanza(name)
 
-	err := (*provider.Client).UpdateConfStanzaObject(d.Id(), owner, aclObject.App, confStanzaConfigObj)
+	err := (*provider.Client).UpdateConfigsConfObject(d.Id(), owner, aclObject.App, configsConfConfigObj)
 	if err != nil {
 		return err
 	}
@@ -157,14 +157,14 @@ func confStanzaUpdate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	return confStanzaRead(d, meta)
+	return configsConfRead(d, meta)
 }
 
-func confStanzaDelete(d *schema.ResourceData, meta interface{}) error {
+func configsConfDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
 
-	resp, err := (*provider.Client).DeleteConfStanzaObject(d.Id(), aclObject.Owner, aclObject.App)
+	resp, err := (*provider.Client).DeleteConfigsConfObject(d.Id(), aclObject.Owner, aclObject.App)
 	if err != nil {
 		return err
 	}
@@ -175,7 +175,7 @@ func confStanzaDelete(d *schema.ResourceData, meta interface{}) error {
 		return nil
 
 	default:
-		errorResponse := &models.ConfStanzaResponse{}
+		errorResponse := &models.ConfigsConfResponse{}
 		_ = json.NewDecoder(resp.Body).Decode(errorResponse)
 		err := errors.New(errorResponse.Messages[0].Text)
 		return err
@@ -183,8 +183,8 @@ func confStanzaDelete(d *schema.ResourceData, meta interface{}) error {
 }
 
 // Helpers
-func getConfStanzaConfig(d *schema.ResourceData) (confStanzaConfigObject *models.ConfStanzaObject) {
-	confStanzaConfigObject = &models.ConfStanzaObject{}
+func getConfigsConfConfig(d *schema.ResourceData) (configsConfConfigObject *models.ConfigsConfObject) {
+	configsConfConfigObject = &models.ConfigsConfObject{}
 	mapInterface := d.Get("variables").(map[string]interface {})
 	mapString := make(map[string]string)
 	for key, value := range mapInterface {
@@ -193,13 +193,13 @@ func getConfStanzaConfig(d *schema.ResourceData) (confStanzaConfigObject *models
 
 		mapString[strKey] = strValue
 	}
-	confStanzaConfigObject.Variables = mapString
+	configsConfConfigObject.Variables = mapString
 
-	return confStanzaConfigObject
+	return configsConfConfigObject
 }
 
-func getConfStanzaConfigByName(name string, httpResponse *http.Response) (confStanzaEntry *models.ConfStanzaEntry, err error) {
-	response := &models.ConfStanzaResponse{}
+func getConfigsConfConfigByName(name string, httpResponse *http.Response) (configsConfEntry *models.ConfigsConfEntry, err error) {
+	response := &models.ConfigsConfResponse{}
 
 	switch httpResponse.StatusCode {
 	case 200, 201:
@@ -215,8 +215,8 @@ func getConfStanzaConfigByName(name string, httpResponse *http.Response) (confSt
 	default:
 		_ = json.NewDecoder(httpResponse.Body).Decode(response)
 		err := errors.New(response.Messages[0].Text)
-		return confStanzaEntry, err
+		return configsConfEntry, err
 	}
 
-	return confStanzaEntry, nil
+	return configsConfEntry, nil
 }

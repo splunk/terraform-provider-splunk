@@ -3,13 +3,14 @@ package client
 import (
 	"github.com/google/go-querystring/query"
 	"net/http"
+	"strings"
 	"terraform-provider-splunk/client/models"
 )
 
-func (client *Client) CreateConfStanzaObject(name string, owner string, app string, confStanzaConfigObj *models.ConfStanzaObject) error {
-	values, err := query.Values(confStanzaConfigObj)
+func (client *Client) CreateConfigsConfObject(name string, owner string, app string, configsConfConfigObj *models.ConfigsConfObject) error {
+	values, err := query.Values(configsConfConfigObj)
 
-	for k, v := range confStanzaConfigObj.Variables {
+	for k, v := range configsConfConfigObj.Variables {
 		values.Add(string(k), string(v))
 	}
 
@@ -27,7 +28,7 @@ func (client *Client) CreateConfStanzaObject(name string, owner string, app stri
 	return nil
 }
 
-func (client *Client) ReadConfStanzaObject(name, owner, app string) (*http.Response, error) {
+func (client *Client) ReadConfigsConfObject(name, owner, app string) (*http.Response, error) {
 	conf, stanza := client.SplitConfStanza(name)
 
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-" + conf, stanza)
@@ -39,10 +40,10 @@ func (client *Client) ReadConfStanzaObject(name, owner, app string) (*http.Respo
 	return resp, nil
 }
 
-func (client *Client) UpdateConfStanzaObject(name string, owner string, app string, confStanzaConfigObj *models.ConfStanzaObject) error {
-	values, err := query.Values(&confStanzaConfigObj)
+func (client *Client) UpdateConfigsConfObject(name string, owner string, app string, configsConfConfigObj *models.ConfigsConfObject) error {
+	values, err := query.Values(&configsConfConfigObj)
 
-	for k, v := range confStanzaConfigObj.Variables {
+	for k, v := range configsConfConfigObj.Variables {
 		values.Add(string(k), string(v))
 	}
 
@@ -59,7 +60,7 @@ func (client *Client) UpdateConfStanzaObject(name string, owner string, app stri
 	return nil
 }
 
-func (client *Client) DeleteConfStanzaObject(name, owner, app string) (*http.Response, error) {
+func (client *Client) DeleteConfigsConfObject(name, owner, app string) (*http.Response, error) {
 	conf, stanza := client.SplitConfStanza(name)
 
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-" + conf, stanza)
@@ -72,7 +73,7 @@ func (client *Client) DeleteConfStanzaObject(name, owner, app string) (*http.Res
 	return resp, nil
 }
 
-func (client *Client) ReadAllConfStanzaObject(name string) (*http.Response, error) {
+func (client *Client) ReadAllConfigsConfObject(name string) (*http.Response, error) {
 	conf, _ := client.SplitConfStanza(name)
 
 	endpoint := client.BuildSplunkURL(nil, "services", "configs", "conf-" + conf)
@@ -83,4 +84,10 @@ func (client *Client) ReadAllConfStanzaObject(name string) (*http.Response, erro
 	}
 
 	return resp, nil
+}
+
+// Takes a '/' separated string and returns the 0, 1 indexed strings from the split
+func (client *Client) SplitConfStanza(name string) (conf string, stanza string) {
+	split := strings.Split(name, "/")
+	return split[0], split[1]
 }
