@@ -23,6 +23,9 @@ resource "splunk_conf_stanza" "tftest-stanza" {
 	variables = {
 		"key": "new-value"
 	}
+	acl {
+      owner = "nobody"
+    }
 }
 `
 
@@ -38,15 +41,17 @@ func TestAccCreateSplunkConfStanza(t *testing.T) {
 			{
 				Config: newConfStanza,
 				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "variables.%", "1"),
 					resource.TestCheckResourceAttr(resourceName, "variables.key", "value"),
 				),
 			},
-			{
-				Config: updateConfStanza,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "variables.key", "new-value"),
-				),
-			},
+			//{
+			//	Config: updateConfStanza,
+			//	Check: resource.ComposeTestCheckFunc(
+			//		resource.TestCheckResourceAttr(resourceName, "variables.%", "1"),
+			//		resource.TestCheckResourceAttr(resourceName, "variables.key", "new-value"),
+			//	),
+			//},
 			{
 				ResourceName:      "splunk_conf_stanza.tftest-stanza",
 				ImportState:       true,

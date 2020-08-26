@@ -74,7 +74,6 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_outputs_tcp_syslog":          outputsTCPSyslog(),
 		"splunk_index":                       index(),
 		"splunk_conf_stanza":                 confStanza(),
-
 	}
 }
 

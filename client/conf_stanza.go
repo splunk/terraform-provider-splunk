@@ -17,7 +17,7 @@ func (client *Client) CreateConfStanzaObject(name string, owner string, app stri
 	conf_name := split_name[0]
 	stanza_name := split_name[1]
 	values.Add("name", stanza_name)
-	values.Del("variables")
+	values.Del("Variables")
 
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-" + conf_name)
 	resp, err := client.Post(endpoint, values)
@@ -53,7 +53,7 @@ func (client *Client) UpdateConfStanzaObject(name string, owner string, app stri
 	split_name := strings.Split(name, "/")
 	conf_name := split_name[0]
 	stanza_name := split_name[1]
-	values.Del("variables")
+	values.Del("Variables")
 
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-" + conf_name, stanza_name)
 	resp, err := client.Post(endpoint, values)
@@ -85,7 +85,7 @@ func (client *Client) ReadAllConfStanzaObject(name string) (*http.Response, erro
 	conf_name := split_name[0]
 
 	endpoint := client.BuildSplunkURL(nil, "services", "configs", "conf-" + conf_name)
-	
+
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
