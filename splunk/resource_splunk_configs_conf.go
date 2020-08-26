@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -20,10 +21,11 @@ func configsConf() *schema.Resource {
 				Description: `A map of key value pairs for a stanza.`,
 			},
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: `A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza`,
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validation.StringMatch(regexp.MustCompile("^[a-zA-Z0-9\\-.]+/[a-zA-Z0-9\\-.]+"), "A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza"),
+				Description:  `A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza`,
 			},
 			"acl": aclSchema(),
 		},
@@ -40,7 +42,7 @@ func configsConf() *schema.Resource {
 // Functions
 func configsConfCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
-	name:= d.Get("name").(string)
+	name := d.Get("name").(string)
 	configsConfConfigObj := getConfigsConfConfig(d)
 	aclObject := &models.ACLObject{}
 	if r, ok := d.GetOk("acl"); ok {
@@ -55,7 +57,7 @@ func configsConfCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 	if _, ok := d.GetOk("acl"); ok {
 		conf, stanza := (*provider.Client).SplitConfStanza(name)
-		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, stanza, aclObject, "configs", "conf-" + conf)
+		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, stanza, aclObject, "configs", "conf-"+conf)
 		if err != nil {
 			return err
 		}
@@ -152,7 +154,7 @@ func configsConfUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	//ACL update
-	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, stanza, aclObject, "configs", "conf-" + conf)
+	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, stanza, aclObject, "configs", "conf-"+conf)
 	if err != nil {
 		return err
 	}
@@ -185,7 +187,7 @@ func configsConfDelete(d *schema.ResourceData, meta interface{}) error {
 // Helpers
 func getConfigsConfConfig(d *schema.ResourceData) (configsConfConfigObject *models.ConfigsConfObject) {
 	configsConfConfigObject = &models.ConfigsConfObject{}
-	mapInterface := d.Get("variables").(map[string]interface {})
+	mapInterface := d.Get("variables").(map[string]interface{})
 	mapString := make(map[string]string)
 	for key, value := range mapInterface {
 		strKey := fmt.Sprintf("%v", key)
@@ -203,7 +205,7 @@ func getConfigsConfConfigByName(name string, httpResponse *http.Response) (confi
 
 	switch httpResponse.StatusCode {
 	case 200, 201:
-		_ =  json.NewDecoder(httpResponse.Body).Decode(&response)
+		_ = json.NewDecoder(httpResponse.Body).Decode(&response)
 		re := regexp.MustCompile(`(.*)`)
 
 		for _, entry := range response.Entry {

@@ -18,7 +18,7 @@ func (client *Client) CreateConfigsConfObject(name string, owner string, app str
 	values.Add("name", stanza)
 	values.Del("Variables")
 
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-" + conf)
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-"+conf)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -31,7 +31,7 @@ func (client *Client) CreateConfigsConfObject(name string, owner string, app str
 func (client *Client) ReadConfigsConfObject(name, owner, app string) (*http.Response, error) {
 	conf, stanza := client.SplitConfStanza(name)
 
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-" + conf, stanza)
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-"+conf, stanza)
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func (client *Client) UpdateConfigsConfObject(name string, owner string, app str
 	conf, stanza := client.SplitConfStanza(name)
 	values.Del("Variables")
 
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-" + conf, stanza)
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-"+conf, stanza)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -63,7 +63,7 @@ func (client *Client) UpdateConfigsConfObject(name string, owner string, app str
 func (client *Client) DeleteConfigsConfObject(name, owner, app string) (*http.Response, error) {
 	conf, stanza := client.SplitConfStanza(name)
 
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-" + conf, stanza)
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-"+conf, stanza)
 
 	resp, err := client.Delete(endpoint)
 	if err != nil {
@@ -76,7 +76,7 @@ func (client *Client) DeleteConfigsConfObject(name, owner, app string) (*http.Re
 func (client *Client) ReadAllConfigsConfObject(name string) (*http.Response, error) {
 	conf, _ := client.SplitConfStanza(name)
 
-	endpoint := client.BuildSplunkURL(nil, "services", "configs", "conf-" + conf)
+	endpoint := client.BuildSplunkURL(nil, "services", "configs", "conf-"+conf)
 
 	resp, err := client.Get(endpoint)
 	if err != nil {
