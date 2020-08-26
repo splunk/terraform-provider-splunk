@@ -3,12 +3,13 @@ package splunk
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"io/ioutil"
 	"net/http"
 	"regexp"
-	"terraform-provider-splunk/client/models"
-	"fmt"
 	"strings"
+	"terraform-provider-splunk/client/models"
 )
 
 func confStanza() *schema.Resource {
@@ -54,7 +55,10 @@ func confStanzaCreate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if _, ok := d.GetOk("acl"); ok {
-		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "config", "conf")
+		split_name := strings.Split(name, "/")
+		conf_name := split_name[0]
+		stanza_name := split_name[1]
+		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, stanza_name, aclObject, "configs", "conf-" + conf_name)
 		if err != nil {
 			return err
 		}
@@ -89,6 +93,28 @@ func confStanzaRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	defer resp.Body.Close()
 
+	contentResp, err := (*provider.Client).ReadConfStanzaObject(name, entry.ACL.Owner, entry.ACL.App)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	var result map[string]interface{}
+	b, _ := ioutil.ReadAll(contentResp.Body)
+
+	json.Unmarshal(b, &result)
+	content := result["entry"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})
+
+	for key, _ := range content {
+		result, _ := regexp.MatchString(`eai:.*`, key)
+
+		if result {
+			delete(content, key)
+		}
+	}
+
+	delete(content, "disabled")
+
 	entry, err = getConfStanzaConfigByName(stanza_name, resp)
 	if err != nil {
 		return err
@@ -98,7 +124,7 @@ func confStanzaRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if err = d.Set("variables", entry.Content.Variables); err != nil {
+	if err = d.Set("variables", content); err != nil {
 		return err
 	}
 
@@ -114,13 +140,17 @@ func confStanzaUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	confStanzaConfigObj := getConfStanzaConfig(d)
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
+	name := d.Id()
+	split_name := strings.Split(name, "/")
+	conf_name := split_name[0]
+	stanza_name := split_name[1]
 	err := (*provider.Client).UpdateConfStanzaObject(d.Id(), aclObject.Owner, aclObject.App, confStanzaConfigObj)
 	if err != nil {
 		return err
 	}
 
 	//ACL update
-	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, d.Id(), aclObject, "config", "conf")
+	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, stanza_name, aclObject, "configs", "conf-" + conf_name)
 	if err != nil {
 		return err
 	}
@@ -156,10 +186,10 @@ func getConfStanzaConfig(d *schema.ResourceData) (confStanzaConfigObject *models
 	mapInterface := d.Get("variables").(map[string]interface {})
 	mapString := make(map[string]string)
 	for key, value := range mapInterface {
-        strKey := fmt.Sprintf("%v", key)
+		strKey := fmt.Sprintf("%v", key)
 		strValue := fmt.Sprintf("%v", value)
 
-        mapString[strKey] = strValue
+		mapString[strKey] = strValue
 	}
 	confStanzaConfigObject.Variables = mapString
 
@@ -168,10 +198,12 @@ func getConfStanzaConfig(d *schema.ResourceData) (confStanzaConfigObject *models
 
 func getConfStanzaConfigByName(name string, httpResponse *http.Response) (confStanzaEntry *models.ConfStanzaEntry, err error) {
 	response := &models.ConfStanzaResponse{}
+
 	switch httpResponse.StatusCode {
 	case 200, 201:
-		_ = json.NewDecoder(httpResponse.Body).Decode(&response)
+		_ =  json.NewDecoder(httpResponse.Body).Decode(&response)
 		re := regexp.MustCompile(`(.*)`)
+
 		for _, entry := range response.Entry {
 			if name == re.FindStringSubmatch(entry.Name)[1] {
 				return &entry, nil

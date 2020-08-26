@@ -6,11 +6,11 @@ type ConfStanzaResponse struct {
 }
 
 type ConfStanzaEntry struct {
-	Name    string           `json:"name"`
-	ACL     ACLObject        `json:"acl"`
-	Content ConfStanzaObject `json:"content"`
+	Name     string           `json:"name"`
+	ACL      ACLObject        `json:"acl"`
+	Content  ConfStanzaObject `json:"content"`
 }
 
 type ConfStanzaObject struct {
-	Variables    map[string]string `json:"variables,omitempty" url:"variables,omitempty"`
+	Variables map[string]string `json:"-"`
 }
