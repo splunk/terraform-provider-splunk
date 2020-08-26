@@ -7,7 +7,7 @@
 provider "splunk" {
   url                  = "localhost:8089"
   username             = "admin"
-  password             = "password"
+  password             = "changeme"
   insecure_skip_verify = true
 }
 
@@ -56,8 +56,6 @@ resource "splunk_inputs_http_event_collector" "hec-token-01" {
 }
 
 resource "splunk_saved_searches" "new-search-01" {
-  name   = "new-search-01"
-  search = "index=main source=http:hec-token-01"
   actions = "email"
   action_email_format = "table"
   action_email_max_time = "5m"
@@ -65,25 +63,19 @@ resource "splunk_saved_searches" "new-search-01" {
   action_email_subject = "Splunk Alert: $name$"
   action_email_to = "user01@splunk.com"
   action_email_track_alert = true
+  description = "New search for user01"
   dispatch_earliest_time = "rt-15m"
   dispatch_latest_time = "rt-0m"
   cron_schedule = "*/15 * * * *"
+  name   = "new-search-01"
+  search = "index=main source=http:hec-token-01"
+
   acl {
     app     = "search"
     owner   = "user01"
-    sharing = "global"
+    sharing = "user"
   }
   depends_on = [
     splunk_authentication_users.user01,
   ]
-}
-
-resource "splunk_index" "foo" {
-  name = "foo"
-  max_hot_buckets = 4
-}
-
-resource "splunk_index" "bar" {
-  name = "summary"
-  max_hot_buckets = 4
 }
