@@ -140,11 +140,18 @@ func confStanzaUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	confStanzaConfigObj := getConfStanzaConfig(d)
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
+	// Update will create a new resource with private `user` permissions if resource had shared permissions set
+	var owner string
+	if aclObject.Sharing != "user" {
+		owner = "nobody"
+	} else {
+		owner = aclObject.Owner
+	}
 	name := d.Id()
 	split_name := strings.Split(name, "/")
 	conf_name := split_name[0]
 	stanza_name := split_name[1]
-	err := (*provider.Client).UpdateConfStanzaObject(d.Id(), aclObject.Owner, aclObject.App, confStanzaConfigObj)
+	err := (*provider.Client).UpdateConfStanzaObject(d.Id(), owner, aclObject.App, confStanzaConfigObj)
 	if err != nil {
 		return err
 	}

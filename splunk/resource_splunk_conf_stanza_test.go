@@ -23,9 +23,6 @@ resource "splunk_conf_stanza" "tftest-stanza" {
 	variables = {
 		"key": "new-value"
 	}
-	acl {
-      owner = "nobody"
-    }
 }
 `
 
