@@ -1,0 +1,1446 @@
+2020/08/26 12:09:35 [INFO] Terraform version: 0.12.19  
+2020/08/26 12:09:35 [INFO] Go runtime version: go1.12.13
+2020/08/26 12:09:35 [INFO] CLI args: []string{"/Users/nstone/terraform/terraform", "apply"}
+2020/08/26 12:09:35 [DEBUG] Attempting to open CLI config file: /Users/nstone/.terraformrc
+2020/08/26 12:09:35 [DEBUG] File doesn't exist, but doesn't need to. Ignoring.
+2020/08/26 12:09:35 [INFO] CLI command args: []string{"apply"}
+2020/08/26 12:09:35 [TRACE] Meta.Backend: no config given or present on disk, so returning nil config
+2020/08/26 12:09:35 [TRACE] Meta.Backend: backend has not previously been initialized in this working directory
+2020/08/26 12:09:35 [DEBUG] New state was assigned lineage "e52af317-31a4-368a-cb0c-fd5739655983"
+2020/08/26 12:09:35 [TRACE] Meta.Backend: using default local state only (no backend configuration, and no existing initialized backend)
+2020/08/26 12:09:35 [TRACE] Meta.Backend: instantiated backend of type <nil>
+2020/08/26 12:09:35 [DEBUG] checking for provider in "."
+2020/08/26 12:09:35 [WARN] found legacy provider "terraform-provider-splunk"
+2020/08/26 12:09:35 [DEBUG] checking for provider in "/Users/nstone/terraform"
+2020/08/26 12:09:35 [DEBUG] checking for provider in ".terraform/plugins/darwin_amd64"
+2020/08/26 12:09:35 [DEBUG] found valid plugin: "splunk", "0.0.0", "/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk"
+2020/08/26 12:09:35 [DEBUG] checking for provisioner in "."
+2020/08/26 12:09:35 [DEBUG] checking for provisioner in "/Users/nstone/terraform"
+2020/08/26 12:09:35 [DEBUG] checking for provisioner in ".terraform/plugins/darwin_amd64"
+2020/08/26 12:09:35 [TRACE] Meta.Backend: backend <nil> does not support operations, so wrapping it in a local backend
+2020/08/26 12:09:35 [INFO] backend/local: starting Apply operation
+2020/08/26 12:09:35 [TRACE] backend/local: requesting state manager for workspace "default"
+2020/08/26 12:09:35 [TRACE] backend/local: state manager for workspace "default" will:
+ - read initial snapshot from terraform.tfstate
+ - write new snapshots to terraform.tfstate
+ - create any backup at terraform.tfstate.backup
+2020/08/26 12:09:35 [TRACE] backend/local: requesting state lock for workspace "default"
+2020/08/26 12:09:35 [TRACE] statemgr.Filesystem: preparing to manage state snapshots at terraform.tfstate
+2020/08/26 12:09:35 [TRACE] statemgr.Filesystem: existing snapshot has lineage "b20ac270-56eb-32ac-64ea-08f6dd0b2c67" serial 11
+2020/08/26 12:09:35 [TRACE] statemgr.Filesystem: locking terraform.tfstate using fcntl flock
+2020/08/26 12:09:35 [TRACE] statemgr.Filesystem: writing lock metadata to .terraform.tfstate.lock.info
+2020/08/26 12:09:35 [TRACE] backend/local: reading remote state for workspace "default"
+2020/08/26 12:09:35 [TRACE] statemgr.Filesystem: reading latest snapshot from terraform.tfstate
+2020/08/26 12:09:35 [TRACE] statemgr.Filesystem: read snapshot with lineage "b20ac270-56eb-32ac-64ea-08f6dd0b2c67" serial 11
+2020/08/26 12:09:35 [TRACE] backend/local: retrieving local state snapshot for workspace "default"
+2020/08/26 12:09:35 [TRACE] backend/local: building context for current working directory
+2020/08/26 12:09:35 [TRACE] terraform.NewContext: starting
+2020/08/26 12:09:35 [TRACE] terraform.NewContext: resolving provider version selections
+2020/08/26 12:09:35 [TRACE] terraform.NewContext: loading provider schemas
+2020/08/26 12:09:35 [TRACE] LoadSchemas: retrieving schema for provider type "splunk"
+2020-08-26T12:09:35.403-0700 [INFO]  plugin: configuring client automatic mTLS
+2020-08-26T12:09:35.424-0700 [DEBUG] plugin: starting plugin: path=/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk args=[/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk]
+2020-08-26T12:09:35.428-0700 [DEBUG] plugin: plugin started: path=/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk pid=46420
+2020-08-26T12:09:35.428-0700 [DEBUG] plugin: waiting for RPC address: path=/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk
+2020-08-26T12:09:35.448-0700 [INFO]  plugin.terraform-provider-splunk: configuring server automatic mTLS: timestamp=2020-08-26T12:09:35.448-0700
+2020-08-26T12:09:35.472-0700 [DEBUG] plugin: using plugin: version=5
+2020-08-26T12:09:35.472-0700 [DEBUG] plugin.terraform-provider-splunk: plugin address: address=/var/folders/3r/lsz_y3cd0dvb5j563yr1hpnrg2g7xb/T/plugin205528867 network=unix timestamp=2020-08-26T12:09:35.472-0700
+2020/08/26 12:09:35 [TRACE] GRPCProvider: GetSchema
+2020/08/26 12:09:35 [TRACE] GRPCProvider: Close
+2020-08-26T12:09:35.529-0700 [DEBUG] plugin: plugin process exited: path=/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk pid=46420
+2020-08-26T12:09:35.529-0700 [DEBUG] plugin: plugin exited
+2020/08/26 12:09:35 [TRACE] terraform.NewContext: complete
+2020/08/26 12:09:35 [TRACE] backend/local: finished building terraform.Context
+2020/08/26 12:09:35 [TRACE] backend/local: requesting interactive input, if necessary
+2020/08/26 12:09:35 [TRACE] Context.Input: Prompting for provider arguments
+2020/08/26 12:09:35 [TRACE] Context.Input: Provider provider.splunk declared at example.tf:7,1-18
+2020/08/26 12:09:35 [TRACE] Context.Input: Input for provider.splunk: map[string]cty.Value{}
+2020/08/26 12:09:35 [TRACE] backend/local: running validation operation
+2020/08/26 12:09:35 [INFO] terraform: building graph: GraphTypeValidate
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ConfigTransformer
+2020/08/26 12:09:35 [TRACE] ConfigTransformer: Starting for path: 
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ConfigTransformer with new graph:
+  splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+  splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+  splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+  splunk_index.new-index - *terraform.NodeValidatableResource
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.LocalTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.LocalTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.OutputTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.OutputTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.OrphanResourceInstanceTransformer
+2020/08/26 12:09:35 [TRACE] OrphanResourceInstanceTransformer: adding single-instance orphan node for splunk_index.bar
+2020/08/26 12:09:35 [TRACE] OrphanResourceInstanceTransformer: adding single-instance orphan node for splunk_index.foo
+2020/08/26 12:09:35 [TRACE] OrphanResourceInstanceTransformer: adding single-instance orphan node for splunk_inputs_http_event_collector.hec
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.OrphanResourceInstanceTransformer with new graph:
+  splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+  splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+  splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+  splunk_index.bar - *terraform.NodeAbstractResourceInstance
+  splunk_index.foo - *terraform.NodeAbstractResourceInstance
+  splunk_index.new-index - *terraform.NodeValidatableResource
+  splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.StateTransformer
+2020/08/26 12:09:35 [TRACE] StateTransformer: creating nodes for deposed instance objects only
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.StateTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.OrphanOutputTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.OrphanOutputTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachResourceConfigTransformer
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_authentication_users.user01" (*terraform.NodeValidatableResource) config from example.tf:21,1-48
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_inputs_http_event_collector.hec-token-01" (*terraform.NodeValidatableResource) config from example.tf:42,1-61
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_saved_searches.new-search-01" (*terraform.NodeValidatableResource) config from example.tf:63,1-49
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_authorization_roles.role01" (*terraform.NodeValidatableResource) config from example.tf:14,1-47
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_index.new-index" (*terraform.NodeValidatableResource) config from example.tf:32,1-36
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_global_http_event_collector.http" (*terraform.NodeValidatableResource) config from example.tf:36,1-53
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_configs_conf.new-conf-stanza" (*terraform.NodeValidatableResource) config from example.tf:89,1-49
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachResourceConfigTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachStateTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachStateTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.RootVariableTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.RootVariableTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.MissingProvisionerTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.MissingProvisionerTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ProvisionerTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ProvisionerTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ModuleVariableTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ModuleVariableTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.graphTransformerMulti
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.ProviderConfigTransformer
+2020/08/26 12:09:35 [TRACE] ProviderConfigTransformer: attaching to "provider.splunk" provider configuration from example.tf:7,1-18
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.ProviderConfigTransformer with new graph:
+  provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+  splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+  splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+  splunk_index.bar - *terraform.NodeAbstractResourceInstance
+  splunk_index.foo - *terraform.NodeAbstractResourceInstance
+  splunk_index.new-index - *terraform.NodeValidatableResource
+  splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+  ------
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.MissingProviderTransformer
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.MissingProviderTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.ProviderTransformer
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_global_http_event_collector.http is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_configs_conf.new-conf-stanza is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_index.bar is provided by provider.splunk exactly
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_authorization_roles.role01 is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_index.new-index is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_saved_searches.new-search-01 is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_index.foo is provided by provider.splunk exactly
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_inputs_http_event_collector.hec is provided by provider.splunk exactly
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_authentication_users.user01 is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_inputs_http_event_collector.hec-token-01 is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_configs_conf.new-conf-stanza" (*terraform.NodeValidatableResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_index.bar
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_index.bar" (*terraform.NodeAbstractResourceInstance) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_authorization_roles.role01
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_authorization_roles.role01" (*terraform.NodeValidatableResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_saved_searches.new-search-01" (*terraform.NodeValidatableResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_inputs_http_event_collector.hec-token-01" (*terraform.NodeValidatableResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_global_http_event_collector.http
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_global_http_event_collector.http" (*terraform.NodeValidatableResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_index.new-index
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_index.new-index" (*terraform.NodeValidatableResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_index.foo
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_index.foo" (*terraform.NodeAbstractResourceInstance) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_inputs_http_event_collector.hec
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_inputs_http_event_collector.hec" (*terraform.NodeAbstractResourceInstance) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_authentication_users.user01
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_authentication_users.user01" (*terraform.NodeValidatableResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.ProviderTransformer with new graph:
+  provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.new-index - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  ------
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.PruneProviderTransformer
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.PruneProviderTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.ParentProviderTransformer
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.ParentProviderTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.graphTransformerMulti with new graph:
+  provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.new-index - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.RemovedModuleTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.RemovedModuleTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachSchemaTransformer
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching provider config schema to provider.splunk
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_authorization_roles.role01
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_index.new-index
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_global_http_event_collector.http
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_index.bar
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_authentication_users.user01
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_index.foo
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_inputs_http_event_collector.hec
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachSchemaTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ReferenceTransformer
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_global_http_event_collector.http" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_configs_conf.new-conf-stanza" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_index.bar" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "provider.splunk" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_authorization_roles.role01" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_index.new-index" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_saved_searches.new-search-01" references: [splunk_authentication_users.user01 splunk_index.new-index]
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_index.foo" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_inputs_http_event_collector.hec" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_authentication_users.user01" references: [splunk_authorization_roles.role01]
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_inputs_http_event_collector.hec-token-01" references: [splunk_authentication_users.user01 splunk_global_http_event_collector.http splunk_index.new-index]
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ReferenceTransformer with new graph:
+  provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+  splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.new-index - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    splunk_index.new-index - *terraform.NodeValidatableResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_index.new-index - *terraform.NodeValidatableResource
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.CountBoundaryTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.CountBoundaryTransformer with new graph:
+  meta.count-boundary (EachMode fixup) - *terraform.NodeCountBoundary
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+    splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    splunk_index.new-index - *terraform.NodeValidatableResource
+    splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+  provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+  splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.new-index - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    splunk_index.new-index - *terraform.NodeValidatableResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_index.new-index - *terraform.NodeValidatableResource
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.TargetsTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.TargetsTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ForcedCBDTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ForcedCBDTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.CloseProviderTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.CloseProviderTransformer with new graph:
+  meta.count-boundary (EachMode fixup) - *terraform.NodeCountBoundary
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+    splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    splunk_index.new-index - *terraform.NodeValidatableResource
+    splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+  provider.splunk - *terraform.NodeApplyableProvider
+  provider.splunk (close) - *terraform.graphNodeCloseProvider
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+    splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    splunk_index.new-index - *terraform.NodeValidatableResource
+    splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+  splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+  splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.new-index - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    splunk_index.new-index - *terraform.NodeValidatableResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_index.new-index - *terraform.NodeValidatableResource
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.CloseProvisionerTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.CloseProvisionerTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.RootTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.RootTransformer with new graph:
+  meta.count-boundary (EachMode fixup) - *terraform.NodeCountBoundary
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+    splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    splunk_index.new-index - *terraform.NodeValidatableResource
+    splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+  provider.splunk - *terraform.NodeApplyableProvider
+  provider.splunk (close) - *terraform.graphNodeCloseProvider
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+    splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    splunk_index.new-index - *terraform.NodeValidatableResource
+    splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+  root - terraform.graphNodeRoot
+    meta.count-boundary (EachMode fixup) - *terraform.NodeCountBoundary
+    provider.splunk (close) - *terraform.graphNodeCloseProvider
+  splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+  splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.new-index - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    splunk_index.new-index - *terraform.NodeValidatableResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_index.new-index - *terraform.NodeValidatableResource
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.TransitiveReductionTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.TransitiveReductionTransformer with new graph:
+  meta.count-boundary (EachMode fixup) - *terraform.NodeCountBoundary
+    splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+  provider.splunk - *terraform.NodeApplyableProvider
+  provider.splunk (close) - *terraform.graphNodeCloseProvider
+    splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+  root - terraform.graphNodeRoot
+    meta.count-boundary (EachMode fixup) - *terraform.NodeCountBoundary
+    provider.splunk (close) - *terraform.graphNodeCloseProvider
+  splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+  splunk_authorization_roles.role01 - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.bar - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.foo - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.new-index - *terraform.NodeValidatableResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec - *terraform.NodeAbstractResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeValidatableResource
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_global_http_event_collector.http - *terraform.NodeValidatableResource
+    splunk_index.new-index - *terraform.NodeValidatableResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeValidatableResource
+    splunk_authentication_users.user01 - *terraform.NodeValidatableResource
+    splunk_index.new-index - *terraform.NodeValidatableResource
+  ------
+2020/08/26 12:09:35 [DEBUG] Starting graph walk: walkValidate
+2020/08/26 12:09:35 [TRACE] dag/walk: updating graph
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "provider.splunk (close)"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_saved_searches.new-search-01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_inputs_http_event_collector.hec"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_authentication_users.user01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_index.bar"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "meta.count-boundary (EachMode fixup)"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_inputs_http_event_collector.hec-token-01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "root"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_index.new-index"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_configs_conf.new-conf-stanza"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_authorization_roles.role01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_global_http_event_collector.http"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_index.foo"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_index.foo" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "meta.count-boundary (EachMode fixup)" waiting on "splunk_inputs_http_event_collector.hec-token-01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "root" waiting on "provider.splunk (close)"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_inputs_http_event_collector.hec" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_inputs_http_event_collector.hec-token-01" waiting on "splunk_authentication_users.user01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "meta.count-boundary (EachMode fixup)" waiting on "splunk_index.bar"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "meta.count-boundary (EachMode fixup)" waiting on "splunk_inputs_http_event_collector.hec"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "provider.splunk (close)" waiting on "splunk_inputs_http_event_collector.hec-token-01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "meta.count-boundary (EachMode fixup)" waiting on "splunk_saved_searches.new-search-01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_index.new-index" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_saved_searches.new-search-01" waiting on "splunk_index.new-index"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "root" waiting on "meta.count-boundary (EachMode fixup)"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_saved_searches.new-search-01" waiting on "splunk_authentication_users.user01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "provider.splunk (close)" waiting on "splunk_inputs_http_event_collector.hec"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "provider.splunk (close)" waiting on "splunk_index.bar"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_configs_conf.new-conf-stanza" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "provider.splunk (close)" waiting on "splunk_saved_searches.new-search-01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_global_http_event_collector.http" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "meta.count-boundary (EachMode fixup)" waiting on "splunk_configs_conf.new-conf-stanza"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "provider.splunk (close)" waiting on "splunk_configs_conf.new-conf-stanza"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_authentication_users.user01" waiting on "splunk_authorization_roles.role01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_authorization_roles.role01" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "provider.splunk (close)" waiting on "splunk_index.foo"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_index.bar" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_inputs_http_event_collector.hec-token-01" waiting on "splunk_global_http_event_collector.http"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "meta.count-boundary (EachMode fixup)" waiting on "splunk_index.foo"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_inputs_http_event_collector.hec-token-01" waiting on "splunk_index.new-index"
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "provider.splunk (close)", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_index.new-index", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_global_http_event_collector.http", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_index.foo", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "meta.count-boundary (EachMode fixup)", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "root", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_inputs_http_event_collector.hec", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_inputs_http_event_collector.hec-token-01", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_authentication_users.user01", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_saved_searches.new-search-01", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_configs_conf.new-conf-stanza", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_authorization_roles.role01", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_index.bar", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "provider.splunk"
+2020/08/26 12:09:35 [TRACE] vertex "provider.splunk": starting visit (*terraform.NodeApplyableProvider)
+2020/08/26 12:09:35 [TRACE] vertex "provider.splunk": evaluating
+2020/08/26 12:09:35 [TRACE] [walkValidate] Entering eval tree: provider.splunk
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalInitProvider
+2020-08-26T12:09:35.534-0700 [INFO]  plugin: configuring client automatic mTLS
+2020-08-26T12:09:35.555-0700 [DEBUG] plugin: starting plugin: path=/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk args=[/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk]
+2020-08-26T12:09:35.559-0700 [DEBUG] plugin: plugin started: path=/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk pid=46423
+2020-08-26T12:09:35.559-0700 [DEBUG] plugin: waiting for RPC address: path=/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk
+2020-08-26T12:09:35.578-0700 [INFO]  plugin.terraform-provider-splunk: configuring server automatic mTLS: timestamp=2020-08-26T12:09:35.578-0700
+2020-08-26T12:09:35.601-0700 [DEBUG] plugin: using plugin: version=5
+2020-08-26T12:09:35.601-0700 [DEBUG] plugin.terraform-provider-splunk: plugin address: address=/var/folders/3r/lsz_y3cd0dvb5j563yr1hpnrg2g7xb/T/plugin347233034 network=unix timestamp=2020-08-26T12:09:35.601-0700
+2020/08/26 12:09:35 [TRACE] BuiltinEvalContext: Initialized "splunk" provider for provider.splunk
+2020/08/26 12:09:35 [TRACE] <root>: eval: terraform.EvalNoop
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalOpFilter
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalValidateProvider
+2020/08/26 12:09:35 [TRACE] buildProviderConfig for provider.splunk: using explicit config only
+2020/08/26 12:09:35 [TRACE] GRPCProvider: GetSchema
+2020/08/26 12:09:35 [TRACE] GRPCProvider: PrepareProviderConfig
+2020/08/26 12:09:35 [TRACE] <root>: eval: terraform.EvalNoop
+2020/08/26 12:09:35 [TRACE] <root>: eval: terraform.EvalNoop
+2020/08/26 12:09:35 [TRACE] [walkValidate] Exiting eval tree: provider.splunk
+2020/08/26 12:09:35 [TRACE] vertex "provider.splunk": visit complete
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_index.new-index"
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_configs_conf.new-conf-stanza"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.new-index": starting visit (*terraform.NodeValidatableResource)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_configs_conf.new-conf-stanza": starting visit (*terraform.NodeValidatableResource)
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_index.foo"
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_inputs_http_event_collector.hec"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.new-index": evaluating
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.foo": starting visit (*terraform.NodeAbstractResourceInstance)
+2020/08/26 12:09:35 [TRACE] [walkValidate] Entering eval tree: splunk_index.new-index
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_authorization_roles.role01"
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] vertex "splunk_configs_conf.new-conf-stanza": evaluating
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authorization_roles.role01": starting visit (*terraform.NodeValidatableResource)
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_index.bar"
+2020/08/26 12:09:35 [TRACE] [walkValidate] Entering eval tree: splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.bar": starting visit (*terraform.NodeAbstractResourceInstance)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.bar": visit complete
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec": starting visit (*terraform.NodeAbstractResourceInstance)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec": visit complete
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_global_http_event_collector.http"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_global_http_event_collector.http": starting visit (*terraform.NodeValidatableResource)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.foo": visit complete
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] vertex "splunk_global_http_event_collector.http": evaluating
+2020/08/26 12:09:35 [TRACE] [walkValidate] Entering eval tree: splunk_global_http_event_collector.http
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalValidateResource
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalValidateResource
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalValidateResource
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authorization_roles.role01": evaluating
+2020/08/26 12:09:35 [TRACE] [walkValidate] Entering eval tree: splunk_authorization_roles.role01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalValidateResource
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] [walkValidate] Exiting eval tree: splunk_global_http_event_collector.http
+2020/08/26 12:09:35 [TRACE] vertex "splunk_global_http_event_collector.http": visit complete
+2020/08/26 12:09:35 [TRACE] [walkValidate] Exiting eval tree: splunk_authorization_roles.role01
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authorization_roles.role01": visit complete
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_authentication_users.user01"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authentication_users.user01": starting visit (*terraform.NodeValidatableResource)
+2020/08/26 12:09:35 [TRACE] [walkValidate] Exiting eval tree: splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [TRACE] vertex "splunk_configs_conf.new-conf-stanza": visit complete
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authentication_users.user01": evaluating
+2020/08/26 12:09:35 [TRACE] [walkValidate] Entering eval tree: splunk_authentication_users.user01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalValidateResource
+2020/08/26 12:09:35 [TRACE] [walkValidate] Exiting eval tree: splunk_index.new-index
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.new-index": visit complete
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] [walkValidate] Exiting eval tree: splunk_authentication_users.user01
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authentication_users.user01": visit complete
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_inputs_http_event_collector.hec-token-01"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec-token-01": starting visit (*terraform.NodeValidatableResource)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec-token-01": evaluating
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_saved_searches.new-search-01"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_saved_searches.new-search-01": starting visit (*terraform.NodeValidatableResource)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_saved_searches.new-search-01": evaluating
+2020/08/26 12:09:35 [TRACE] [walkValidate] Entering eval tree: splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] [walkValidate] Entering eval tree: splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalValidateResource
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalValidateResource
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] [walkValidate] Exiting eval tree: splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec-token-01": visit complete
+2020/08/26 12:09:35 [TRACE] [walkValidate] Exiting eval tree: splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [TRACE] vertex "splunk_saved_searches.new-search-01": visit complete
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "provider.splunk (close)"
+2020/08/26 12:09:35 [TRACE] vertex "provider.splunk (close)": starting visit (*terraform.graphNodeCloseProvider)
+2020/08/26 12:09:35 [TRACE] vertex "provider.splunk (close)": evaluating
+2020/08/26 12:09:35 [TRACE] [walkValidate] Entering eval tree: provider.splunk (close)
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalCloseProvider
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "meta.count-boundary (EachMode fixup)"
+2020/08/26 12:09:35 [TRACE] GRPCProvider: Close
+2020/08/26 12:09:35 [TRACE] vertex "meta.count-boundary (EachMode fixup)": starting visit (*terraform.NodeCountBoundary)
+2020/08/26 12:09:35 [TRACE] vertex "meta.count-boundary (EachMode fixup)": evaluating
+2020/08/26 12:09:35 [TRACE] [walkValidate] Entering eval tree: meta.count-boundary (EachMode fixup)
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalCountFixZeroOneBoundaryGlobal
+2020/08/26 12:09:35 [WARN] Not fixing up EachModes for splunk_index.foo because it has no config
+2020/08/26 12:09:35 [WARN] Not fixing up EachModes for splunk_inputs_http_event_collector.hec because it has no config
+2020/08/26 12:09:35 [WARN] Not fixing up EachModes for splunk_index.bar because it has no config
+2020/08/26 12:09:35 [TRACE] [walkValidate] Exiting eval tree: meta.count-boundary (EachMode fixup)
+2020/08/26 12:09:35 [TRACE] vertex "meta.count-boundary (EachMode fixup)": visit complete
+2020-08-26T12:09:35.658-0700 [DEBUG] plugin: plugin process exited: path=/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk pid=46423
+2020-08-26T12:09:35.658-0700 [DEBUG] plugin: plugin exited
+2020/08/26 12:09:35 [TRACE] [walkValidate] Exiting eval tree: provider.splunk (close)
+2020/08/26 12:09:35 [TRACE] vertex "provider.splunk (close)": visit complete
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "root"
+2020/08/26 12:09:35 [TRACE] vertex "root": starting visit (terraform.graphNodeRoot)
+2020/08/26 12:09:35 [TRACE] vertex "root": visit complete
+2020/08/26 12:09:35 [INFO] backend/local: apply calling Refresh
+2020/08/26 12:09:35 [INFO] terraform: building graph: GraphTypeRefresh
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ConfigTransformer
+2020/08/26 12:09:35 [TRACE] ConfigTransformer: Starting for path: 
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ConfigTransformer with new graph:
+  splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+  splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResource
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeRefreshableManagedResource
+  splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResource
+  splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeRefreshableManagedResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeRefreshableManagedResource
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ConfigTransformer
+2020/08/26 12:09:35 [TRACE] ConfigTransformer: Starting for path: 
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ConfigTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.OrphanResourceInstanceTransformer
+2020/08/26 12:09:35 [TRACE] OrphanResourceInstanceTransformer: adding single-instance orphan node for splunk_index.bar
+2020/08/26 12:09:35 [TRACE] OrphanResourceInstanceTransformer: adding single-instance orphan node for splunk_index.foo
+2020/08/26 12:09:35 [TRACE] OrphanResourceInstanceTransformer: adding single-instance orphan node for splunk_inputs_http_event_collector.hec
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.OrphanResourceInstanceTransformer with new graph:
+  splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+  splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResource
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeRefreshableManagedResource
+  splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResource
+  splunk_index.bar - *terraform.NodeRefreshableManagedResourceInstance
+  splunk_index.foo - *terraform.NodeRefreshableManagedResourceInstance
+  splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+  splunk_inputs_http_event_collector.hec - *terraform.NodeRefreshableManagedResourceInstance
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeRefreshableManagedResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeRefreshableManagedResource
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.StateTransformer
+2020/08/26 12:09:35 [TRACE] StateTransformer: creating nodes for deposed instance objects only
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.StateTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachStateTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachStateTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachResourceConfigTransformer
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_configs_conf.new-conf-stanza" (*terraform.NodeRefreshableManagedResource) config from example.tf:89,1-49
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_authorization_roles.role01" (*terraform.NodeRefreshableManagedResource) config from example.tf:14,1-47
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_index.new-index" (*terraform.NodeRefreshableManagedResource) config from example.tf:32,1-36
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_global_http_event_collector.http" (*terraform.NodeRefreshableManagedResource) config from example.tf:36,1-53
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_inputs_http_event_collector.hec-token-01" (*terraform.NodeRefreshableManagedResource) config from example.tf:42,1-61
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_saved_searches.new-search-01" (*terraform.NodeRefreshableManagedResource) config from example.tf:63,1-49
+2020/08/26 12:09:35 [TRACE] AttachResourceConfigTransformer: attaching to "splunk_authentication_users.user01" (*terraform.NodeRefreshableManagedResource) config from example.tf:21,1-48
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachResourceConfigTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.RootVariableTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.RootVariableTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.LocalTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.LocalTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.OutputTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.OutputTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ModuleVariableTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ModuleVariableTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.graphTransformerMulti
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.ProviderConfigTransformer
+2020/08/26 12:09:35 [TRACE] ProviderConfigTransformer: attaching to "provider.splunk" provider configuration from example.tf:7,1-18
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.ProviderConfigTransformer with new graph:
+  provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+  splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResource
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeRefreshableManagedResource
+  splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResource
+  splunk_index.bar - *terraform.NodeRefreshableManagedResourceInstance
+  splunk_index.foo - *terraform.NodeRefreshableManagedResourceInstance
+  splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+  splunk_inputs_http_event_collector.hec - *terraform.NodeRefreshableManagedResourceInstance
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeRefreshableManagedResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeRefreshableManagedResource
+  ------
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.MissingProviderTransformer
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.MissingProviderTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.ProviderTransformer
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_inputs_http_event_collector.hec is provided by provider.splunk exactly
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_authentication_users.user01 is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_global_http_event_collector.http is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_inputs_http_event_collector.hec-token-01 is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_saved_searches.new-search-01 is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_index.foo is provided by provider.splunk exactly
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_index.new-index is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_configs_conf.new-conf-stanza is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_authorization_roles.role01 is provided by provider.splunk or inherited equivalent
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: splunk_index.bar is provided by provider.splunk exactly
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_inputs_http_event_collector.hec
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_inputs_http_event_collector.hec" (*terraform.NodeRefreshableManagedResourceInstance) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_authentication_users.user01
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_authentication_users.user01" (*terraform.NodeRefreshableManagedResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_inputs_http_event_collector.hec-token-01" (*terraform.NodeRefreshableManagedResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_saved_searches.new-search-01" (*terraform.NodeRefreshableManagedResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_index.new-index
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_index.new-index" (*terraform.NodeRefreshableManagedResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_authorization_roles.role01
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_authorization_roles.role01" (*terraform.NodeRefreshableManagedResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_global_http_event_collector.http
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_global_http_event_collector.http" (*terraform.NodeRefreshableManagedResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_index.foo
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_index.foo" (*terraform.NodeRefreshableManagedResourceInstance) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_configs_conf.new-conf-stanza" (*terraform.NodeRefreshableManagedResource) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] ProviderTransformer: exact match for provider.splunk serving splunk_index.bar
+2020/08/26 12:09:35 [DEBUG] ProviderTransformer: "splunk_index.bar" (*terraform.NodeRefreshableManagedResourceInstance) needs provider.splunk
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.ProviderTransformer with new graph:
+  provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.bar - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.foo - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_saved_searches.new-search-01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  ------
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.PruneProviderTransformer
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.PruneProviderTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Executing graph transform *terraform.ParentProviderTransformer
+2020/08/26 12:09:35 [TRACE] (graphTransformerMulti) Completed graph transform *terraform.ParentProviderTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.graphTransformerMulti with new graph:
+  provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.bar - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.foo - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_saved_searches.new-search-01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachSchemaTransformer
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_index.new-index
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_authorization_roles.role01
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_index.bar
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching provider config schema to provider.splunk
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_authentication_users.user01
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_global_http_event_collector.http
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_index.foo
+2020/08/26 12:09:35 [TRACE] AttachSchemaTransformer: attaching resource schema to splunk_inputs_http_event_collector.hec
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachSchemaTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ReferenceTransformer
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_inputs_http_event_collector.hec-token-01" references: [splunk_authentication_users.user01 splunk_global_http_event_collector.http splunk_index.new-index]
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_saved_searches.new-search-01" references: [splunk_authentication_users.user01 splunk_index.new-index]
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_index.foo" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_inputs_http_event_collector.hec" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "provider.splunk" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_authentication_users.user01" references: [splunk_authorization_roles.role01]
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_global_http_event_collector.http" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_authorization_roles.role01" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_index.bar" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_index.new-index" references: []
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_configs_conf.new-conf-stanza" references: []
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ReferenceTransformer with new graph:
+  provider.splunk - *terraform.NodeApplyableProvider
+  splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResource
+  splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.bar - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.foo - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+    splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResource
+    splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+    splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachDependenciesTransformer
+2020/08/26 12:09:35 [TRACE] AttachDependenciesTransformer: splunk_index.new-index depends on []
+2020/08/26 12:09:35 [TRACE] AttachDependenciesTransformer: splunk_configs_conf.new-conf-stanza depends on []
+2020/08/26 12:09:35 [TRACE] AttachDependenciesTransformer: splunk_authorization_roles.role01 depends on []
+2020/08/26 12:09:35 [TRACE] AttachDependenciesTransformer: splunk_authentication_users.user01 depends on [splunk_authorization_roles.role01]
+2020/08/26 12:09:35 [TRACE] AttachDependenciesTransformer: splunk_global_http_event_collector.http depends on []
+2020/08/26 12:09:35 [TRACE] AttachDependenciesTransformer: splunk_inputs_http_event_collector.hec-token-01 depends on [splunk_authentication_users.user01 splunk_authorization_roles.role01 splunk_global_http_event_collector.http splunk_index.new-index]
+2020/08/26 12:09:35 [TRACE] AttachDependenciesTransformer: splunk_saved_searches.new-search-01 depends on [splunk_authentication_users.user01 splunk_authorization_roles.role01 splunk_index.new-index]
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachDependenciesTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.TargetsTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.TargetsTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.CloseProviderTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.CloseProviderTransformer with new graph:
+  provider.splunk - *terraform.NodeApplyableProvider
+  provider.splunk (close) - *terraform.graphNodeCloseProvider
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+    splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResource
+    splunk_configs_conf.new-conf-stanza - *terraform.NodeRefreshableManagedResource
+    splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResource
+    splunk_index.bar - *terraform.NodeRefreshableManagedResourceInstance
+    splunk_index.foo - *terraform.NodeRefreshableManagedResourceInstance
+    splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+    splunk_inputs_http_event_collector.hec - *terraform.NodeRefreshableManagedResourceInstance
+    splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeRefreshableManagedResource
+    splunk_saved_searches.new-search-01 - *terraform.NodeRefreshableManagedResource
+  splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResource
+  splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.bar - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.foo - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+    splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResource
+    splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+    splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+    splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.RootTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.RootTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.TransitiveReductionTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.TransitiveReductionTransformer with new graph:
+  provider.splunk - *terraform.NodeApplyableProvider
+  provider.splunk (close) - *terraform.graphNodeCloseProvider
+    splunk_configs_conf.new-conf-stanza - *terraform.NodeRefreshableManagedResource
+    splunk_index.bar - *terraform.NodeRefreshableManagedResourceInstance
+    splunk_index.foo - *terraform.NodeRefreshableManagedResourceInstance
+    splunk_inputs_http_event_collector.hec - *terraform.NodeRefreshableManagedResourceInstance
+    splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeRefreshableManagedResource
+    splunk_saved_searches.new-search-01 - *terraform.NodeRefreshableManagedResource
+  splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+    splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResource
+  splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.bar - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.foo - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec - *terraform.NodeRefreshableManagedResourceInstance
+    provider.splunk - *terraform.NodeApplyableProvider
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeRefreshableManagedResource
+    splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+    splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResource
+    splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+  splunk_saved_searches.new-search-01 - *terraform.NodeRefreshableManagedResource
+    splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResource
+    splunk_index.new-index - *terraform.NodeRefreshableManagedResource
+  ------
+2020/08/26 12:09:35 [DEBUG] Starting graph walk: walkRefresh
+2020/08/26 12:09:35 [TRACE] dag/walk: updating graph
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_inputs_http_event_collector.hec-token-01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_inputs_http_event_collector.hec"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_authentication_users.user01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_authorization_roles.role01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_index.new-index"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_index.bar"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_global_http_event_collector.http"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_saved_searches.new-search-01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_index.foo"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "provider.splunk (close)"
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_configs_conf.new-conf-stanza"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "provider.splunk (close)" waiting on "splunk_inputs_http_event_collector.hec"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_global_http_event_collector.http" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "provider.splunk (close)" waiting on "splunk_inputs_http_event_collector.hec-token-01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_inputs_http_event_collector.hec-token-01" waiting on "splunk_global_http_event_collector.http"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_inputs_http_event_collector.hec" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_authorization_roles.role01" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_authentication_users.user01" waiting on "splunk_authorization_roles.role01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_index.new-index" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "provider.splunk (close)" waiting on "splunk_configs_conf.new-conf-stanza"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_inputs_http_event_collector.hec-token-01" waiting on "splunk_index.new-index"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "provider.splunk (close)" waiting on "splunk_index.foo"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "provider.splunk (close)" waiting on "splunk_saved_searches.new-search-01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_inputs_http_event_collector.hec-token-01" waiting on "splunk_authentication_users.user01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_index.bar" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_index.foo" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_saved_searches.new-search-01" waiting on "splunk_authentication_users.user01"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_saved_searches.new-search-01" waiting on "splunk_index.new-index"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "splunk_configs_conf.new-conf-stanza" waiting on "provider.splunk"
+2020/08/26 12:09:35 [TRACE] dag/walk: added edge: "provider.splunk (close)" waiting on "splunk_index.bar"
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_global_http_event_collector.http", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_inputs_http_event_collector.hec", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_authorization_roles.role01", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_index.new-index", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_configs_conf.new-conf-stanza", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "provider.splunk (close)", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_inputs_http_event_collector.hec-token-01", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_authentication_users.user01", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_index.bar", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_index.foo", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: dependencies changed for "splunk_saved_searches.new-search-01", sending new deps
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "provider.splunk"
+2020/08/26 12:09:35 [TRACE] vertex "provider.splunk": starting visit (*terraform.NodeApplyableProvider)
+2020/08/26 12:09:35 [TRACE] vertex "provider.splunk": evaluating
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Entering eval tree: provider.splunk
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalInitProvider
+2020-08-26T12:09:35.661-0700 [INFO]  plugin: configuring client automatic mTLS
+2020-08-26T12:09:35.681-0700 [DEBUG] plugin: starting plugin: path=/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk args=[/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk]
+2020-08-26T12:09:35.684-0700 [DEBUG] plugin: plugin started: path=/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk pid=46424
+2020-08-26T12:09:35.684-0700 [DEBUG] plugin: waiting for RPC address: path=/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk
+2020-08-26T12:09:35.702-0700 [INFO]  plugin.terraform-provider-splunk: configuring server automatic mTLS: timestamp=2020-08-26T12:09:35.702-0700
+2020-08-26T12:09:35.726-0700 [DEBUG] plugin: using plugin: version=5
+2020-08-26T12:09:35.726-0700 [DEBUG] plugin.terraform-provider-splunk: plugin address: address=/var/folders/3r/lsz_y3cd0dvb5j563yr1hpnrg2g7xb/T/plugin976216687 network=unix timestamp=2020-08-26T12:09:35.726-0700
+2020/08/26 12:09:35 [TRACE] BuiltinEvalContext: Initialized "splunk" provider for provider.splunk
+2020/08/26 12:09:35 [TRACE] <root>: eval: terraform.EvalNoop
+2020/08/26 12:09:35 [TRACE] <root>: eval: terraform.EvalNoop
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalOpFilter
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalOpFilter
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalConfigProvider
+2020/08/26 12:09:35 [TRACE] buildProviderConfig for provider.splunk: using explicit config only
+2020/08/26 12:09:35 [TRACE] GRPCProvider: GetSchema
+2020/08/26 12:09:35 [TRACE] GRPCProvider: Configure
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Exiting eval tree: provider.splunk
+2020/08/26 12:09:35 [TRACE] vertex "provider.splunk": visit complete
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_index.foo"
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_configs_conf.new-conf-stanza"
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_global_http_event_collector.http"
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_inputs_http_event_collector.hec"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_global_http_event_collector.http": starting visit (*terraform.NodeRefreshableManagedResource)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec": starting visit (*terraform.NodeRefreshableManagedResourceInstance)
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_authorization_roles.role01"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_global_http_event_collector.http": expanding dynamic subgraph
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authorization_roles.role01": starting visit (*terraform.NodeRefreshableManagedResource)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.foo": starting visit (*terraform.NodeRefreshableManagedResourceInstance)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_configs_conf.new-conf-stanza": starting visit (*terraform.NodeRefreshableManagedResource)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_configs_conf.new-conf-stanza": expanding dynamic subgraph
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_index.bar"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.bar": starting visit (*terraform.NodeRefreshableManagedResourceInstance)
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_index.new-index"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.new-index": starting visit (*terraform.NodeRefreshableManagedResource)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authorization_roles.role01": expanding dynamic subgraph
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.new-index": expanding dynamic subgraph
+2020/08/26 12:09:35 [TRACE] NodeRefreshableManagedResourceInstance: splunk_index.bar will be refreshed
+2020/08/26 12:09:35 [TRACE] NodeRefreshableManagedResourceInstance: splunk_index.foo will be refreshed
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.bar": evaluating
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ResourceCountTransformer with new graph:
+  splunk_global_http_event_collector.http - *terraform.NodeRefreshableManagedResourceInstance
+  ------
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.foo": evaluating
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Entering eval tree: splunk_index.bar
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.OrphanResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Entering eval tree: splunk_index.foo
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] NodeRefreshableManagedResourceInstance: splunk_inputs_http_event_collector.hec will be refreshed
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec": evaluating
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Entering eval tree: splunk_inputs_http_event_collector.hec
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.OrphanResourceCountTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachStateTransformer
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalReadState
+2020/08/26 12:09:35 [TRACE] EvalReadState: reading state for splunk_inputs_http_event_collector.hec
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachStateTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.TargetsTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.TargetsTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ReferenceTransformer
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalReadState
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalReadState
+2020/08/26 12:09:35 [TRACE] EvalReadState: reading state for splunk_index.foo
+2020/08/26 12:09:35 [TRACE] EvalReadState: reading state for splunk_index.bar
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_global_http_event_collector.http" references: []
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ReferenceTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.RootTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.RootTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_global_http_event_collector.http": entering dynamic subgraph
+2020/08/26 12:09:35 [TRACE] dag/walk: updating graph
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_global_http_event_collector.http"
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_global_http_event_collector.http"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_global_http_event_collector.http": starting visit (*terraform.NodeRefreshableManagedResourceInstance)
+2020/08/26 12:09:35 [TRACE] NodeRefreshableManagedResourceInstance: splunk_global_http_event_collector.http will be refreshed
+2020/08/26 12:09:35 [TRACE] vertex "splunk_global_http_event_collector.http": evaluating
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Entering eval tree: splunk_global_http_event_collector.http
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ResourceCountTransformer with new graph:
+  splunk_configs_conf.new-conf-stanza - *terraform.NodeRefreshableManagedResourceInstance
+  ------
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalReadState
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.OrphanResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.OrphanResourceCountTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachStateTransformer
+2020/08/26 12:09:35 [DEBUG] Resource state not found for node "splunk_configs_conf.new-conf-stanza", instance splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachStateTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.TargetsTransformer
+2020/08/26 12:09:35 [TRACE] UpgradeResourceState: schema version of splunk_index.bar is still 0; calling provider "registry.terraform.io/-/splunk" for any other minor fixups
+2020/08/26 12:09:35 [TRACE] GRPCProvider: UpgradeResourceState
+2020/08/26 12:09:35 [TRACE] UpgradeResourceState: schema version of splunk_inputs_http_event_collector.hec is still 0; calling provider "registry.terraform.io/-/splunk" for any other minor fixups
+2020/08/26 12:09:35 [TRACE] GRPCProvider: UpgradeResourceState
+2020/08/26 12:09:35 [TRACE] UpgradeResourceState: schema version of splunk_index.foo is still 0; calling provider "registry.terraform.io/-/splunk" for any other minor fixups
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.TargetsTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] GRPCProvider: UpgradeResourceState
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ReferenceTransformer
+2020/08/26 12:09:35 [TRACE] EvalReadState: reading state for splunk_global_http_event_collector.http
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_configs_conf.new-conf-stanza" references: []
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ReferenceTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.RootTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.RootTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_configs_conf.new-conf-stanza": entering dynamic subgraph
+2020/08/26 12:09:35 [TRACE] UpgradeResourceState: schema version of splunk_global_http_event_collector.http is still 0; calling provider "registry.terraform.io/-/splunk" for any other minor fixups
+2020/08/26 12:09:35 [TRACE] GRPCProvider: UpgradeResourceState
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] dag/walk: updating graph
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_configs_conf.new-conf-stanza"
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ResourceCountTransformer with new graph:
+  splunk_authorization_roles.role01 - *terraform.NodeRefreshableManagedResourceInstance
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.OrphanResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.OrphanResourceCountTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachStateTransformer
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_configs_conf.new-conf-stanza"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_configs_conf.new-conf-stanza": starting visit (*terraform.NodeRefreshableManagedResourceInstance)
+2020/08/26 12:09:35 [DEBUG] Resource state not found for node "splunk_authorization_roles.role01", instance splunk_authorization_roles.role01
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachStateTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] NodeRefreshableManagedResourceInstance: splunk_configs_conf.new-conf-stanza has no existing state to refresh
+2020/08/26 12:09:35 [TRACE] vertex "splunk_configs_conf.new-conf-stanza": evaluating
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.TargetsTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.TargetsTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ReferenceTransformer
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Entering eval tree: splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalReadState
+2020/08/26 12:09:35 [TRACE] EvalReadState: reading state for splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_authorization_roles.role01" references: []
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ReferenceTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.RootTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.RootTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authorization_roles.role01": entering dynamic subgraph
+2020/08/26 12:09:35 [TRACE] dag/walk: updating graph
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_authorization_roles.role01"
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_authorization_roles.role01"
+2020/08/26 12:09:35 [TRACE] EvalReadState: no state present for splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authorization_roles.role01": starting visit (*terraform.NodeRefreshableManagedResourceInstance)
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalDiff
+2020/08/26 12:09:35 [TRACE] NodeRefreshableManagedResourceInstance: splunk_authorization_roles.role01 has no existing state to refresh
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ResourceCountTransformer with new graph:
+  splunk_index.new-index - *terraform.NodeRefreshableManagedResourceInstance
+  ------
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authorization_roles.role01": evaluating
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.OrphanResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.OrphanResourceCountTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachStateTransformer
+2020/08/26 12:09:35 [DEBUG] Resource state not found for node "splunk_index.new-index", instance splunk_index.new-index
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachStateTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.TargetsTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.TargetsTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Entering eval tree: splunk_authorization_roles.role01
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ReferenceTransformer
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalReadState
+2020/08/26 12:09:35 [TRACE] EvalReadState: reading state for splunk_authorization_roles.role01
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_index.new-index" references: []
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ReferenceTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.RootTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.RootTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.new-index": entering dynamic subgraph
+2020/08/26 12:09:35 [TRACE] dag/walk: updating graph
+2020/08/26 12:09:35 [TRACE] EvalReadState: no state present for splunk_authorization_roles.role01
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_index.new-index"
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_index.new-index"
+2020/08/26 12:09:35 [TRACE] Re-validating config for "splunk_configs_conf.new-conf-stanza"
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalDiff
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.new-index": starting visit (*terraform.NodeRefreshableManagedResourceInstance)
+2020/08/26 12:09:35 [TRACE] NodeRefreshableManagedResourceInstance: splunk_index.new-index has no existing state to refresh
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.new-index": evaluating
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Entering eval tree: splunk_index.new-index
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalReadState
+2020/08/26 12:09:35 [TRACE] EvalReadState: reading state for splunk_index.new-index
+2020/08/26 12:09:35 [TRACE] EvalReadState: no state present for splunk_index.new-index
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalDiff
+2020/08/26 12:09:35 [TRACE] Re-validating config for "splunk_authorization_roles.role01"
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] Re-validating config for "splunk_index.new-index"
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] GRPCProvider: PlanResourceChange
+2020/08/26 12:09:35 [TRACE] GRPCProvider: PlanResourceChange
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalRefreshDependencies
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalRefresh
+2020/08/26 12:09:35 [TRACE] GRPCProvider: PlanResourceChange
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ReadResource
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalRefreshDependencies
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalRefresh
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ReadResource
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalRefreshDependencies
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalRefresh
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ReadResource
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalRefreshDependencies
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalRefresh
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ReadResource
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteState
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteState
+2020/08/26 12:09:35 [TRACE] EvalWriteState: recording 0 dependencies for splunk_authorization_roles.role01
+2020/08/26 12:09:35 [TRACE] EvalWriteState: writing current state object for splunk_authorization_roles.role01
+2020/08/26 12:09:35 [TRACE] EvalWriteState: recording 0 dependencies for splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [TRACE] EvalWriteState: writing current state object for splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteDiff
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteDiff
+2020/08/26 12:09:35 [WARN] Provider "registry.terraform.io/-/splunk" produced an invalid plan for splunk_index.new-index, but we are tolerating it because it is using the legacy plugin SDK.
+    The following problems may be the cause of any confusing errors from downstream operations:
+      - .block_sign_size: planned value cty.NumberIntVal(0) does not match config value cty.NullVal(cty.Number)
+      - .enable_online_bucket_repair: planned value cty.True does not match config value cty.NullVal(cty.Bool)
+      - .max_warm_db_count: planned value cty.NumberIntVal(300) does not match config value cty.NullVal(cty.Number)
+      - .process_tracker_service_interval: planned value cty.NumberIntVal(1) does not match config value cty.NullVal(cty.Number)
+      - .partial_service_meta_period: planned value cty.NumberIntVal(0) does not match config value cty.NullVal(cty.Number)
+      - .sync_meta: planned value cty.True does not match config value cty.NullVal(cty.Bool)
+      - .frozen_time_period_in_secs: planned value cty.NumberIntVal(1.886976e+08) does not match config value cty.NullVal(cty.Number)
+      - .max_hot_idle_secs: planned value cty.NumberIntVal(0) does not match config value cty.NullVal(cty.Number)
+      - .max_mem_mb: planned value cty.NumberIntVal(5) does not match config value cty.NullVal(cty.Number)
+      - .max_total_data_size_mb: planned value cty.NumberIntVal(500000) does not match config value cty.NullVal(cty.Number)
+      - .rotate_period_in_secs: planned value cty.NumberIntVal(60) does not match config value cty.NullVal(cty.Number)
+      - .max_data_size: planned value cty.StringVal("auto") does not match config value cty.NullVal(cty.String)
+      - .min_stream_group_queue_size: planned value cty.NumberIntVal(2000) does not match config value cty.NullVal(cty.Number)
+      - .quarantine_past_secs: planned value cty.NumberIntVal(7.776e+07) does not match config value cty.NullVal(cty.Number)
+      - .max_concurrent_optimizes: planned value cty.NumberIntVal(6) does not match config value cty.NullVal(cty.Number)
+      - .max_hot_span_secs: planned value cty.NumberIntVal(7.776e+06) does not match config value cty.NullVal(cty.Number)
+      - .max_meta_entries: planned value cty.NumberIntVal(1e+06) does not match config value cty.NullVal(cty.Number)
+      - .max_time_unreplicated_no_acks: planned value cty.NumberIntVal(300) does not match config value cty.NullVal(cty.Number)
+      - .max_time_unreplicated_with_acks: planned value cty.NumberIntVal(60) does not match config value cty.NullVal(cty.Number)
+      - .datatype: planned value cty.StringVal("event") does not match config value cty.NullVal(cty.String)
+      - .min_raw_file_sync_secs: planned value cty.StringVal("disable") does not match config value cty.NullVal(cty.String)
+      - .quarantine_future_secs: planned value cty.NumberIntVal(2.592e+06) does not match config value cty.NullVal(cty.Number)
+      - .throttle_check_period: planned value cty.NumberIntVal(15) does not match config value cty.NullVal(cty.Number)
+      - .compress_rawdata: planned value cty.True does not match config value cty.NullVal(cty.Bool)
+      - .max_bloom_backfill_bucket_age: planned value cty.StringVal("30d") does not match config value cty.NullVal(cty.String)
+      - .service_meta_period: planned value cty.NumberIntVal(25) does not match config value cty.NullVal(cty.Number)
+      - .max_hot_buckets: planned value cty.NumberIntVal(3) does not match config value cty.NullVal(cty.Number)
+      - .raw_chunk_size_bytes: planned value cty.NumberIntVal(131072) does not match config value cty.NullVal(cty.Number)
+      - .acl: attribute representing nested block must not be unknown itself; set nested attribute values to unknown instead
+2020/08/26 12:09:35 [TRACE] EvalWriteDiff: recorded Create change for splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteState
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Exiting eval tree: splunk_configs_conf.new-conf-stanza
+2020/08/26 12:09:35 [TRACE] vertex "splunk_configs_conf.new-conf-stanza": visit complete
+2020/08/26 12:09:35 [TRACE] EvalWriteState: recording 0 dependencies for splunk_index.new-index
+2020/08/26 12:09:35 [TRACE] EvalWriteState: writing current state object for splunk_index.new-index
+2020/08/26 12:09:35 [TRACE] vertex "splunk_configs_conf.new-conf-stanza": dynamic subgraph completed successfully
+2020/08/26 12:09:35 [TRACE] EvalWriteDiff: recorded Create change for splunk_authorization_roles.role01
+2020/08/26 12:09:35 [TRACE] vertex "splunk_configs_conf.new-conf-stanza": visit complete
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Exiting eval tree: splunk_authorization_roles.role01
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authorization_roles.role01": visit complete
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authorization_roles.role01": dynamic subgraph completed successfully
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authorization_roles.role01": visit complete
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_authentication_users.user01"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authentication_users.user01": starting visit (*terraform.NodeRefreshableManagedResource)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authentication_users.user01": expanding dynamic subgraph
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ResourceCountTransformer with new graph:
+  splunk_authentication_users.user01 - *terraform.NodeRefreshableManagedResourceInstance
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.OrphanResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.OrphanResourceCountTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachStateTransformer
+2020/08/26 12:09:35 [DEBUG] Resource state not found for node "splunk_authentication_users.user01", instance splunk_authentication_users.user01
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachStateTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.TargetsTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.TargetsTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ReferenceTransformer
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_authentication_users.user01" references: []
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ReferenceTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.RootTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.RootTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authentication_users.user01": entering dynamic subgraph
+2020/08/26 12:09:35 [TRACE] dag/walk: updating graph
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteDiff
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_authentication_users.user01"
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_authentication_users.user01"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authentication_users.user01": starting visit (*terraform.NodeRefreshableManagedResourceInstance)
+2020/08/26 12:09:35 [TRACE] NodeRefreshableManagedResourceInstance: splunk_authentication_users.user01 has no existing state to refresh
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authentication_users.user01": evaluating
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Entering eval tree: splunk_authentication_users.user01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalReadState
+2020/08/26 12:09:35 [TRACE] EvalReadState: reading state for splunk_authentication_users.user01
+2020/08/26 12:09:35 [TRACE] EvalReadState: no state present for splunk_authentication_users.user01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalDiff
+2020/08/26 12:09:35 [TRACE] EvalWriteDiff: recorded Create change for splunk_index.new-index
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Exiting eval tree: splunk_index.new-index
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.new-index": visit complete
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.new-index": dynamic subgraph completed successfully
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.new-index": visit complete
+2020/08/26 12:09:35 [TRACE] Re-validating config for "splunk_authentication_users.user01"
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] GRPCProvider: PlanResourceChange
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteState
+2020/08/26 12:09:35 [TRACE] EvalWriteState: recording 1 dependencies for splunk_authentication_users.user01
+2020/08/26 12:09:35 [TRACE] EvalWriteState: writing current state object for splunk_authentication_users.user01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteDiff
+2020/08/26 12:09:35 [TRACE] EvalWriteDiff: recorded Create change for splunk_authentication_users.user01
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Exiting eval tree: splunk_authentication_users.user01
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authentication_users.user01": visit complete
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authentication_users.user01": dynamic subgraph completed successfully
+2020/08/26 12:09:35 [TRACE] vertex "splunk_authentication_users.user01": visit complete
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_saved_searches.new-search-01"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_saved_searches.new-search-01": starting visit (*terraform.NodeRefreshableManagedResource)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_saved_searches.new-search-01": expanding dynamic subgraph
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ResourceCountTransformer with new graph:
+  splunk_saved_searches.new-search-01 - *terraform.NodeRefreshableManagedResourceInstance
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.OrphanResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.OrphanResourceCountTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachStateTransformer
+2020/08/26 12:09:35 [DEBUG] Resource state not found for node "splunk_saved_searches.new-search-01", instance splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachStateTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.TargetsTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.TargetsTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ReferenceTransformer
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_saved_searches.new-search-01" references: []
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ReferenceTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.RootTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.RootTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_saved_searches.new-search-01": entering dynamic subgraph
+2020/08/26 12:09:35 [TRACE] dag/walk: updating graph
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_saved_searches.new-search-01"
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_saved_searches.new-search-01"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_saved_searches.new-search-01": starting visit (*terraform.NodeRefreshableManagedResourceInstance)
+2020/08/26 12:09:35 [TRACE] NodeRefreshableManagedResourceInstance: splunk_saved_searches.new-search-01 has no existing state to refresh
+2020/08/26 12:09:35 [TRACE] vertex "splunk_saved_searches.new-search-01": evaluating
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Entering eval tree: splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalReadState
+2020/08/26 12:09:35 [TRACE] EvalReadState: reading state for splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [TRACE] EvalReadState: no state present for splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalDiff
+2020/08/26 12:09:35 [TRACE] Re-validating config for "splunk_saved_searches.new-search-01"
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] GRPCProvider: PlanResourceChange
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteState
+2020/08/26 12:09:35 [TRACE] EvalWriteState: recording 3 dependencies for splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [TRACE] EvalWriteState: writing current state object for splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteDiff
+2020/08/26 12:09:35 [TRACE] EvalWriteDiff: recorded Create change for splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Exiting eval tree: splunk_saved_searches.new-search-01
+2020/08/26 12:09:35 [TRACE] vertex "splunk_saved_searches.new-search-01": visit complete
+2020/08/26 12:09:35 [TRACE] vertex "splunk_saved_searches.new-search-01": dynamic subgraph completed successfully
+2020/08/26 12:09:35 [TRACE] vertex "splunk_saved_searches.new-search-01": visit complete
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteState
+2020/08/26 12:09:35 [TRACE] EvalWriteState: recording 0 dependencies for splunk_global_http_event_collector.http
+2020/08/26 12:09:35 [TRACE] EvalWriteState: writing current state object for splunk_global_http_event_collector.http
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Exiting eval tree: splunk_global_http_event_collector.http
+2020/08/26 12:09:35 [TRACE] vertex "splunk_global_http_event_collector.http": visit complete
+2020/08/26 12:09:35 [TRACE] vertex "splunk_global_http_event_collector.http": dynamic subgraph completed successfully
+2020/08/26 12:09:35 [TRACE] vertex "splunk_global_http_event_collector.http": visit complete
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_inputs_http_event_collector.hec-token-01"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec-token-01": starting visit (*terraform.NodeRefreshableManagedResource)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec-token-01": expanding dynamic subgraph
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ResourceCountTransformer with new graph:
+  splunk_inputs_http_event_collector.hec-token-01 - *terraform.NodeRefreshableManagedResourceInstance
+  ------
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.OrphanResourceCountTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.OrphanResourceCountTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.AttachStateTransformer
+2020/08/26 12:09:35 [DEBUG] Resource state not found for node "splunk_inputs_http_event_collector.hec-token-01", instance splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.AttachStateTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.TargetsTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.TargetsTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.ReferenceTransformer
+2020/08/26 12:09:35 [DEBUG] ReferenceTransformer: "splunk_inputs_http_event_collector.hec-token-01" references: []
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.ReferenceTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] Executing graph transform *terraform.RootTransformer
+2020/08/26 12:09:35 [TRACE] Completed graph transform *terraform.RootTransformer (no changes)
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec-token-01": entering dynamic subgraph
+2020/08/26 12:09:35 [TRACE] dag/walk: updating graph
+2020/08/26 12:09:35 [TRACE] dag/walk: added new vertex: "splunk_inputs_http_event_collector.hec-token-01"
+2020/08/26 12:09:35 [TRACE] dag/walk: visiting "splunk_inputs_http_event_collector.hec-token-01"
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec-token-01": starting visit (*terraform.NodeRefreshableManagedResourceInstance)
+2020/08/26 12:09:35 [TRACE] NodeRefreshableManagedResourceInstance: splunk_inputs_http_event_collector.hec-token-01 has no existing state to refresh
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec-token-01": evaluating
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Entering eval tree: splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalSequence
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalGetProvider
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalReadState
+2020/08/26 12:09:35 [TRACE] EvalReadState: reading state for splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [TRACE] EvalReadState: no state present for splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalDiff
+2020/08/26 12:09:35 [TRACE] Re-validating config for "splunk_inputs_http_event_collector.hec-token-01"
+2020/08/26 12:09:35 [TRACE] GRPCProvider: ValidateResourceTypeConfig
+2020/08/26 12:09:35 [TRACE] GRPCProvider: PlanResourceChange
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteState
+2020/08/26 12:09:35 [TRACE] EvalWriteState: recording 4 dependencies for splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [TRACE] EvalWriteState: writing current state object for splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteDiff
+2020/08/26 12:09:35 [TRACE] EvalWriteDiff: recorded Create change for splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Exiting eval tree: splunk_inputs_http_event_collector.hec-token-01
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec-token-01": visit complete
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec-token-01": dynamic subgraph completed successfully
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec-token-01": visit complete
+2020/08/26 12:09:35 [TRACE] <root>: eval: *terraform.EvalWriteState
+2020/08/26 12:09:35 [TRACE] EvalWriteState: recording 1 dependencies for splunk_inputs_http_event_collector.hec
+2020/08/26 12:09:35 [TRACE] EvalWriteState: writing current state object for splunk_inputs_http_event_collector.hec
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Exiting eval tree: splunk_inputs_http_event_collector.hec
+2020/08/26 12:09:35 [TRACE] vertex "splunk_inputs_http_event_collector.hec": visit complete
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: panic: runtime error: invalid memory address or nil pointer dereference
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: [signal SIGSEGV: segmentation violation code=0x1 addr=0x28 pc=0x19c120a]
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: 
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: goroutine 130 [running]:
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: terraform-provider-splunk/splunk.indexRead(0xc00018ee70, 0x1a706e0, 0xc000010038, 0x0, 0x0)
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: 	/Users/nstone/Desktop/terraform-provider-splunk/splunk/resource_splunk_index.go:401 +0x16a
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: github.com/hashicorp/terraform-plugin-sdk/helper/schema.(*Resource).RefreshWithoutUpgrade(0xc0005de2d0, 0xc0000ae5f0, 0x1a706e0, 0xc000010038, 0xc000010a88, 0x0, 0x0)
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: 	/Users/nstone/Desktop/terraform-provider-splunk/vendor/github.com/hashicorp/terraform-plugin-sdk/helper/schema/resource.go:460 +0x129
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: github.com/hashicorp/terraform-plugin-sdk/internal/helper/plugin.(*GRPCProviderServer).ReadResource(0xc00012acc0, 0x1dc25e0, 0xc000283e30, 0xc0002866c0, 0xc00012acc0, 0xc000283e30, 0xc00073fb78)
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: 	/Users/nstone/Desktop/terraform-provider-splunk/vendor/github.com/hashicorp/terraform-plugin-sdk/internal/helper/plugin/grpc_provider.go:525 +0x3dd
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: github.com/hashicorp/terraform-plugin-sdk/internal/tfplugin5._Provider_ReadResource_Handler(0x1bf6e40, 0xc00012acc0, 0x1dc25e0, 0xc000283e30, 0xc000286660, 0x0, 0x1dc25e0, 0xc000283e30, 0xc000850000, 0x494)
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: 	/Users/nstone/Desktop/terraform-provider-splunk/vendor/github.com/hashicorp/terraform-plugin-sdk/internal/tfplugin5/tfplugin5.pb.go:3269 +0x214
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: google.golang.org/grpc.(*Server).processUnaryRPC(0xc0000a2600, 0x1dcb900, 0xc0000a3500, 0xc000202100, 0xc0000ba4e0, 0x2376bd0, 0x0, 0x0, 0x0)
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: 	/Users/nstone/Desktop/terraform-provider-splunk/vendor/google.golang.org/grpc/server.go:1024 +0x522
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: google.golang.org/grpc.(*Server).handleStream(0xc0000a2600, 0x1dcb900, 0xc0000a3500, 0xc000202100, 0x0)
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: 	/Users/nstone/Desktop/terraform-provider-splunk/vendor/google.golang.org/grpc/server.go:1313 +0xd34
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: google.golang.org/grpc.(*Server).serveStreams.func1.1(0xc00003a1f0, 0xc0000a2600, 0x1dcb900, 0xc0000a3500, 0xc000202100)
+2020-08-26T12:09:35.924-0700 [DEBUG] plugin.terraform-provider-splunk: 	/Users/nstone/Desktop/terraform-provider-splunk/vendor/google.golang.org/grpc/server.go:722 +0xa5
+2020-08-26T12:09:35.925-0700 [DEBUG] plugin.terraform-provider-splunk: created by google.golang.org/grpc.(*Server).serveStreams.func1
+2020-08-26T12:09:35.925-0700 [DEBUG] plugin.terraform-provider-splunk: 	/Users/nstone/Desktop/terraform-provider-splunk/vendor/google.golang.org/grpc/server.go:720 +0xa5
+2020/08/26 12:09:35 [ERROR] <root>: eval: *terraform.EvalRefresh, err: rpc error: code = Unavailable desc = transport is closing
+2020/08/26 12:09:35 [ERROR] <root>: eval: *terraform.EvalRefresh, err: rpc error: code = Unavailable desc = transport is closing
+2020-08-26T12:09:35.927-0700 [DEBUG] plugin: plugin process exited: path=/Users/nstone/Desktop/terraform-provider-splunk/terraform-provider-splunk pid=46424 error="exit status 2"
+2020/08/26 12:09:35 [ERROR] <root>: eval: *terraform.EvalSequence, err: rpc error: code = Unavailable desc = transport is closing
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Exiting eval tree: splunk_index.foo
+2020/08/26 12:09:35 [ERROR] <root>: eval: *terraform.EvalSequence, err: rpc error: code = Unavailable desc = transport is closing
+2020/08/26 12:09:35 [TRACE] [walkRefresh] Exiting eval tree: splunk_index.bar
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.bar": visit complete
+2020/08/26 12:09:35 [TRACE] vertex "splunk_index.foo": visit complete
+2020/08/26 12:09:35 [TRACE] dag/walk: upstream of "provider.splunk (close)" errored, so skipping
+2020/08/26 12:09:35 [TRACE] statemgr.Filesystem: removing lock metadata file .terraform.tfstate.lock.info
+2020/08/26 12:09:35 [TRACE] statemgr.Filesystem: unlocking terraform.tfstate using fcntl flock
+2020-08-26T12:09:35.927-0700 [DEBUG] plugin: plugin exited
