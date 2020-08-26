@@ -45,13 +45,13 @@ func TestAccCreateSplunkConfStanza(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "variables.key", "value"),
 				),
 			},
-			//{
-			//	Config: updateConfStanza,
-			//	Check: resource.ComposeTestCheckFunc(
-			//		resource.TestCheckResourceAttr(resourceName, "variables.%", "1"),
-			//		resource.TestCheckResourceAttr(resourceName, "variables.key", "new-value"),
-			//	),
-			//},
+			{
+				Config: updateConfStanza,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "variables.%", "1"),
+					resource.TestCheckResourceAttr(resourceName, "variables.key", "new-value"),
+				),
+			},
 			{
 				ResourceName:      "splunk_conf_stanza.tftest-stanza",
 				ImportState:       true,
