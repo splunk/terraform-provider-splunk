@@ -178,6 +178,12 @@ func (c *Client) Login() (e error) {
 	return err
 }
 
+// Takes a '/' separated string and returns the 0, 1 indexed strings from the split
+func (c *Client) SplitConfStanza(name string) (conf string, stanza string) {
+	split := strings.Split(name, "/")
+	return split[0], split[1]
+}
+
 // EncodeRequestBody takes a json string or object and serializes it to be used in request body
 func (c *Client) EncodeRequestBody(content interface{}) ([]byte, error) {
 	if content != nil {

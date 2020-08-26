@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
-	"strings"
 	"terraform-provider-splunk/client/models"
 )
 
@@ -55,10 +54,8 @@ func confStanzaCreate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if _, ok := d.GetOk("acl"); ok {
-		split_name := strings.Split(name, "/")
-		conf_name := split_name[0]
-		stanza_name := split_name[1]
-		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, stanza_name, aclObject, "configs", "conf-" + conf_name)
+		conf, stanza := (*provider.Client).SplitConfStanza(name)
+		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, stanza, aclObject, "configs", "conf-" + conf)
 		if err != nil {
 			return err
 		}
@@ -71,8 +68,7 @@ func confStanzaCreate(d *schema.ResourceData, meta interface{}) error {
 func confStanzaRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
-	split_name := strings.Split(name, "/")
-	stanza_name := split_name[1]
+	_, stanza := (*provider.Client).SplitConfStanza(name)
 
 	// We first get list of stanzas in a conf file to get owner and app name for the specific stanza
 	resp, err := (*provider.Client).ReadAllConfStanzaObject(name)
@@ -81,7 +77,7 @@ func confStanzaRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	defer resp.Body.Close()
 
-	entry, err := getConfStanzaConfigByName(stanza_name, resp)
+	entry, err := getConfStanzaConfigByName(stanza, resp)
 	if err != nil {
 		return err
 	}
@@ -115,7 +111,7 @@ func confStanzaRead(d *schema.ResourceData, meta interface{}) error {
 
 	delete(content, "disabled")
 
-	entry, err = getConfStanzaConfigByName(stanza_name, resp)
+	entry, err = getConfStanzaConfigByName(stanza, resp)
 	if err != nil {
 		return err
 	}
@@ -148,16 +144,15 @@ func confStanzaUpdate(d *schema.ResourceData, meta interface{}) error {
 		owner = aclObject.Owner
 	}
 	name := d.Id()
-	split_name := strings.Split(name, "/")
-	conf_name := split_name[0]
-	stanza_name := split_name[1]
+	conf, stanza := (*provider.Client).SplitConfStanza(name)
+
 	err := (*provider.Client).UpdateConfStanzaObject(d.Id(), owner, aclObject.App, confStanzaConfigObj)
 	if err != nil {
 		return err
 	}
 
 	//ACL update
-	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, stanza_name, aclObject, "configs", "conf-" + conf_name)
+	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, stanza, aclObject, "configs", "conf-" + conf)
 	if err != nil {
 		return err
 	}
