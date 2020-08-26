@@ -6,9 +6,9 @@ type ConfigsConfResponse struct {
 }
 
 type ConfigsConfEntry struct {
-	Name     string            `json:"name"`
-	ACL      ACLObject         `json:"acl"`
-	Content  ConfigsConfObject `json:"content"`
+	Name    string            `json:"name"`
+	ACL     ACLObject         `json:"acl"`
+	Content ConfigsConfObject `json:"content"`
 }
 
 type ConfigsConfObject struct {

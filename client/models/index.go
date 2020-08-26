@@ -1,14 +1,14 @@
 package models
 
 type IndexResponse struct {
-	Entry    []IndexEntry     `json:"entry"`
-	Messages []ErrorMessage   `json:"messages"`
+	Entry    []IndexEntry   `json:"entry"`
+	Messages []ErrorMessage `json:"messages"`
 }
 
 type IndexEntry struct {
-	Name    string                   `json:"name"`
-	ACL     ACLObject                `json:"acl"`
-	Content IndexObject              `json:"content"`
+	Name    string      `json:"name"`
+	ACL     ACLObject   `json:"acl"`
+	Content IndexObject `json:"content"`
 }
 
 type IndexObject struct {
