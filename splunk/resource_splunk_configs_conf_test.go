@@ -12,6 +12,7 @@ const newConfigsConf = `
 resource "splunk_configs_conf" "tftest-stanza" {
 	name = "tftest/tftest_stanza"
 	variables = {
+        "disabled": "false"
 		"key": "value"
 	}
 }
@@ -21,6 +22,7 @@ const updateConfigsConf = `
 resource "splunk_configs_conf" "tftest-stanza" {
 	name = "tftest/tftest_stanza"
 	variables = {
+        "disabled": "false"
 		"key": "new-value"
 	}
 }
@@ -38,14 +40,14 @@ func TestAccCreateSplunkConfigsConf(t *testing.T) {
 			{
 				Config: newConfigsConf,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "variables.%", "1"),
+					resource.TestCheckResourceAttr(resourceName, "variables.%", "2"),
 					resource.TestCheckResourceAttr(resourceName, "variables.key", "value"),
 				),
 			},
 			{
 				Config: updateConfigsConf,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "variables.%", "1"),
+					resource.TestCheckResourceAttr(resourceName, "variables.%", "2"),
 					resource.TestCheckResourceAttr(resourceName, "variables.key", "new-value"),
 				),
 			},

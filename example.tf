@@ -89,8 +89,9 @@ resource "splunk_saved_searches" "new-search-01" {
 }
 
 resource "splunk_configs_conf" "new-conf-stanza" {
-  name = "internaltf/custom"
+  name = "custom-conf/custom"
   variables = {
+    "disabled" : "false"
     "custom_key" : "value"
   }
   acl {

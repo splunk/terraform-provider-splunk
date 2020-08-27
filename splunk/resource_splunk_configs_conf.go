@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"strconv"
 	"terraform-provider-splunk/client/models"
 )
 
@@ -18,7 +19,12 @@ func configsConf() *schema.Resource {
 			"variables": {
 				Type:        schema.TypeMap,
 				Optional:    true,
+				Computed:    true,
 				Description: `A map of key value pairs for a stanza.`,
+				Elem: &schema.Schema{
+					Type:     schema.TypeString,
+					Computed: true,
+				},
 			},
 			"name": {
 				Type:         schema.TypeString,
@@ -95,7 +101,7 @@ func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer contentResp.Body.Close()
 
 	var result map[string]interface{}
 	b, _ := ioutil.ReadAll(contentResp.Body)
@@ -111,7 +117,8 @@ func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	delete(content, "disabled")
+	// Override value to convert bool Type to string
+	content["disabled"] = strconv.FormatBool(content["disabled"].(bool))
 
 	entry, err = getConfigsConfConfigByName(stanza, resp)
 	if err != nil {
