@@ -566,6 +566,10 @@ func indexRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
+	if err = d.Set("name", d.Id()); err != nil {
+		return err
+	}
+
 	err = d.Set("acl", flattenACL(&entry.ACL))
 	if err != nil {
 		return err
