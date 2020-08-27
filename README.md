@@ -49,7 +49,8 @@ Build the provider: `make build`
     `resource "splunk_inputs_scripts" "bar" { }`
 
 #### Notes and Troubleshooting
+* When conflicts arise during resource creation, import the resource first using `terraform import` command and make modifications to the resource.
 * When importing an existing conf file, Splunk will respond with all default values for the conf file stanza (even if they do not appear explicitly in the stanza itself). These can be added to the associated `configs_conf` Terraform resource in your `.tf` file, otherwise they will show up as removed in the `terraform plan` diff. <b>Although the plan will show them being removed, these default fields will <b>not</b> actually be modified or removed by Splunk.</b>
 * Testing errors mentioning `too many open files` may be related to `ulimits` on your machine. Check current and increase the maximum number of open files `1024` using `ulimits -n 1024`
 * If conf files are edited or deleted <b>manually</b>, restart Splunk to ensure state consistency before applying or reapplying a template.
-* Splunk environments with a large number of indexes, saved searches, knowledge objects, etc. may cause issues with the provided tests. To avoid these errors, use a fresh or lightly configured Splunk environment.
+* Splunk environments with numerous indexes, saved searches, knowledge objects, etc. may cause issues with the provided tests. To avoid these errors, use a fresh or lightly configured Splunk environment.

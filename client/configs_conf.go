@@ -76,7 +76,7 @@ func (client *Client) DeleteConfigsConfObject(name, owner, app string) (*http.Re
 func (client *Client) ReadAllConfigsConfObject(name string) (*http.Response, error) {
 	conf, _ := client.SplitConfStanza(name)
 
-	endpoint := client.BuildSplunkURL(nil, "services", "configs", "conf-"+conf)
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "configs", "conf-"+conf)
 
 	resp, err := client.Get(endpoint)
 	if err != nil {

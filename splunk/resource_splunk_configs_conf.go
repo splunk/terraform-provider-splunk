@@ -90,6 +90,10 @@ func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
+	if entry == nil {
+		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+	}
+
 	// Now we read the input configuration with proper owner and app
 	resp, err = (*provider.Client).ReadConfigsConfObject(name, entry.ACL.Owner, entry.ACL.App)
 	if err != nil {

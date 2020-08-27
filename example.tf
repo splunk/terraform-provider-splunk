@@ -94,7 +94,14 @@ resource "splunk_configs_conf" "new-conf-stanza" {
     "disabled" : "false"
     "custom_key" : "value"
   }
+
   acl {
-    app = "search"
+    app     = "search"
+    owner   = "user01"
+    sharing = "user"
   }
+
+  depends_on = [
+    splunk_authentication_users.user01,
+  ]
 }
