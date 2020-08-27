@@ -29,6 +29,12 @@ resource "splunk_authentication_users" "user01" {
   ]
 }
 
+resource "splunk_indexes" "user01-index" {
+  name                   = "user01-index"
+  max_hot_buckets        = 6
+  max_total_data_size_mb = 1000000
+}
+
 resource "splunk_global_http_event_collector" "http" {
   disabled   = false
   enable_ssl = true
@@ -37,8 +43,8 @@ resource "splunk_global_http_event_collector" "http" {
 
 resource "splunk_inputs_http_event_collector" "hec-token-01" {
   name       = "hec-token-01"
-  index      = "main"
-  indexes    = ["main", "history", "summary"]
+  index      = "user01-index"
+  indexes    = ["user01-index", "history", "summary"]
   source     = "new:source"
   sourcetype = "new:sourcetype"
   disabled   = false
@@ -50,8 +56,9 @@ resource "splunk_inputs_http_event_collector" "hec-token-01" {
     write   = ["admin"]
   }
   depends_on = [
+    splunk_indexes.user01-index,
     splunk_authentication_users.user01,
-    splunk_global_http_event_collector.http
+    splunk_global_http_event_collector.http,
   ]
 }
 
@@ -68,7 +75,7 @@ resource "splunk_saved_searches" "new-search-01" {
   dispatch_latest_time      = "rt-0m"
   cron_schedule             = "*/15 * * * *"
   name                      = "new-search-01"
-  search                    = "index=main source=http:hec-token-01"
+  search                    = "index=user01-index source=http:hec-token-01"
 
   acl {
     app     = "search"
@@ -77,5 +84,17 @@ resource "splunk_saved_searches" "new-search-01" {
   }
   depends_on = [
     splunk_authentication_users.user01,
+    splunk_indexes.user01-index
   ]
+}
+
+resource "splunk_configs_conf" "new-conf-stanza" {
+  name = "custom-conf/custom"
+  variables = {
+    "disabled" : "false"
+    "custom_key" : "value"
+  }
+  acl {
+    app = "search"
+  }
 }
