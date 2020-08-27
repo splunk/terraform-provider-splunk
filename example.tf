@@ -29,8 +29,10 @@ resource "splunk_authentication_users" "user01" {
   ]
 }
 
-resource "splunk_index" "new-index" {
-  name = "new-index"
+resource "splunk_indexes" "user01-index" {
+  name                   = "user01-index"
+  max_hot_buckets        = 6
+  max_total_data_size_mb = 1000000
 }
 
 resource "splunk_global_http_event_collector" "http" {
@@ -54,9 +56,9 @@ resource "splunk_inputs_http_event_collector" "hec-token-01" {
     write   = ["admin"]
   }
   depends_on = [
+    splunk_indexes.user01-index,
     splunk_authentication_users.user01,
     splunk_global_http_event_collector.http,
-    splunk_index.new-index
   ]
 }
 
@@ -82,7 +84,7 @@ resource "splunk_saved_searches" "new-search-01" {
   }
   depends_on = [
     splunk_authentication_users.user01,
-    splunk_index.new-index
+    splunk_indexes.user01-index
   ]
 }
 

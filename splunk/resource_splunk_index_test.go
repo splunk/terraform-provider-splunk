@@ -9,20 +9,20 @@ import (
 )
 
 const newIndex = `
-resource "splunk_index" "new-index" {
+resource "splunk_indexes" "new-index" {
     name = "new-index"
 }
 `
 
 const updateIndex = `
-resource "splunk_index" "new-index" {
+resource "splunk_indexes" "new-index" {
 	name = "new-index"
     max_time_unreplicated_no_acks = 301
 }
 `
 
 func TestAccCreateSplunkIndex(t *testing.T) {
-	resourceName := "splunk_index.new-index"
+	resourceName := "splunk_indexes.new-index"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -43,7 +43,7 @@ func TestAccCreateSplunkIndex(t *testing.T) {
 				),
 			},
 			{
-				ResourceName:      "splunk_index.new-index",
+				ResourceName:      "splunk_indexes.new-index",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -55,7 +55,7 @@ func testAccSplunkIndexDestroyResources(s *terraform.State) error {
 	client := newTestClient()
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
-		case "splunk_index":
+		case "splunk_indexes":
 			endpoint := client.BuildSplunkURL(nil, "services", "data", "indexes", rs.Primary.ID)
 			resp, err := client.Get(endpoint)
 			if resp.StatusCode != http.StatusNotFound {
