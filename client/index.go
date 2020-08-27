@@ -57,7 +57,7 @@ func (client *Client) DeleteIndexObject(name, owner, app string) (*http.Response
 }
 
 func (client *Client) ReadAllIndexObject() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "data", "indexes")
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "indexes")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
