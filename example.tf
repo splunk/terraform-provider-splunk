@@ -7,7 +7,7 @@
 provider "splunk" {
   url                  = "localhost:8089"
   username             = "admin"
-  password             = "password"
+  password             = "changeme"
   insecure_skip_verify = true
 }
 
@@ -97,4 +97,3 @@ resource "splunk_configs_conf" "new-conf-stanza" {
     app = "search"
   }
 }
-
