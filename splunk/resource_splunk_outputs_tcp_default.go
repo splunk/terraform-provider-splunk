@@ -15,10 +15,10 @@ func outputsTCPDefault() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "tcpout",
-				Description: "Configuration to be edited. The only valid value is tcpout",
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validation.StringInSlice([]string{"tcpout"}, false),
+				Description:  "Configuration to be edited. The only valid value is tcpout",
 			},
 			"default_group": {
 				Type:     schema.TypeString,

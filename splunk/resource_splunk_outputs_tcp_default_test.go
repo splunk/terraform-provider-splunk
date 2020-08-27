@@ -12,6 +12,7 @@ import (
 
 const newTCPDefaultOutput = `
 resource "splunk_outputs_tcp_default" "test" {
+    name = "tcpout"
     disabled = false
     default_group = "test-indexers"
     drop_events_on_queue_full = 60
@@ -23,6 +24,7 @@ resource "splunk_outputs_tcp_default" "test" {
 
 const updateTCPDefaultOutput = `
 resource "splunk_outputs_tcp_default" "test" {
+    name = "tcpout"
     disabled = false
     default_group = "test-indexers"
     drop_events_on_queue_full = 60
