@@ -71,10 +71,11 @@ func authorizationRoles() *schema.Resource {
 				Description: "Specifies the maximum disk space in MB that can be used by a user's search jobs. For example, a value of 100 limits this role to 100 MB total.",
 			},
 			"search_filter": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Restart background search job that has not completed when Splunk restarts indication.",
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "Specify a search string that restricts the scope of searches run by this role. " +
+					"Search results for this role only show events that also match the search string you specify. In the case that a user has multiple roles with different search filters, they are combined with an OR.",
 			},
 			"search_indexes_allowed": {
 				Type:     schema.TypeString,

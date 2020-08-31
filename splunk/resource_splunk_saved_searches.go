@@ -758,9 +758,10 @@ func savedSearches() *schema.Resource {
 				Description: "The maximum number of concurrent instances of this search the scheduler is allowed to run. Defaults to 1. ",
 			},
 			"name": {
-				Type:     schema.TypeString,
-				ForceNew: true,
-				Required: true,
+				Type:        schema.TypeString,
+				ForceNew:    true,
+				Required:    true,
+				Description: "A name for the search.",
 			},
 			"realtime_schedule": {
 				Type:     schema.TypeBool,

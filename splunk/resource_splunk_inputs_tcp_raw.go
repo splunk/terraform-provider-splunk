@@ -15,10 +15,11 @@ func inputsTCPRaw() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "Required. The input port which receives raw data.",
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validation.StringMatch(regexp.MustCompile("\\d+"), "Must be a Integer"),
+				Description:  "Required. The input port which receives raw data.",
 			},
 			"index": {
 				Type:        schema.TypeString,

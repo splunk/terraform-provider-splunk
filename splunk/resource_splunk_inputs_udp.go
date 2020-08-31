@@ -15,10 +15,11 @@ func inputsUDP() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "Required. The UDP port that this input should listen on.",
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validation.StringMatch(regexp.MustCompile("\\d+"), "Must be a Integer"),
+				Description:  "Required. The UDP port that this input should listen on.",
 			},
 			"index": {
 				Type:        schema.TypeString,
@@ -51,10 +52,10 @@ func inputsUDP() *schema.Resource {
 				Description: "Indicates if input is disabled.",
 			},
 			"queue": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
-				Description: " 	Which queue events from this input should be sent to. Generally this does not need to be changed.",
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Which queue events from this input should be sent to. Generally this does not need to be changed.",
 			},
 			"restrict_to_host": {
 				Type:        schema.TypeString,

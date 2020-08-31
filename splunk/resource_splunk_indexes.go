@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"net/http"
 	"regexp"
 	"terraform-provider-splunk/client/models"
@@ -86,10 +87,11 @@ func index() *schema.Resource {
 				Description: `This parameter is ignored. The splunkd process always compresses raw data.`,
 			},
 			"datatype": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: `Valid values: (event | metric). Specifies the type of index.`,
+				Type:         schema.TypeString,
+				Optional:     true,
+				Computed:     true,
+				ValidateFunc: validation.StringInSlice([]string{"event", "metric"}, false),
+				Description:  `Valid values: (event | metric). Specifies the type of index.`,
 			},
 			"enable_online_bucket_repair": {
 				Type:     schema.TypeBool,
@@ -115,10 +117,11 @@ func index() *schema.Resource {
 				Caution: The path must be readable and writable.`,
 			},
 			"max_bloom_backfill_bucket_age": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: `This parameter is ignored. The splunkd process always compresses raw data.`,
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "Valid values are: Integer[m|s|h|d]." +
+					"If a warm or cold bucket is older than the specified age, do not create or rebuild its bloomfilter. Specify 0 to never rebuild bloomfilters.",
 			},
 			"max_concurrent_optimizes": {
 				Type:     schema.TypeInt,

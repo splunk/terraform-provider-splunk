@@ -15,10 +15,11 @@ func inputsTCPCooked() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "Required. The port number of this input.",
+				Type:         schema.TypeString,
+				Required:     true,
+				ForceNew:     true,
+				ValidateFunc: validation.StringMatch(regexp.MustCompile("\\d+"), "Must be a Integer"),
+				Description:  "Required. The port number of this input.",
 			},
 			"host": {
 				Type:        schema.TypeString,

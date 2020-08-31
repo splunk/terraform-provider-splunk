@@ -18,7 +18,6 @@ resource "splunk_inputs_tcp_raw" "test" {
 `
 
 const updateTCPRawInput = `
-
 resource "splunk_inputs_tcp_raw" "test" {
     name = "41000"
     index = "main"
