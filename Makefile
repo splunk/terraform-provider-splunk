@@ -25,7 +25,7 @@ test:
 	go test ./...
 
 testacc:
-	TF_ACC=1 go test ./... -v
+	TF_ACC=1 SPLUNK_HOME=so1:/opt/splunk SPLUNK_URL=localhost:8089 SPLUNK_USERNAME=admin SPLUNK_PASSWORD=password go test ./... -v
 
 init:
 	@terraform init

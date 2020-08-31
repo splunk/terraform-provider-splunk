@@ -23,8 +23,11 @@ Build the provider: `make build`
 
 ### Testing The Provider
 * To run unit tests: `make test`
-* To run acceptance tests: `make testacc`
-  * Set the following variables to run acceptance tests `SPLUNK_HOME`, `SPLUNK_USERNAME`, `SPLUNK_URL`, `SPLUNK_PASSWORD`
+* To run acceptance tests: 
+  * `cd docker-compose`
+  * `docker-compose up`
+  * `cd ..`
+  * `make testacc`
 
 ### Using the provider
 
