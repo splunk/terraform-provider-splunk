@@ -23,11 +23,13 @@ Build the provider: `make build`
 
 ### Testing The Provider
 * To run unit tests: `make test`
-* To run acceptance tests: 
+* To run acceptance tests:
+  * Navigate to the `terraform-provider-splunk` directory
   * `cd docker-compose`
   * `docker-compose up`
-  * `cd ..`
-  * `make testacc`
+  * In a new terminal window, navigate to the `terraform-provider-splunk` directory
+  * `make testacc-docker`
+  * Currently several tests requiring static assets on the Splunk environment will fail
 
 ### Using the provider
 
