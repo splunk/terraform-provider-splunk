@@ -15,7 +15,7 @@ resource "splunk_outputs_tcp_default" "tcp_default" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESToutput#data.2Foutputs.2Ftcp.2Fdefault
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESToutput#data.2Foutputs.2Ftcp.2Fdefault
 
 This resource block supports the following arguments:
 * `name` - (Required) Configuration to be edited. The only valid value is "tcpout".

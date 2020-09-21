@@ -10,7 +10,7 @@ resource "splunk_inputs_tcp_ssl" "test" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTinput#data.2Finputs.2Ftcp.2Fssl
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTinput#data.2Finputs.2Ftcp.2Fssl
 
 This resource block supports the following arguments:
 * `disabled` - (Optional) Indicates if input is disabled.

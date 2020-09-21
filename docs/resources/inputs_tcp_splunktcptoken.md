@@ -10,7 +10,7 @@ resource "splunk_inputs_tcp_splunk_tcp_token" "tcp_splunk_tcp_token" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTinput#data.2Finputs.2Ftcp.2Fsplunktcptoken
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTinput#data.2Finputs.2Ftcp.2Fsplunktcptoken
 
 This resource block supports the following arguments:
 * `name` - (Required) Required. Name for the token to create.

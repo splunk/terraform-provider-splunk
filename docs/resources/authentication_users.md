@@ -13,7 +13,7 @@ resource "splunk_authentication_users" "user01" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTaccess#authentication.2Fusers
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTaccess#authentication.2Fusers
 
 This resource block supports the following arguments:
 * `name` - (Required) Unique user login name.

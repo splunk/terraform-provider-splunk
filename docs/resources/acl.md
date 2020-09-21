@@ -28,7 +28,7 @@ resource "splunk_saved_searches" "new-search" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTUM/RESTusing#Access_Control_List
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTUM/RESTusing#Access_Control_List
 
 This resource block supports the following arguments:
 * `app` - (Optional) The app context for the resource. Required for updating saved search ACL properties. Allowed values are: The name of an app and system.

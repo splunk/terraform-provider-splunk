@@ -11,7 +11,7 @@ resource "splunk_global_http_event_collector" "http" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTinput#data.2Finputs.2Fhttp
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTinput#data.2Finputs.2Fhttp
 
 This resource block supports the following arguments:
 * `disabled` - (Optional) Input disabled indicator.

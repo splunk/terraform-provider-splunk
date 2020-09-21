@@ -14,7 +14,7 @@ resource "splunk_outputs_tcp_group" "tcp_group" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESToutput#data.2Foutputs.2Ftcp.2Fgroup
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESToutput#data.2Foutputs.2Ftcp.2Fgroup
 
 This resource block supports the following arguments:
 * `name` - (Required) The name of the group of receivers.

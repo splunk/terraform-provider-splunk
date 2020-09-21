@@ -11,7 +11,7 @@ resource "splunk_outputs_tcp_syslog" "tcp_syslog" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESToutput#data.2Foutputs.2Ftcp.2Fsyslog
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESToutput#data.2Foutputs.2Ftcp.2Fsyslog
 
 This resource block supports the following arguments:
 * `name` - (Required) Name of the syslog output group. This is name used when creating syslog configuration in outputs.conf.

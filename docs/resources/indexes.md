@@ -15,7 +15,7 @@ resource "splunk_indexes" "user01-index" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTintrospect#data.2Findexes
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTintrospect#data.2Findexes
 
 This resource block supports the following arguments:
 * `name` - (Required) The name of the index to create.
