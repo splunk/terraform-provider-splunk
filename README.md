@@ -8,7 +8,7 @@
 
 ### Building The Provider
 
-Clone the repository: https://git.splunk.com/projects/GSA/repos/terraform-provider-splunk
+Clone the repository: https://github.com/splunk/terraform-provider-splunk/
 
 Create go src directory and setup $GOPATH
 
@@ -21,6 +21,7 @@ Build the provider: `make build`
 * Test the provider with the existing suite of provider tests before merging your changes
 * Build the provider and test the new resources' CRUD and import operations before merging your changes
 * Add all necessary documentation in the docs folder
+* Update changelog.md and version as required - https://www.terraform.io/docs/extend/best-practices/versioning.html
 
 ### Testing The Provider
 * To run unit tests: `make test`
@@ -51,6 +52,6 @@ Follow guidelines: https://github.com/hashicorp/terraform/blob/master/website/up
 
 #### Notes and Troubleshooting
 * When conflicts arise during resource creation, import the resource first using `terraform import` command and make modifications to the resource.
-* Testing errors mentioning `too many open files` may be related to `ulimits` on your machine. Check current and increase the maximum number of open files `1024` using `ulimits -n 1024`
+* Testing errors mentioning `too many open files` may be related to `ulimit` on your machine. Check current and increase the maximum number of open files `1024` using `ulimit -n 1024`
 * If conf files are edited or deleted <b>manually</b>, restart Splunk to ensure state consistency before applying or reapplying a template.
 * Splunk environments with numerous indexes, saved searches, knowledge objects, etc. may cause issues with the provided tests. To avoid these errors, use a fresh or lightly configured Splunk environment.

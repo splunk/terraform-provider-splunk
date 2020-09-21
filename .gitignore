@@ -1,6 +1,7 @@
 # Ignore dist file
 .idea
 .terraform
+dist
 terraform-provider-splunk
 terraform.tfstate
 terraform.tfstate.backup

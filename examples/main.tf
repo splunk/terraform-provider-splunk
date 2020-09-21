@@ -75,6 +75,7 @@ resource "splunk_saved_searches" "new-search-01" {
   dispatch_latest_time      = "rt-0m"
   cron_schedule             = "*/15 * * * *"
   name                      = "new-search-01"
+  schedule_priority         = "default"
   search                    = "index=user01-index source=http:hec-token-01"
 
   acl {
