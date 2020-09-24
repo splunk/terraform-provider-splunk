@@ -12,7 +12,7 @@ resource "splunk_inputs_tcp_cooked" "tcp_cooked" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTinput#data.2Finputs.2Ftcp.2Fcooked
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTinput#data.2Finputs.2Ftcp.2Fcooked
 
 This resource block supports the following arguments:
 * `name` - (Required) The port number of this input.

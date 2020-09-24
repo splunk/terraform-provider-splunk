@@ -14,7 +14,7 @@ resource "splunk_inputs_tcp_raw" "tcp_raw" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTinput#data.2Finputs.2Ftcp.2Fraw
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTinput#data.2Finputs.2Ftcp.2Fraw
 
 This resource block supports the following arguments:
 * `name` - (Required) The input port which receives raw data.

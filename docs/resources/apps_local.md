@@ -11,7 +11,7 @@ resource "splunk_apps_local" "amazon_connect_app" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTapps#apps.2Flocal
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTapps#apps.2Flocal
 
 This resource block supports the following arguments:
 * `name` - (Required) Literal app name or path for the file to install, depending on the value of filename.

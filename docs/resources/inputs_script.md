@@ -14,7 +14,7 @@ terraform import splunk_inputs_script.bar "\$SPLUNK_HOME/etc/apps/splunk_instrum
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTinput#data.2Finputs.2Fscript
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTinput#data.2Finputs.2Fscript
 
 This resource block supports the following arguments:
 * `name` - (Required) Specify the name of the scripted input.

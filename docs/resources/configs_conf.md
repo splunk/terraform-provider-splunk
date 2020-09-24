@@ -13,7 +13,7 @@ resource "splunk_configs_conf" "new-conf-stanza" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTconf#configs.2Fconf-.7Bfile.7D
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTconf#configs.2Fconf-.7Bfile.7D
 
 This resource block supports the following arguments:
 * `name` - (Required) A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza

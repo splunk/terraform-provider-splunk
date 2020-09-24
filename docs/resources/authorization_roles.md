@@ -13,7 +13,7 @@ resource "splunk_authorization_roles" "user01" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTaccess#authorization.2Froles
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTaccess#authorization.2Froles
 
 This resource block supports the following arguments:
 * `name` - (Required) The name of the user role to create.

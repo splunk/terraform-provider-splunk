@@ -13,7 +13,7 @@ resource "splunk_inputs_udp" "udp" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTinput#data.2Finputs.2Fudp
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTinput#data.2Finputs.2Fudp
 
 This resource block supports the following arguments:
 * `name` - (Required) The UDP port that this input should listen on.

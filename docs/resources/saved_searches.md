@@ -26,7 +26,7 @@ resource "splunk_saved_searches" "saved_search" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.1.0/RESTREF/RESTsearch#saved.2Fsearches
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTsearch#saved.2Fsearches
 
 This resource block supports the following arguments:
 * `name` - (Required) A name for the search.
