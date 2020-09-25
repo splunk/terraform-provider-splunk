@@ -30,7 +30,7 @@ func newTestClient() *client.Client {
 		"",
 		[2]string{os.Getenv("SPLUNK_USERNAME"),
 			os.Getenv("SPLUNK_PASSWORD")},
-		"localhost:8089",
+		os.Getenv("SPLUNK_URL"),
 		client.NewSplunkdHTTPClient(30*time.Second, true))
 	return client
 }

@@ -18,7 +18,7 @@ resource "splunk_inputs_http_event_collector" "new-token" {
     name = "new-token"
     source = "new"
     disabled = false
-    use_ack = false
+    use_ack = 0
 
     acl {
       app = "launcher"
@@ -43,14 +43,7 @@ resource "splunk_inputs_http_event_collector" "new-token" {
     source = "new"
     sourcetype = "new"
     disabled = false
-    use_ack = true
-
-    acl {
-      app = "launcher"
-      sharing = "global"
-      read = ["admin"]
-      write = ["admin"]
-    }
+    use_ack = 1
 
     depends_on = ["splunk_global_http_event_collector.http"]
 }
@@ -71,7 +64,7 @@ func TestAccSplunkHttpEventCollectorInput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "source", "new"),
 					resource.TestCheckResourceAttr(resourceName, "index", "default"),
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
-					resource.TestCheckResourceAttr(resourceName, "use_ack", "false"),
+					resource.TestCheckResourceAttr(resourceName, "use_ack", "0"),
 					resource.TestCheckResourceAttr(resourceName, "acl.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "launcher"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "nobody"),
@@ -92,7 +85,7 @@ func TestAccSplunkHttpEventCollectorInput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "indexes.0", "main"),
 					resource.TestCheckResourceAttr(resourceName, "indexes.1", "history"),
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
-					resource.TestCheckResourceAttr(resourceName, "use_ack", "true"),
+					resource.TestCheckResourceAttr(resourceName, "use_ack", "1"),
 					resource.TestCheckResourceAttr(resourceName, "acl.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "launcher"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "nobody"),

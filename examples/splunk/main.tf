@@ -9,6 +9,11 @@ provider "splunk" {
   username             = "admin"
   password             = "changeme"
   insecure_skip_verify = true
+  // Or use environment variables used:
+  // SPLUNK_USERNAME
+  // SPLUNK_PASSWORD
+  // SPLUNK_URL
+  // SPLUNK_INSECURE_SKIP_VERIFY (Defaults to true)
 }
 
 resource "splunk_authorization_roles" "role01" {

@@ -54,7 +54,7 @@ func globalHttpEventCollector() *schema.Resource {
 					"Possible values for this setting vary by OS.",
 			},
 			"use_deployment_server": {
-				Type:     schema.TypeBool,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 				Description: "Indicates whether the event collector input writes its configuration to a deployment server repository." +
@@ -157,7 +157,7 @@ func createGlobalHttpInputConfigObject(d *schema.ResourceData) (globalHttpInputC
 	globalHttpInputConfigObject.DedicatedIoThreads = d.Get("dedicated_io_threads").(int)
 	globalHttpInputConfigObject.MaxSockets = d.Get("max_sockets").(int)
 	globalHttpInputConfigObject.MaxThreads = d.Get("max_threads").(int)
-	globalHttpInputConfigObject.UseDeploymentServer = d.Get("use_deployment_server").(bool)
+	globalHttpInputConfigObject.UseDeploymentServer = d.Get("use_deployment_server").(int)
 	return globalHttpInputConfigObject
 }
 

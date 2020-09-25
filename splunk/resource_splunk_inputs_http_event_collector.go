@@ -63,10 +63,10 @@ func inputsHttpEventCollector() *schema.Resource {
 				Description: "Input disabled indicator: 0 = Input Not disabled, 1 = Input disabled",
 			},
 			"use_ack": {
-				Type:        schema.TypeBool,
+				Type:        schema.TypeInt,
 				Optional:    true,
 				Computed:    true,
-				Description: "Indexer acknowledgement for this token",
+				Description: "Indexer acknowledgement for this token: 0 = disabled, 1 = enabled",
 			},
 			"acl": aclSchema(),
 		},
@@ -235,16 +235,23 @@ func getHttpEventCollectorConfig(d *schema.ResourceData) (httpInputConfigObject 
 	httpInputConfigObject.Indexes = d.Get("indexes").([]interface{})
 	httpInputConfigObject.Source = d.Get("source").(string)
 	httpInputConfigObject.SourceType = d.Get("sourcetype").(string)
-	httpInputConfigObject.UseACK = d.Get("use_ack").(bool)
+	httpInputConfigObject.UseACK = d.Get("use_ack").(int)
 	httpInputConfigObject.Disabled = d.Get("disabled").(bool)
 	return httpInputConfigObject
 }
 
 func getHECConfigByName(name string, httpResponse *http.Response) (hecEntry *models.HECEntry, err error) {
 	response := &models.HECResponse{}
+	//body, err := ioutil.ReadAll(httpResponse.Body)
+	//fmt.Println(body)
 	switch httpResponse.StatusCode {
 	case 200, 201:
-		_ = json.NewDecoder(httpResponse.Body).Decode(&response)
+
+		decoder := json.NewDecoder(httpResponse.Body)
+		err := decoder.Decode(response)
+		if err != nil {
+			return nil, err
+		}
 		re := regexp.MustCompile(`http://(.*)`)
 		for _, entry := range response.Entry {
 			if name == re.FindStringSubmatch(entry.Name)[1] {

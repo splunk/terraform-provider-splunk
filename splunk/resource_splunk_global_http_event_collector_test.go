@@ -42,7 +42,7 @@ func TestAccGlobalSplunkHttpEventCollectorInput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
 					resource.TestCheckResourceAttr(resourceName, "max_threads", "0"),
 					resource.TestCheckResourceAttr(resourceName, "max_sockets", "0"),
-					resource.TestCheckResourceAttr(resourceName, "use_deployment_server", "false"),
+					resource.TestCheckResourceAttr(resourceName, "use_deployment_server", "0"),
 				),
 			},
 			{
@@ -54,7 +54,7 @@ func TestAccGlobalSplunkHttpEventCollectorInput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "dedicated_io_threads", "2"),
 					resource.TestCheckResourceAttr(resourceName, "max_threads", "0"),
 					resource.TestCheckResourceAttr(resourceName, "max_sockets", "0"),
-					resource.TestCheckResourceAttr(resourceName, "use_deployment_server", "false"),
+					resource.TestCheckResourceAttr(resourceName, "use_deployment_server", "0"),
 				),
 			},
 			{
