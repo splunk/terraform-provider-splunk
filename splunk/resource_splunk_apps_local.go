@@ -225,6 +225,7 @@ func appsLocalDelete(d *schema.ResourceData, meta interface{}) error {
 // Helpers
 func getAppsLocalConfig(d *schema.ResourceData) (appsLocalObject *models.AppsLocalObject) {
 	appsLocalObject = &models.AppsLocalObject{}
+	appsLocalObject.Auth = d.Get("auth").(string)
 	appsLocalObject.Author = d.Get("author").(string)
 	appsLocalObject.Configured = d.Get("configured").(bool)
 	appsLocalObject.Description = d.Get("description").(string)
@@ -232,6 +233,7 @@ func getAppsLocalConfig(d *schema.ResourceData) (appsLocalObject *models.AppsLoc
 	appsLocalObject.Filename = d.Get("filename").(bool)
 	appsLocalObject.Label = d.Get("label").(string)
 	appsLocalObject.Name = d.Get("name").(string)
+	appsLocalObject.Session = d.Get("session").(string)
 	appsLocalObject.Version = d.Get("version").(string)
 	appsLocalObject.Visible = d.Get("visible").(bool)
 	appsLocalObject.Update = d.Get("update").(bool)

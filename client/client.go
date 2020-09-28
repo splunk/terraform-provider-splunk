@@ -257,9 +257,9 @@ func NewDefaultSplunkdClient() *Client {
 // NewSplunkdClient creates a Client with custom values passed in
 func NewSplunkdClient(sessionKey string, auth [2]string, host string, httpClient *http.Client) *Client {
 	c := NewDefaultSplunkdClient()
+	c.auth = auth
 	c.host = host
 	c.sessionKey = sessionKey
-	c.auth = auth
 	if httpClient != nil {
 		c.httpClient = httpClient
 	}

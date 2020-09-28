@@ -30,26 +30,39 @@ func providerSchema() map[string]*schema.Schema {
 		"url": {
 			Type:        schema.TypeString,
 			Required:    true,
-			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_URL", "localhost:8089"),
+			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_URL", nil),
 			Description: "Splunk instance URL",
 		},
 		"username": {
 			Type:        schema.TypeString,
-			Required:    true,
-			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_USERNAME", "admin"),
+			Optional:    true,
+			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_USERNAME", nil),
 			Description: "Splunk instance admin username",
 		},
 		"password": {
 			Type:        schema.TypeString,
-			Required:    true,
-			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_PASSWORD", "changeme"),
+			Optional:    true,
+			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_PASSWORD", nil),
 			Description: "Splunk instance password",
+		},
+		"auth_token": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_AUTH_TOKEN", nil),
+			Description: "Authentication tokens, also known as JSON Web Tokens (JWT), are a method for authenticating " +
+				"Splunk platform users into the Splunk platform",
 		},
 		"insecure_skip_verify": {
 			Type:        schema.TypeBool,
 			Optional:    true,
 			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_INSECURE_SKIP_VERIFY", true),
 			Description: "insecure skip verification flag",
+		},
+		"timeout": {
+			Type:        schema.TypeInt,
+			Optional:    true,
+			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_TIMEOUT", 60),
+			Description: "Timeout when making calls to Splunk server. Defaults to 60 seconds",
 		},
 	}
 }
@@ -83,17 +96,31 @@ func providerResources() map[string]*schema.Resource {
 // to our provider which we will use to initialise splunk client that
 // interacts with the API.
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	client := client.NewSplunkdClient("", [2]string{d.Get("username").(string), d.Get("password").(string)},
-		d.Get("url").(string), client.NewSplunkdHTTPClient(time.Second*30, d.Get("insecure_skip_verify").(bool)))
-	err := client.Login()
+	provider := &SplunkProvider{}
+	var splunkdClient *client.Client
 
-	if err != nil {
-		return client, err
+	if token, ok := d.GetOk("auth_token"); ok {
+		splunkdClient = client.NewSplunkdClient(token.(string),
+			[2]string{d.Get("username").(string), d.Get("password").(string)},
+			d.Get("url").(string),
+			client.NewSplunkdHTTPClient(
+				time.Duration(d.Get("timeout").(int))*time.Second,
+				d.Get("insecure_skip_verify").(bool)))
+	} else {
+		splunkdClient = client.NewSplunkdClient("",
+			[2]string{d.Get("username").(string), d.Get("password").(string)},
+			d.Get("url").(string),
+			client.NewSplunkdHTTPClient(
+				time.Duration(d.Get("timeout").(int))*time.Second,
+				d.Get("insecure_skip_verify").(bool)))
+
+		// Login is required to get session key
+		err := splunkdClient.Login()
+		if err != nil {
+			return splunkdClient, err
+		}
 	}
 
-	provider := &SplunkProvider{
-		Client: client,
-	}
-
+	provider.Client = splunkdClient
 	return provider, nil
 }

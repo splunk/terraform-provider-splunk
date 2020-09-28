@@ -185,6 +185,19 @@ func TestNewRequestSessionKey(t *testing.T) {
 	}
 }
 
+func TestNewRequestWithOnlySessionKey(t *testing.T) {
+	client := &Client{}
+	client.sessionKey = testSessionKey
+	req, err := client.NewRequest(MethodGet, testURL, nil)
+	if err != nil {
+		t.Errorf("NewRequest returns unexpected error %v", err)
+	}
+	expectedBasicAuth := []string{"Splunk " + client.sessionKey}
+	if got, want := req.Header["Authorization"], expectedBasicAuth; !reflect.DeepEqual(got, want) {
+		t.Errorf("NewRequest authorization is %v, want %v", got, want)
+	}
+}
+
 func TestNewRequestError(t *testing.T) {
 	client := NewDefaultSplunkdClient()
 	client.sessionKey = testSessionKey

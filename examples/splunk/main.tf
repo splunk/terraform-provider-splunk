@@ -53,7 +53,7 @@ resource "splunk_inputs_http_event_collector" "hec-token-01" {
   source     = "new:source"
   sourcetype = "new:sourcetype"
   disabled   = false
-  use_ack    = false
+  use_ack    = 0
   acl {
     owner   = "user01"
     sharing = "global"

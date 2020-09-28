@@ -15,7 +15,15 @@ provider "splunk" {
 
 ## Argument Reference
 
-* `url` - (Required) The URL for the Splunk instance to be configured. (The provider uses `https` as the default schema as prefix to the URL)
-* `username` - (Required) The username to access the Splunk instance to be configured.
-* `password` - (Required) The password to access the Splunk instance to be configured.
-* `insecure_skip_verify` - (Optional) Insecure skip verification flag (Defaults to `true`)
+Below arguments for the provider can also be set as environment variables.
+
+* `url` or `SPLUNK_URL` - (Required) The URL for the Splunk instance to be configured. (The provider uses `https` as the default schema as prefix to the URL)
+* `username` or `SPLUNK_USERNAME`  - (Optional) The username to access the Splunk instance to be configured.
+* `password` or `SPLUNK_PASSWORD` - (Optional) The password to access the Splunk instance to be configured.
+* `auth_token` or `SPLUNK_AUTH_TOKEN` - (Optional) Use auth token instead of username and password to configure Splunk instance.
+If specified, auth token takes priority over username/password.
+* `insecure_skip_verify` or `SPLUNK_INSECURE_SKIP_VERIFY` - (Optional) Insecure skip verification flag (Defaults to `true`)
+* `timeout` or `SPLUNK_TIMEOUT` -  (Optional) Timeout when making calls to Splunk server. (Defaults to `60 seconds`)
+
+(NOTE: Auth token can only be used with certain type of Splunk deployments.
+Read more on authentication with tokens here: https://docs.splunk.com/Documentation/Splunk/latest/Security/Setupauthenticationwithtokens)

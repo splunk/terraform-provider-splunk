@@ -195,10 +195,6 @@ func inputsMonitorRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if err = d.Set("rename_source", entry.Content.RenameSource); err != nil {
-		return err
-	}
-
 	if err = d.Set("disabled", entry.Content.Disabled); err != nil {
 		return err
 	}

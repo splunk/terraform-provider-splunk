@@ -23,7 +23,7 @@ resource "aws_iam_role_policy" "firehose-stream-policy" {
   name = "firehose-stream-policy"
   role = aws_iam_role.firehose-stream-role.id
   depends_on = [
-	aws_iam_role.firehose-stream-role
+    aws_iam_role.firehose-stream-role
   ]
 
   policy = <<EOF

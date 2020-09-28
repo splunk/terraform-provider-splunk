@@ -42,35 +42,35 @@ resource "splunk_inputs_http_event_collector" "firehose" {
   use_ack    = 1
   token      = ""
   depends_on = [
-	splunk_indexes.aws-firehose-index,
-	splunk_global_http_event_collector.http,
+    splunk_indexes.aws-firehose-index,
+    splunk_global_http_event_collector.http,
   ]
 }
 
 resource "aws_kinesis_firehose_delivery_stream" "firehose-stream-splunk" {
   destination = "splunk"
-  name = "firehose-to-splunk"
+  name        = "firehose-to-splunk"
   splunk_configuration {
-	hec_endpoint = "https://localhost:8088"
-	hec_token = splunk_inputs_http_event_collector.firehose.token
-	hec_acknowledgment_timeout = 180
-	retry_duration = 300
-	s3_backup_mode = "FailedEventsOnly"
+    hec_endpoint               = "https://localhost:8088"
+    hec_token                  = splunk_inputs_http_event_collector.firehose.token
+    hec_acknowledgment_timeout = 180
+    retry_duration             = 300
+    s3_backup_mode             = "FailedEventsOnly"
   }
 
   s3_configuration {
-	bucket_arn = aws_s3_bucket.firehose-splunk-s3.arn
-	role_arn = aws_iam_role.firehose-stream-role.arn
+    bucket_arn = aws_s3_bucket.firehose-splunk-s3.arn
+    role_arn   = aws_iam_role.firehose-stream-role.arn
   }
 
   depends_on = [
-	aws_s3_bucket.firehose-splunk-s3,
-	aws_iam_role.firehose-stream-role,
-	splunk_inputs_http_event_collector.firehose
+    aws_s3_bucket.firehose-splunk-s3,
+    aws_iam_role.firehose-stream-role,
+    splunk_inputs_http_event_collector.firehose
   ]
 }
 
 resource "aws_s3_bucket" "firehose-splunk-s3" {
-  bucket = "firehose-to-splunk-splash-bucket"
+  bucket        = "firehose-to-splunk-splash-bucket"
   force_destroy = true
 }
