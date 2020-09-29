@@ -1,3 +1,6 @@
+## 1.2.0 (September 29, 2020)
+* Change provider configuration - support for splunk auth token
+
 ## 1.1.0 (September 25, 2020)
 * Change HTTP inputs resource attribute types (`use_ack` and `use_deployment_server`) to `int`
 * Creating examples folder
