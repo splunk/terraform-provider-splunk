@@ -35,6 +35,7 @@ var defaultAuth = [2]string{"admin", "changeme"}
 
 // A Client is used to communicate with Splunkd endpoints
 type Client struct {
+	authToken          string
 	sessionKey         string
 	auth               [2]string
 	host               string
@@ -49,8 +50,10 @@ func (c *Client) NewRequest(httpMethod, url string, body io.Reader) (*http.Reque
 	if err != nil {
 		return nil, err
 	}
-	if c.sessionKey != "" {
-		request.Header.Add("authorization", "Splunk "+c.sessionKey)
+	if c.authToken != "" {
+		request.Header.Add("Authorization", "Bearer "+c.authToken)
+	} else if c.sessionKey != "" {
+		request.Header.Add("Authorization", "Splunk "+c.sessionKey)
 	} else {
 		request.SetBasicAuth(c.auth[0], c.auth[1])
 	}
@@ -260,6 +263,18 @@ func NewSplunkdClient(sessionKey string, auth [2]string, host string, httpClient
 	c.auth = auth
 	c.host = host
 	c.sessionKey = sessionKey
+	if httpClient != nil {
+		c.httpClient = httpClient
+	}
+	return c
+}
+
+// NewSplunkdClient creates a Client with custom values passed in
+func NewSplunkdClientWithAuthToken(authToken string, auth [2]string, host string, httpClient *http.Client) *Client {
+	c := NewDefaultSplunkdClient()
+	c.auth = auth
+	c.host = host
+	c.authToken = authToken
 	if httpClient != nil {
 		c.httpClient = httpClient
 	}

@@ -100,7 +100,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	var splunkdClient *client.Client
 
 	if token, ok := d.GetOk("auth_token"); ok {
-		splunkdClient = client.NewSplunkdClient(token.(string),
+		splunkdClient = client.NewSplunkdClientWithAuthToken(token.(string),
 			[2]string{d.Get("username").(string), d.Get("password").(string)},
 			d.Get("url").(string),
 			client.NewSplunkdHTTPClient(

@@ -185,14 +185,14 @@ func TestNewRequestSessionKey(t *testing.T) {
 	}
 }
 
-func TestNewRequestWithOnlySessionKey(t *testing.T) {
+func TestNewRequestWithAuthToken(t *testing.T) {
 	client := &Client{}
-	client.sessionKey = testSessionKey
+	client.authToken = "auth_token"
 	req, err := client.NewRequest(MethodGet, testURL, nil)
 	if err != nil {
 		t.Errorf("NewRequest returns unexpected error %v", err)
 	}
-	expectedBasicAuth := []string{"Splunk " + client.sessionKey}
+	expectedBasicAuth := []string{"Bearer " + client.authToken}
 	if got, want := req.Header["Authorization"], expectedBasicAuth; !reflect.DeepEqual(got, want) {
 		t.Errorf("NewRequest authorization is %v, want %v", got, want)
 	}
