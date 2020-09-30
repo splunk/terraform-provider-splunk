@@ -43,9 +43,7 @@ Build the provider: `make build`
 Follow guidelines: https://github.com/hashicorp/terraform/blob/master/website/upgrade-guides/0-13.html.markdown
 
 #### Examples
-* Use the `example.tf` provided in the repo to run `terraform plan` and `terraform apply` to apply configuration
-  * Modify `provider "splunk"` resource block with proper instance details
-* To update values modify the `example.tf` file and execute `terraform plan` and `terraform apply`
+* The examples folder contains a few basic splunk provider examples, run `terraform init` and `terraform apply` to apply these example configuration.
 * Resource examples are also available in their respective docs/resources folder
 
 **NOTE:** Create a resource block first before importing resources (USAGE: https://www.terraform.io/docs/import/usage.html)

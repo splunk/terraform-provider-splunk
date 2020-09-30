@@ -1,3 +1,6 @@
+## 1.2.1 (September 30, 2020)
+* Bug fix for authorization header
+
 ## 1.2.0 (September 29, 2020)
 * Change provider configuration - support for splunk auth token
 
