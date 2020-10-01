@@ -1,0 +1,11 @@
+name: docker-compose-actions-workflow
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the stack
+        run: docker-compose up -d
+      - name: Run tests
+        run: SKIP_DOCKER=true TF_ACC=1 SPLUNK_HOME=so1:/opt/splunk SPLUNK_URL=localhost:8089 SPLUNK_USERNAME=admin SPLUNK_PASSWORD=password go test ./... -v
