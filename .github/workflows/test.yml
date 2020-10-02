@@ -11,8 +11,18 @@ jobs:
   build:
     name: Build and test
     runs-on: ubuntu-latest
-    steps:
 
+    services:
+      splunk:
+        image: splunk/splunk:latest
+        env:
+          SPLUNK_START_ARGS: --accept-license
+          SPLUNK_PASSWORD: password
+        ports:
+          - 8000:8000
+          - 8089:8089
+
+    steps:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
       with:
@@ -33,9 +43,5 @@ jobs:
     - name: Build
       run: go build -v .
 
-    - name: Deploy Splunk
-      run: docker-compose up -d
-
     - name: Test
-      run: SKIP_DOCKER=true TF_ACC=1 SPLUNK_HOME=so1:/opt/splunk SPLUNK_URL=localhost:8089 SPLUNK_USERNAME=admin SPLUNK_PASSWORD=password go test ./... -v
-
+      run: TF_ACC=1 SPLUNK_HOME=/opt/splunk SPLUNK_URL=localhost:8089 SPLUNK_USERNAME=admin SPLUNK_PASSWORD=password go test ./... -v
