@@ -10,10 +10,10 @@ resource "splunk_saved_searches" "saved_search" {
     action_email_format = "table"
     action_email_max_time = "5m"
     action_email_max_results = 10
-	action_email_send_results = false
-	action_email_subject = "Splunk Alert: $name$"
-	action_email_to = "splunk@splunk.com"
-	action_email_track_alert = true
+    action_email_send_results = false
+    action_email_subject = "Splunk Alert: $name$"
+    action_email_to = "splunk@splunk.com"
+    action_email_track_alert = true
     dispatch_earliest_time = "rt-15m"
     dispatch_latest_time = "rt-0m"
     cron_schedule = "*/5 * * * *"
@@ -123,8 +123,10 @@ This resource block supports the following arguments:
 * `description` - (Optional) Human-readable description of this saved search. Defaults to empty string.
 * `disabled` - (Optional) Indicates if the saved search is enabled. Defaults to 0.Disabled saved searches are not visible in Splunk Web.
 * `dispatch_buckets` - (Optional) The maximum number of timeline buckets. Defaults to 0.
-* `dispatch_earliest_time` - (Optional) A time string that specifies the earliest time for this search. Can be a relative or absolute time.If this value is an absolute time, use the dispatch.time_format to format the value.
-* `dispatch_indexed_realtime` - (Optional) A time string that specifies the earliest time for this search. Can be a relative or absolute time.If this value is an absolute time, use the dispatch.time_format to format the value.
+* `dispatch_earliest_time` - (Optional) A time string that specifies the earliest time for this search. Can be a relative or absolute time. If this value is an absolute time, use the dispatch.time_format to format the value.
+* `dispatch_index_earliest` - (Optional) A time string that specifies the earliest index time for this search. Can be a relative or absolute time. If this value is an absolute time, use the dispatch.time_format to format the value.
+* `dispatch_index_latest` - (Optional) A time string that specifies the latest index time for this search. Can be a relative or absolute time. If this value is an absolute time, use the dispatch.time_format to format the value.
+* `dispatch_indexed_realtime` - (Optional) A time string that specifies the earliest time for this search. Can be a relative or absolute time. If this value is an absolute time, use the dispatch.time_format to format the value.
 * `dispatch_indexed_realtime_minspan` - (Optional) Allows for a per-job override of the [search] indexed_realtime_disk_sync_delay setting in limits.conf.
 * `dispatch_indexed_realtime_offset` - (Optional) Allows for a per-job override of the [search] indexed_realtime_disk_sync_delay setting in limits.conf.
 * `dispatch_latest_time` - (Optional) A time string that specifies the latest time for this saved search. Can be a relative or absolute time.If this value is an absolute time, use the dispatch.time_format to format the value.

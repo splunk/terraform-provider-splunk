@@ -16,12 +16,14 @@ resource "splunk_saved_searches" "test" {
     action_email_format = "table"
     action_email_max_time = "5m"
     action_email_max_results = 10
-	action_email_send_results = false
-	action_email_subject = "Splunk Alert: $name$"
-	action_email_to = "splunk@splunk.com"
-	action_email_track_alert = true
+    action_email_send_results = false
+    action_email_subject = "Splunk Alert: $name$"
+    action_email_to = "splunk@splunk.com"
+    action_email_track_alert = true
     dispatch_earliest_time = "rt-15m"
     dispatch_latest_time = "rt-0m"
+    dispatch_index_earliest = "-10m"
+    dispatch_index_latest = "-5m"
     cron_schedule = "*/5 * * * *"
     acl {
       owner = "admin"
@@ -39,12 +41,14 @@ resource "splunk_saved_searches" "test" {
     action_email_format = "table"
     action_email_max_time = "5m"
     action_email_max_results = 100
-	action_email_send_results = false
-	action_email_subject = "Splunk Alert: $name$"
-	action_email_to = "splunk@splunk.com"
-	action_email_track_alert = true
+    action_email_send_results = false
+    action_email_subject = "Splunk Alert: $name$"
+    action_email_to = "splunk@splunk.com"
+    action_email_track_alert = true
     dispatch_earliest_time = "rt-15m"
     dispatch_latest_time = "rt-0m"
+    dispatch_index_earliest = "-20m"
+    dispatch_index_latest = "-5m"
     cron_schedule = "*/15 * * * *"
     acl {
       owner = "admin"
@@ -79,6 +83,8 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "action_email_track_alert", "true"),
 					resource.TestCheckResourceAttr(resourceName, "dispatch_earliest_time", "rt-15m"),
 					resource.TestCheckResourceAttr(resourceName, "dispatch_latest_time", "rt-0m"),
+					resource.TestCheckResourceAttr(resourceName, "dispatch_index_earliest", "-10m"),
+					resource.TestCheckResourceAttr(resourceName, "dispatch_index_latest", "-5m"),
 					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/5 * * * *"),
 				),
 			},
@@ -98,6 +104,8 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "action_email_track_alert", "true"),
 					resource.TestCheckResourceAttr(resourceName, "dispatch_earliest_time", "rt-15m"),
 					resource.TestCheckResourceAttr(resourceName, "dispatch_latest_time", "rt-0m"),
+					resource.TestCheckResourceAttr(resourceName, "dispatch_index_earliest", "-20m"),
+					resource.TestCheckResourceAttr(resourceName, "dispatch_index_latest", "-5m"),
 					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/15 * * * *"),
 				),
 			},
