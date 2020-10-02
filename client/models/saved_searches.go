@@ -105,6 +105,8 @@ type SavedSearchObject struct {
 	Disabled                           bool    `json:"disabled" url:"disabled"`
 	DispatchBuckets                    int     `json:"dispatch.buckets,omitempty" url:"dispatch.buckets,omitempty"`
 	DispatchEarliestTime               string  `json:"dispatch.earliest_time,omitempty" url:"dispatch.earliest_time,omitempty"`
+	DispatchIndexEarliest              string  `json:"dispatch.index_earliest,omitempty" url:"dispatch.index_earliest,omitempty"`
+	DispatchIndexLatest                string  `json:"dispatch.index_latest,omitempty" url:"dispatch.index_latest,omitempty"`
 	DispatchIndexedRealtime            bool    `json:"dispatch.indexedRealtime" url:"dispatch.indexedRealtime"`
 	DispatchIndexedRealtimeOffset      int     `json:"dispatch.indexedRealtimeOffset" url:"dispatch.indexedRealtimeOffset,omitempty"`
 	DispatchIndexedRealtimeMinspan     int     `json:"dispatch.indexedRealtimeMinspan" url:"dispatch.indexedRealtimeMinspan,omitempty"`

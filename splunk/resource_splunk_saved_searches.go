@@ -647,6 +647,20 @@ func savedSearches() *schema.Resource {
 				Description: "A time string that specifies the earliest time for this search. Can be a relative or absolute time." +
 					"If this value is an absolute time, use the dispatch.time_format to format the value.",
 			},
+			"dispatch_index_earliest": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "A time string that specifies the latest time for this search. Can be a relative or absolute time." +
+					"If this value is an absolute time, use the dispatch.time_format to format the value.",
+			},
+			"dispatch_index_latest": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "A time string that specifies the earliest time for this search. Can be a relative or absolute time." +
+					"If this value is an absolute time, use the dispatch.time_format to format the value.",
+			},
 			"dispatch_indexed_realtime": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -1189,6 +1203,12 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("dispatch_earliest_time", entry.Content.DispatchEarliestTime); err != nil {
 		return err
 	}
+	if err = d.Set("dispatch_index_earliest", entry.Content.DispatchIndexEarliest); err != nil {
+		return err
+	}
+	if err = d.Set("dispatch_index_latest", entry.Content.DispatchIndexLatest); err != nil {
+		return err
+	}
 	if err = d.Set("dispatch_indexed_realtime", entry.Content.DispatchIndexedRealtime); err != nil {
 		return err
 	}
@@ -1417,6 +1437,8 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		Disabled:                           d.Get("disabled").(bool),
 		DispatchBuckets:                    d.Get("dispatch_buckets").(int),
 		DispatchEarliestTime:               d.Get("dispatch_earliest_time").(string),
+		DispatchIndexEarliest:              d.Get("dispatch_index_earliest").(string),
+		DispatchIndexLatest:                d.Get("dispatch_index_latest").(string),
 		DispatchIndexedRealtime:            d.Get("dispatch_indexed_realtime").(bool),
 		DispatchIndexedRealtimeOffset:      d.Get("dispatch_indexed_realtime_offset").(int),
 		DispatchIndexedRealtimeMinspan:     d.Get("dispatch_indexed_realtime_minspan").(int),
