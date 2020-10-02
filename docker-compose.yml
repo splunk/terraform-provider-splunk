@@ -9,5 +9,5 @@ services:
       - SPLUNK_START_ARGS=--accept-license
       - SPLUNK_PASSWORD=password
     ports:
-      - 8000:8000
-      - 8089:8089
+      - 0.0.0.0:8000:8000
+      - 0.0.0.0:8089:8089
