@@ -36,6 +36,12 @@ jobs:
     - name: Deploy Splunk
       run: docker-compose up -d
 
+    - name: Check containers
+      run: docker ps -a
+
     - name: Test
       run: TF_ACC=1 SPLUNK_HOME=/opt/splunk SPLUNK_URL=localhost:8089 SPLUNK_USERNAME=admin SPLUNK_PASSWORD=password go test ./... -v
+
+    - name: Remove Splunk
+      run: docker-compose down --rmi all -v
 
