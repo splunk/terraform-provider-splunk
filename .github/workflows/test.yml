@@ -9,7 +9,7 @@ on:
 jobs:
 
   build:
-    name: Build
+    name: Build and test
     runs-on: ubuntu-latest
     steps:
 
@@ -33,5 +33,9 @@ jobs:
     - name: Build
       run: go build -v .
 
+    - name: Deploy Splunk
+      run: docker-compose up -d
+
     - name: Test
-      run: go test -v ./...
+      run: SKIP_DOCKER=true TF_ACC=1 SPLUNK_HOME=so1:/opt/splunk SPLUNK_URL=localhost:8089 SPLUNK_USERNAME=admin SPLUNK_PASSWORD=password go test ./... -v
+
