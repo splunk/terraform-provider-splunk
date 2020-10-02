@@ -25,9 +25,6 @@ resource "splunk_inputs_script" "script" {
 `
 
 func TestAccSplunkInputsScript(t *testing.T) {
-	if os.Getenv("SKIP_DOCKER") != "" {
-		t.Skip("Skipping not finished test")
-	}
 	// Required since scripted inputs are limited to certain paths within $SPLUNK_HOME
 	path := os.Getenv("SPLUNK_HOME")
 	f := filepath.Join(path, "/bin/scripts/readme.txt")

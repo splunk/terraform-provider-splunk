@@ -37,5 +37,5 @@ jobs:
       run: docker-compose up -d
 
     - name: Test
-      run: SKIP_DOCKER=true TF_ACC=1 SPLUNK_HOME=so1:/opt/splunk SPLUNK_URL=localhost:8089 SPLUNK_USERNAME=admin SPLUNK_PASSWORD=password go test ./... -v
+      run: TF_ACC=1 SPLUNK_HOME=/opt/splunk SPLUNK_URL=localhost:8089 SPLUNK_USERNAME=admin SPLUNK_PASSWORD=password go test ./... -v
 
