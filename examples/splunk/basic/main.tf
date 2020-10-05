@@ -3,6 +3,13 @@
 # This basic example.tf creates a Splunk user and role, setup global HEC configuration,
 # creates a new HEC token with indexer acknowledgement enabled
 # creates a saved search to search for events received with above token as source
+terraform {
+  required_providers {
+    splunk = {
+      source = "splunk/splunk"
+    }
+  }
+}
 
 provider "splunk" {
   url                  = "localhost:8089"
