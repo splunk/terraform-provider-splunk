@@ -22,8 +22,8 @@ type AuthorizationRolesObject struct {
 	RtSrchJobsQuota           int      `json:"rtSrchJobsQuota,omitempty" url:"rtSrchJobsQuota,omitempty"`
 	SrchDiskQuota             int      `json:"srchDiskQuota,omitempty" url:"srchDiskQuota,omitempty"`
 	SrchFilter                string   `json:"srchFilter,omitempty" url:"srchFilter,omitempty"`
-	SrchIndexesAllowed        string   `json:"srchIndexesAllowed,omitempty" url:"srchIndexesAllowed,omitempty"`
-	SrchIndexesDefault        string   `json:"srchIndexesDefault,omitempty" url:"srchIndexesDefault,omitempty"`
+	SrchIndexesAllowed        []string `json:"srchIndexesAllowed,omitempty" url:"srchIndexesAllowed,omitempty"`
+	SrchIndexesDefault        []string `json:"srchIndexesDefault,omitempty" url:"srchIndexesDefault,omitempty"`
 	SrchJobsQuota             int      `json:"srchJobsQuota,omitempty" url:"srchJobsQuota,omitempty"`
 	SrchTimeWin               int      `json:"srchTimeWin,omitempty" url:"srchTimeWin,omitempty"`
 }

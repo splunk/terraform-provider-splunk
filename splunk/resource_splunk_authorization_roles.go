@@ -78,11 +78,13 @@ func authorizationRoles() *schema.Resource {
 					"Search results for this role only show events that also match the search string you specify. In the case that a user has multiple roles with different search filters, they are combined with an OR.",
 			},
 			"search_indexes_allowed": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
-				Description: "Index that this role has permissions to search. " +
-					"Pass this argument once for each index that you want to specify. " +
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Description: "List of indexes that this role has permissions to search. " +
 					"These may be wildcarded, but the index name must begin with an underscore to match internal indexes." +
 					"Search indexes available by default include the following. " +
 					"All internal indexes    " +
@@ -96,10 +98,13 @@ func authorizationRoles() *schema.Resource {
 					"You can also specify other search indexes added to the server. ",
 			},
 			"search_indexes_default": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeList,
 				Optional: true,
 				Computed: true,
-				Description: "For this role, indexes to search when no index is specified. " +
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Description: "For this role, list of indexes to search when no index is specified. " +
 					"These indexes can be wildcarded, with the exception that '*' does not match internal indexes. " +
 					"To match internal indexes, start with '_'. All internal indexes are represented by '_*'. " +
 					"A user with this role can search other indexes using \"index= \" For example, \"index=special_index\". " +
@@ -293,8 +298,16 @@ func getAuthorizationRolesConfig(d *schema.ResourceData) (authenticationUserObje
 	authenticationUserObject.RtSrchJobsQuota = d.Get("realtime_search_jobs_quota").(int)
 	authenticationUserObject.SrchDiskQuota = d.Get("search_disk_quota").(int)
 	authenticationUserObject.SrchFilter = d.Get("search_filter").(string)
-	authenticationUserObject.SrchIndexesAllowed = d.Get("search_indexes_allowed").(string)
-	authenticationUserObject.SrchIndexesDefault = d.Get("search_indexes_default").(string)
+	if val, ok := d.GetOk("search_indexes_allowed"); ok {
+		for _, v := range val.([]interface{}) {
+			authenticationUserObject.SrchIndexesAllowed = append(authenticationUserObject.SrchIndexesAllowed, v.(string))
+		}
+	}
+	if val, ok := d.GetOk("search_indexes_default"); ok {
+		for _, v := range val.([]interface{}) {
+			authenticationUserObject.SrchIndexesDefault = append(authenticationUserObject.SrchIndexesDefault, v.(string))
+		}
+	}
 	authenticationUserObject.SrchJobsQuota = d.Get("search_jobs_quota").(int)
 	authenticationUserObject.SrchTimeWin = d.Get("search_time_win").(int)
 	return authenticationUserObject

@@ -28,6 +28,8 @@ resource "splunk_authorization_roles" "role01" {
   default_app    = "search"
   imported_roles = ["power", "user"]
   capabilities   = ["accelerate_datamodel", "change_authentication", "restart_splunkd"]
+  search_indexes_allowed = ["_audit", "_internal", "main"]
+  search_indexes_default = ["_audit", "_internal", "main"]
 }
 
 resource "splunk_authentication_users" "user01" {

@@ -14,6 +14,8 @@ resource "splunk_authorization_roles" "role" {
   default_app = "search"
   imported_roles = ["user"]
   capabilities = ["accelerate_datamodel", "change_authentication"]
+  search_indexes_allowed = ["_audit", "_internal"]
+  search_indexes_default = ["_audit", "_internal"]
 }
 `
 
@@ -23,6 +25,8 @@ resource "splunk_authorization_roles" "role" {
   default_app = "search"
   imported_roles = ["power", "user"]
   capabilities = ["accelerate_datamodel", "change_authentication", "restart_splunkd"]
+  search_indexes_allowed = ["_audit", "_internal", "main"]
+  search_indexes_default = ["_audit", "_internal", "main"]
 }
 `
 
@@ -45,6 +49,12 @@ func TestAccSplunkAuthorizationRoles(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "capabilities.#", "2"),
 					resource.TestCheckResourceAttr(resourceName, "capabilities.0", "accelerate_datamodel"),
 					resource.TestCheckResourceAttr(resourceName, "capabilities.1", "change_authentication"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_allowed.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_allowed.0", "_audit"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_allowed.1", "_internal"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_default.#", "2"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_default.0", "_audit"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_default.1", "_internal"),
 				),
 			},
 			{
@@ -59,6 +69,14 @@ func TestAccSplunkAuthorizationRoles(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "capabilities.0", "accelerate_datamodel"),
 					resource.TestCheckResourceAttr(resourceName, "capabilities.1", "change_authentication"),
 					resource.TestCheckResourceAttr(resourceName, "capabilities.2", "restart_splunkd"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_allowed.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_allowed.0", "_audit"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_allowed.1", "_internal"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_allowed.2", "main"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_default.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_default.0", "_audit"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_default.1", "_internal"),
+					resource.TestCheckResourceAttr(resourceName, "search_indexes_default.2", "main"),
 				),
 			},
 			{
