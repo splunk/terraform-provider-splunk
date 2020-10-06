@@ -10,7 +10,7 @@ resource "splunk_admin_saml_groups" "saml-group01" {
 ```
 
 ## Argument Reference
-For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/8.0.6/RESTREF/RESTaccess#admin.2FSAML-groups
+For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTaccess#admin.2FSAML-groups
 
 This resource block supports the following arguments:
 * `name` - (Required) The name of the external group.
