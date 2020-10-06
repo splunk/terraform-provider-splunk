@@ -70,6 +70,7 @@ func providerSchema() map[string]*schema.Schema {
 // Returns a map of splunk resources for configuration
 func providerResources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
+		"splunk_admin_saml_groups":           adminSAMLGroups(),
 		"splunk_apps_local":                  appsLocal(),
 		"splunk_authentication_users":        authenticationUsers(),
 		"splunk_authorization_roles":         authorizationRoles(),
