@@ -1,3 +1,9 @@
+## 1.3.0 (October 6, 2020)
+* Fix: authorization/roles srchIndexesAllowed and srchIndexesDefault should be lists #20
+* Fix: Support for saved_search argument dispatch.index_earliest #15
+* github action workflow for integration tests
+* Additional examples in the examples folder
+
 ## 1.2.1 (September 30, 2020)
 * Bug fix for authorization header
 
