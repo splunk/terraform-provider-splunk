@@ -1,14 +1,15 @@
 # Resource: splunk_authorization_roles
-Create and update user information or delete the user.
+Create and update role information.
 
 ## Example Usage
 ```
-resource "splunk_authorization_roles" "user01" {
-  name              = "user01"
-  email             = "user01@example.com"
-  password          = "password01"
-  force_change_pass = false
-  roles             = ["terraform-user01-role"]
+resource "splunk_authorization_roles" "role01" {
+  name           = "terraform-user01-role"
+  default_app    = "search"
+  imported_roles = ["power", "user"]
+  capabilities   = ["accelerate_datamodel", "change_authentication", "restart_splunkd"]
+  search_indexes_allowed = ["_audit", "_internal", "main"]
+  search_indexes_default = ["_audit", "_internal", "main"]
 }
 ```
 
@@ -25,8 +26,8 @@ This resource block supports the following arguments:
 * `realtime_search_jobs_quota` - (Optional) Specify the maximum number of concurrent real-time search jobs for this role. This count is independent from the normal search jobs limit.
 * `search_disk_quota` - (Optional) Specifies the maximum disk space in MB that can be used by a user's search jobs. For example, a value of 100 limits this role to 100 MB total.
 * `search_filter` - (Optional) Specify a search string that restricts the scope of searches run by this role. Search results for this role only show events that also match the search string you specify. In the case that a user has multiple roles with different search filters, they are combined with an OR.
-* `search_indexes_allowed` - (Optional) Index that this role has permissions to search. Pass this argument once for each index that you want to specify. These may be wildcarded, but the index name must begin with an underscore to match internal indexes.
-* `search_indexes_default` - (Optional) For this role, indexes to search when no index is specified. These indexes can be wildcarded, with the exception that '*' does not match internal indexes. To match internal indexes, start with '_'. All internal indexes are represented by '_*'. A user with this role can search other indexes using "index= "
+* `search_indexes_allowed` - (Optional) List of indexes that this role has permissions to search. These may be wildcarded, but the index name must begin with an underscore to match internal indexes.
+* `search_indexes_default` - (Optional) List of indexes to search when no index is specified. These indexes can be wildcarded, with the exception that '*' does not match internal indexes. To match internal indexes, start with '_'. All internal indexes are represented by '_*'. A user with this role can search other indexes using "index= "
 * `search_jobs_quota` - (Optional) The maximum number of concurrent searches a user with this role is allowed to run. For users with multiple roles, the maximum quota value among all of the roles applies.
 * `search_time_win` - (Optional) Maximum time span of a search, in seconds. By default, searches are not limited to any specific time window. To override any search time windows from imported roles, set srchTimeWin to '0', as the 'admin' role does.
 
