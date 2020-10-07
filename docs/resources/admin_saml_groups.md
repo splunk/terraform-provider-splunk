@@ -3,7 +3,7 @@ Manage external groups in an IdP response to internal Splunk roles.
 
 ## Example Usage
 ```
-resource "splunk_admin_saml_groups" "saml-group01" {
+resource "splunk_admin_saml_groups" "saml-group" {
   name              = "mygroup"
   roles             = ["admin", "power"]
 }
@@ -26,5 +26,5 @@ In addition to all arguments above, This resource block exports the following ar
 SAML groups can be imported using the id, e.g.
 
 ```
-terraform import splunk_admin_saml_groups.saml-group01 mygroup
+terraform import splunk_admin_saml_groups.saml-group mygroup
 ```
