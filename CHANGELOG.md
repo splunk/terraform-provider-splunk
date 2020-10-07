@@ -1,3 +1,6 @@
+## 1.3.1 (October 6, 2020)
+* Support for admin/SAML-groups API endpoint #23
+
 ## 1.3.0 (October 6, 2020)
 * Fix: authorization/roles srchIndexesAllowed and srchIndexesDefault should be lists #20
 * Fix: Support for saved_search argument dispatch.index_earliest #15
