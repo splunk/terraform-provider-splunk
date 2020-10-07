@@ -23,6 +23,11 @@ provider "splunk" {
   // SPLUNK_INSECURE_SKIP_VERIFY (Defaults to true)
 }
 
+resource "splunk_admin_saml_groups" "saml-group01" {
+  name              = "mygroup"
+  roles             = ["admin", "power"]
+}
+
 resource "splunk_authorization_roles" "role01" {
   name           = "terraform-user01-role"
   default_app    = "search"
