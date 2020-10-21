@@ -1,3 +1,7 @@
+## 1.3.2 (October 21, 2020)
+* Fix: Feature Request for saved search to support additional attributes #24
+* Fix: `saved_search` default is_visible to true #3
+
 ## 1.3.1 (October 6, 2020)
 * Support for admin/SAML-groups API endpoint #23
 

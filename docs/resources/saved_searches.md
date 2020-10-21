@@ -40,6 +40,11 @@ This resource block supports the following arguments:
 * `action_email_format` - (Optional) Valid values: (table | plain | html | raw | csv)Specify the format of text in the email. This value also applies to any attachments.
 * `action_email_from` - (Optional) Email address from which the email action originates.Defaults to splunk@$LOCALHOST or whatever value is set in alert_actions.conf.
 * `action_email_hostname` - (Optional) Sets the hostname used in the web link (url) sent in email actions.This value accepts two forms:hostname (for example, splunkserver, splunkserver.example.com)
+* `action_email_include_results_link` - (Optional) Specify whether to include a link to the results. Defaults to 0.
+* `action_email_include_search` - (Optional) Specify whether to include the search that caused an email to be sent. Defaults to 0.
+* `action_email_include_trigger` - (Optional) Specify whether to show the trigger condition that caused the alert to fire. Defaults to 0.
+* `action_email_include_trigger_time` - (Optional) Specify whether to show the time that the alert was fired. Defaults to 0.
+* `action_email_include_view_link` - (Optional) Specify whether to show the title and a link to enable the user to edit the saved search. Defaults to 0.
 * `action_email_inline` - (Optional) Indicates whether the search results are contained in the body of the email.Results can be either inline or attached to an email.
 * `action_email_mailserver` - (Optional) Set the address of the MTA server to be used to send the emails.Defaults to <LOCALHOST> or whatever is set in alert_actions.conf.
 * `action_email_max_results` - (Optional) Sets the global maximum number of search results to send when email.action is enabled. Defaults to 100.
@@ -52,6 +57,7 @@ This resource block supports the following arguments:
 * `action_email_report_paper_size` - (Optional) Valid values: (letter | legal | ledger | a2 | a3 | a4 | a5)Specifies the paper size for PDFs. Defaults to letter.
 * `action_email_report_server_enabled` - (Optional) No Supported
 * `action_email_report_server_url` - (Optional) Not supported.For a default locally installed report server, the URL is http://localhost:8091/
+* `action_email_send_csv` - (Optional) Specify whether to send results as a CSV file. Defaults to 0.
 * `action_email_send_pdf` - (Optional) Indicates whether to create and send the results as a PDF. Defaults to false.
 * `action_email_send_results` - (Optional) Indicates whether to attach the search results in the email.Results can be either attached or inline. See action.email.inline.
 * `action_email_subject` - (Optional) Specifies an alternate email subject.Defaults to SplunkAlert-<savedsearchname>.

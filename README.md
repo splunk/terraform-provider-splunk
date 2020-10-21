@@ -42,6 +42,12 @@ Build the provider: `make build`
 
 Follow guidelines: https://github.com/hashicorp/terraform/blob/master/website/upgrade-guides/0-13.html.markdown
 
+### Contributions
+We are open to contributions!
+<p>Please follow development guidelines and feel free to open a PR against the `master` branch with your changes. The PR should trigger the GitHub actions to run
+both the unit and acceptance tests. Once all tests have passed, our team will review, make suggestions, approve, and merge the PR.
+After merging, our team will update the changelog.MD file and create a version tag that should automatically create a new release.</p>
+
 #### Examples
 * The examples folder contains a few basic splunk provider examples, run `terraform init` and `terraform apply` to apply these example configuration.
 * Resource examples are also available in their respective docs/resources folder
