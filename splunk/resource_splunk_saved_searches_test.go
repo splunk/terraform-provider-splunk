@@ -13,9 +13,12 @@ resource "splunk_saved_searches" "test" {
     name = "Test New Alert"
     search = "index=main"
     actions = "email"
+    action_email_include_search = 0
+    action_email_include_trigger = 1
     action_email_format = "table"
     action_email_max_time = "5m"
     action_email_max_results = 10
+    action_email_send_csv = 1
     action_email_send_results = false
     action_email_subject = "Splunk Alert: $name$"
     action_email_to = "splunk@splunk.com"
@@ -38,9 +41,12 @@ resource "splunk_saved_searches" "test" {
     name = "Test New Alert"
     search = "index=main"
     actions = "email"
+    action_email_include_search = 1
+    action_email_include_trigger = 1
     action_email_format = "table"
     action_email_max_time = "5m"
     action_email_max_results = 100
+    action_email_send_csv = 1
     action_email_send_results = false
     action_email_subject = "Splunk Alert: $name$"
     action_email_to = "splunk@splunk.com"
@@ -74,9 +80,12 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "search", "index=main"),
 					resource.TestCheckResourceAttr(resourceName, "actions", "email"),
 					resource.TestCheckResourceAttr(resourceName, "action_email", "true"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_include_search", "0"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_include_trigger", "1"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_format", "table"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_max_time", "5m"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_max_results", "10"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_send_csv", "1"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_send_results", "false"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_subject", "Splunk Alert: $name$"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_to", "splunk@splunk.com"),
@@ -86,6 +95,7 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "dispatch_index_earliest", "-10m"),
 					resource.TestCheckResourceAttr(resourceName, "dispatch_index_latest", "-5m"),
 					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/5 * * * *"),
+					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
 				),
 			},
 			{
@@ -95,9 +105,12 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "search", "index=main"),
 					resource.TestCheckResourceAttr(resourceName, "actions", "email"),
 					resource.TestCheckResourceAttr(resourceName, "action_email", "true"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_include_search", "1"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_include_trigger", "1"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_format", "table"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_max_time", "5m"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_max_results", "100"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_send_csv", "1"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_send_results", "false"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_subject", "Splunk Alert: $name$"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_to", "splunk@splunk.com"),
@@ -107,6 +120,7 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "dispatch_index_earliest", "-20m"),
 					resource.TestCheckResourceAttr(resourceName, "dispatch_index_latest", "-5m"),
 					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/15 * * * *"),
+					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
 				),
 			},
 			{
