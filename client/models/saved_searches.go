@@ -22,6 +22,11 @@ type SavedSearchObject struct {
 	ActionEmailFormat                  string  `json:"action.email.format,omitempty" url:"action.email.format,omitempty"`
 	ActionEmailFrom                    string  `json:"action.email.from,omitempty" url:"action.email.from,omitempty"`
 	ActionEmailHostname                string  `json:"action.email.hostname,omitempty" url:"action.email.hostname,omitempty"`
+	ActionEmailIncludeResultsLink      int     `json:"action.email.include.results_link,string,omitempty" url:"action.email.include.results_link,omitempty"`
+	ActionEmailIncludeSearch           int     `json:"action.email.include.search,string,omitempty" url:"action.email.include.search,omitempty"`
+	ActionEmailIncludeTrigger          int     `json:"action.email.include.trigger,string,omitempty" url:"action.email.include.trigger,omitempty"`
+	ActionEmailIncludeTriggerTime      int     `json:"action.email.include.trigger_time,string,omitempty" url:"action.email.include.trigger_time,omitempty"`
+	ActionEmailIncludeViewLink         int     `json:"action.email.include.view_link,string,omitempty" url:"action.email.include.view_link,omitempty"`
 	ActionEmailInline                  bool    `json:"action.email.inline" url:"action.email.inline"`
 	ActionEmailMailserver              string  `json:"action.email.mailserver,omitempty" url:"action.email.mailserver,omitempty"`
 	ActionEmailMaxResults              int     `json:"action.email.maxresults,omitempty" url:"action.email.maxresults,omitempty"`
@@ -34,6 +39,7 @@ type SavedSearchObject struct {
 	ActionEmailReportPaperSize         string  `json:"action.email.reportPaperSize,omitempty" url:"action.email.reportPaperSize,omitempty"`
 	ActionEmailReportServerEnabled     bool    `json:"action.email.reportServerEnabled" url:"action.email.reportServerEnabled"`
 	ActionEmailReportServerURL         string  `json:"action.email.reportServerURL,omitempty" url:"action.email.reportServerURL,omitempty"`
+	ActionEmailSendCSV                 int     `json:"action.email.sendcsv,string,omitempty" url:"action.email.sendcsv,omitempty"`
 	ActionEmailSendPDF                 bool    `json:"action.email.sendpdf" url:"action.email.sendpdf"`
 	ActionEmailSendResults             bool    `json:"action.email.sendresults" url:"action.email.sendresults"`
 	ActionEmailSubject                 string  `json:"action.email.subject,omitempty" url:"action.email.subject,omitempty"`

@@ -82,6 +82,36 @@ func savedSearches() *schema.Resource {
 				Description: "Sets the hostname used in the web link (url) sent in email actions." +
 					"This value accepts two forms:hostname (for example, splunkserver, splunkserver.example.com) ",
 			},
+			"action_email_include_results_link": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Specify whether to include a link to the results. [1|0]",
+			},
+			"action_email_include_search": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Specify whether to include the search that caused an email to be sent. [1|0]",
+			},
+			"action_email_include_trigger": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Specify whether to show the trigger condition that caused the alert to fire. [1|0]",
+			},
+			"action_email_include_trigger_time": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Specify whether to show the time that the alert was fired. [1|0]",
+			},
+			"action_email_include_view_link": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Specify whether to show the title and a link to enable the user to edit the saved search. [1|0]",
+			},
 			"action_email_inline": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -163,6 +193,12 @@ func savedSearches() *schema.Resource {
 				Computed: true,
 				Description: "Not supported." +
 					"For a default locally installed report server, the URL is http://localhost:8091/",
+			},
+			"action_email_send_csv": {
+				Type:        schema.TypeInt,
+				Optional:    true,
+				Computed:    true,
+				Description: "Specify whether to send results as a CSV file. Default: 0 (false).",
 			},
 			"action_email_send_pdf": {
 				Type:        schema.TypeBool,
@@ -761,8 +797,8 @@ func savedSearches() *schema.Resource {
 			},
 			"is_visible": {
 				Type:        schema.TypeBool,
+				Default:     true,
 				Optional:    true,
-				Computed:    true,
 				Description: "Specifies whether this saved search should be listed in the visible saved search list. Defaults to 1. ",
 			},
 			"max_concurrent": {
@@ -953,6 +989,21 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_email_from", entry.Content.ActionEmailFrom); err != nil {
 		return err
 	}
+	if err = d.Set("action_email_include_results_link", entry.Content.ActionEmailIncludeResultsLink); err != nil {
+		return err
+	}
+	if err = d.Set("action_email_include_search", entry.Content.ActionEmailIncludeSearch); err != nil {
+		return err
+	}
+	if err = d.Set("action_email_include_trigger", entry.Content.ActionEmailIncludeTrigger); err != nil {
+		return err
+	}
+	if err = d.Set("action_email_include_trigger_time", entry.Content.ActionEmailIncludeTriggerTime); err != nil {
+		return err
+	}
+	if err = d.Set("action_email_include_view_link", entry.Content.ActionEmailIncludeViewLink); err != nil {
+		return err
+	}
 	if err = d.Set("action_email_inline", entry.Content.ActionEmailInline); err != nil {
 		return err
 	}
@@ -987,6 +1038,9 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if err = d.Set("action_email_report_server_url", entry.Content.ActionEmailReportServerURL); err != nil {
+		return err
+	}
+	if err = d.Set("action_email_send_csv", entry.Content.ActionEmailSendCSV); err != nil {
 		return err
 	}
 	if err = d.Set("action_email_send_pdf", entry.Content.ActionEmailSendPDF); err != nil {
@@ -1358,6 +1412,11 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionEmailFormat:                  d.Get("action_email_format").(string),
 		ActionEmailFrom:                    d.Get("action_email_from").(string),
 		ActionEmailHostname:                d.Get("action_email_hostname").(string),
+		ActionEmailIncludeResultsLink:      d.Get("action_email_include_results_link").(int),
+		ActionEmailIncludeSearch:           d.Get("action_email_include_search").(int),
+		ActionEmailIncludeTrigger:          d.Get("action_email_include_trigger").(int),
+		ActionEmailIncludeTriggerTime:      d.Get("action_email_include_trigger_time").(int),
+		ActionEmailIncludeViewLink:         d.Get("action_email_include_view_link").(int),
 		ActionEmailInline:                  d.Get("action_email_inline").(bool),
 		ActionEmailMailserver:              d.Get("action_email_mailserver").(string),
 		ActionEmailMaxResults:              d.Get("action_email_max_results").(int),
@@ -1370,6 +1429,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionEmailReportPaperSize:         d.Get("action_email_report_paper_size").(string),
 		ActionEmailReportServerEnabled:     d.Get("action_email_report_server_enabled").(bool),
 		ActionEmailReportServerURL:         d.Get("action_email_report_server_url").(string),
+		ActionEmailSendCSV:                 d.Get("action_email_send_csv").(int),
 		ActionEmailSendPDF:                 d.Get("action_email_send_pdf").(bool),
 		ActionEmailSendResults:             d.Get("action_email_send_results").(bool),
 		ActionEmailSubject:                 d.Get("action_email_subject").(string),
