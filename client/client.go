@@ -35,13 +35,12 @@ var defaultAuth = [2]string{"admin", "changeme"}
 
 // A Client is used to communicate with Splunkd endpoints
 type Client struct {
-	authToken          string
-	sessionKey         string
-	auth               [2]string
-	host               string
-	httpClient         *http.Client
-	insecureSkipVerify bool
-	userAgent          string
+	authToken  string
+	sessionKey string
+	auth       [2]string
+	host       string
+	httpClient *http.Client
+	userAgent  string
 }
 
 // NewRequest creates a new HTTP Request and set proper header
@@ -75,6 +74,12 @@ func (c *Client) BuildSplunkURL(queryValues url.Values, urlPathParts ...string) 
 	buildPath := ""
 	for _, pathPart := range urlPathParts {
 		pathPart = strings.ReplaceAll(pathPart, " ", "+") // url parameters cannot have spaces
+		if len(urlPathParts) > 5 && urlPathParts[4] == "searches" {
+			// URL encoding a search name will cause the special characters to be double encoded.
+			// for this reason we skip encoding this part of the URL when we are looking for a specific
+			buildPath = path.Join(buildPath, pathPart)
+			continue
+		}
 		buildPath = path.Join(buildPath, url.PathEscape(pathPart))
 	}
 	if queryValues == nil {
@@ -167,10 +172,10 @@ func (c *Client) Login() (e error) {
 	switch response.StatusCode {
 	case 200:
 		decoded := struct {
-			sessionKey string `json:"sessionKey"`
+			SessionKey string `json:"sessionKey"`
 		}{}
 		_ = json.NewDecoder(response.Body).Decode(&decoded)
-		c.sessionKey = decoded.sessionKey
+		c.sessionKey = decoded.SessionKey
 	default:
 		buf := new(bytes.Buffer)
 		_, _ = buf.ReadFrom(response.Body)

@@ -9,6 +9,9 @@ import (
 
 func (client *Client) CreateAppsLocalObject(app string, localAppObject *models.AppsLocalObject) error {
 	values, err := query.Values(localAppObject)
+	if err != nil {
+		return err
+	}
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", "nobody", "system", "apps", "local")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
@@ -29,6 +32,9 @@ func (client *Client) ReadAppsLocalObject(app string) (*http.Response, error) {
 
 func (client *Client) UpdateAppsLocalObject(app string, localAppObject *models.AppsLocalObject) error {
 	values, err := query.Values(&localAppObject)
+	if err != nil {
+		return err
+	}
 	values.Del("name")             // Handler does not support "name" argument
 	values.Del("update")           // Handler does not support "udpate" argument
 	values.Del("filename")         // Handler does not support "filename" argument

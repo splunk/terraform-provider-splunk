@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"net/http"
 	"regexp"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func inputsMonitor() *schema.Resource {
@@ -160,7 +161,7 @@ func inputsMonitorRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
 	// Now we read the input configuration with proper owner and app
@@ -176,7 +177,7 @@ func inputsMonitorRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
 	if err = d.Set("name", d.Id()); err != nil {
@@ -307,6 +308,9 @@ func getInputsMonitorConfigByName(name string, httpResponse *http.Response) (ent
 	switch httpResponse.StatusCode {
 	case 200, 201:
 		err = json.NewDecoder(httpResponse.Body).Decode(&response)
+		if err != nil {
+			return nil, err
+		}
 		re := regexp.MustCompile(`(.*)`)
 		for _, e := range response.Entry {
 			if name == re.FindStringSubmatch(e.Name)[1] {

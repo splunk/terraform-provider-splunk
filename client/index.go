@@ -1,13 +1,17 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 func (client *Client) CreateIndexObject(name string, owner string, app string, indexConfigObj *models.IndexObject) error {
 	values, err := query.Values(indexConfigObj)
+	if err != nil {
+		return err
+	}
 	values.Add("name", name)
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "indexes", name)
 	resp, err := client.Post(endpoint, values)
@@ -31,6 +35,9 @@ func (client *Client) ReadIndexObject(name, owner, app string) (*http.Response, 
 
 func (client *Client) UpdateIndexObject(name string, owner string, app string, indexConfigObj *models.IndexObject) error {
 	values, err := query.Values(&indexConfigObj)
+	if err != nil {
+		return err
+	}
 	values.Del("coldPath")
 	values.Del("datatype")
 	values.Del("homePath")

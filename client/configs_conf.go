@@ -1,14 +1,18 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
 	"strings"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 func (client *Client) CreateConfigsConfObject(name string, owner string, app string, configsConfConfigObj *models.ConfigsConfObject) error {
 	values, err := query.Values(configsConfConfigObj)
+	if err != nil {
+		return err
+	}
 
 	for k, v := range configsConfConfigObj.Variables {
 		values.Add(string(k), string(v))
@@ -42,6 +46,9 @@ func (client *Client) ReadConfigsConfObject(name, owner, app string) (*http.Resp
 
 func (client *Client) UpdateConfigsConfObject(name string, owner string, app string, configsConfConfigObj *models.ConfigsConfObject) error {
 	values, err := query.Values(&configsConfConfigObj)
+	if err != nil {
+		return err
+	}
 
 	for k, v := range configsConfConfigObj.Variables {
 		values.Add(string(k), string(v))

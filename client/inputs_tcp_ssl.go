@@ -1,9 +1,10 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 func (client *Client) CreateTCPSSLInput(inputsTCPSSLObject *models.InputsTCPSSLObject) error {
@@ -33,6 +34,9 @@ func (client *Client) ReadTCPSSLInput() (*http.Response, error) {
 
 func (client *Client) UpdateTCPSSLInput(name string, inputsTCPSSLObject *models.InputsTCPSSLObject) error {
 	values, err := query.Values(&inputsTCPSSLObject)
+	if err != nil {
+		return err
+	}
 	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "tcp", "ssl", name)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {

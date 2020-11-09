@@ -1,9 +1,10 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 func (client *Client) CreateAdminSAMLGroups(name string, adminSAMLGroupsObject *models.AdminSAMLGroupsObject) error {
@@ -33,6 +34,9 @@ func (client *Client) ReadAdminSAMLGroups(name string) (*http.Response, error) {
 
 func (client *Client) UpdateAdminSAMLGroups(name string, adminSAMLGroupsObject *models.AdminSAMLGroupsObject) error {
 	values, err := query.Values(&adminSAMLGroupsObject)
+	if err != nil {
+		return err
+	}
 	// Not required for updates
 	values.Del("name")
 	endpoint := client.BuildSplunkURL(nil, "services", "admin", "SAML-groups", name)

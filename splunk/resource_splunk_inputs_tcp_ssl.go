@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"net/http"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func inputsTCPSSL() *schema.Resource {
@@ -82,7 +83,7 @@ func inputsTCPSSLRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if content == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", d.Id()))
+		return fmt.Errorf("Unable to find resource: %v", d.Id())
 	}
 
 	if err = d.Set("disabled", content.Disabled); err != nil {
@@ -141,6 +142,9 @@ func getInputsTCPSSLConfigByName(name string, httpResponse *http.Response) (inpu
 	switch httpResponse.StatusCode {
 	case 200, 201:
 		err = json.NewDecoder(httpResponse.Body).Decode(&response)
+		if err != nil {
+			return nil, err
+		}
 		return &response.Entry[0].Content, nil
 
 	default:

@@ -1,9 +1,10 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 func (client *Client) CreateMonitorInput(name string, owner string, app string, inputsMonitorObject *models.InputsMonitorObject) error {
@@ -34,6 +35,9 @@ func (client *Client) ReadMonitorInput(name, owner, app string) (*http.Response,
 
 func (client *Client) UpdateMonitorInput(name string, owner string, app string, inputsMonitorObject *models.InputsMonitorObject) error {
 	values, err := query.Values(&inputsMonitorObject)
+	if err != nil {
+		return err
+	}
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "monitor", name)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {

@@ -1,13 +1,17 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 func (client *Client) CreateHttpEventCollectorObject(name string, owner string, app string, httpInputConfigObj *models.HttpEventCollectorObject) error {
 	values, err := query.Values(httpInputConfigObj)
+	if err != nil {
+		return err
+	}
 	values.Add("name", name)
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "http", name)
 	resp, err := client.Post(endpoint, values)
@@ -31,6 +35,9 @@ func (client *Client) ReadHttpEventCollectorObject(name, owner, app string) (*ht
 
 func (client *Client) UpdateHttpEventCollectorObject(name string, owner string, app string, httpInputConfigObj *models.HttpEventCollectorObject) error {
 	values, err := query.Values(&httpInputConfigObj)
+	if err != nil {
+		return err
+	}
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "http", name)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {

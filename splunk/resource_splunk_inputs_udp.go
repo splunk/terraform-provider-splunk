@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"net/http"
 	"regexp"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func inputsUDP() *schema.Resource {
@@ -18,7 +19,7 @@ func inputsUDP() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.StringMatch(regexp.MustCompile("\\d+"), "Must be a Integer"),
+				ValidateFunc: validation.StringMatch(regexp.MustCompile(`\d+`), "Must be a Integer"),
 				Description:  "Required. The UDP port that this input should listen on.",
 			},
 			"index": {
@@ -144,7 +145,7 @@ func inputsUDPRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
 	// Now we read the input configuration with proper owner and app
@@ -160,7 +161,7 @@ func inputsUDPRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
 	if err = d.Set("name", d.Id()); err != nil {
@@ -275,6 +276,9 @@ func getInputsUDPConfigByName(name string, httpResponse *http.Response) (entry *
 	switch httpResponse.StatusCode {
 	case 200, 201:
 		err = json.NewDecoder(httpResponse.Body).Decode(&response)
+		if err != nil {
+			return nil, err
+		}
 		re := regexp.MustCompile(`(.*)`)
 		for _, e := range response.Entry {
 			if name == re.FindStringSubmatch(e.Name)[1] {
