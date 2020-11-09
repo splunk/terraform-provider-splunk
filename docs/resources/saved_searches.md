@@ -163,4 +163,4 @@ This resource block supports the following arguments:
 ## Attribute Reference
 In addition to all arguments above, This resource block exports the following arguments:
 
-* `id` - The ID of the http event collector resource
+* `id` - The ID of the saved search resource 
