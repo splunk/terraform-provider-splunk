@@ -403,7 +403,7 @@ func indexRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
 	// Now we read the input configuration with proper owner and app
