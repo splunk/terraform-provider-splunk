@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"net/http"
+	"net/url"
 	"regexp"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func inputsMonitor() *schema.Resource {
@@ -134,7 +136,7 @@ func inputsMonitorCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if _, ok := d.GetOk("acl"); ok {
-		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "inputs", "monitor")
+		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, url.PathEscape(name), aclObject, "data", "inputs", "monitor")
 		if err != nil {
 			return err
 		}
@@ -253,7 +255,7 @@ func inputsMonitorUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	//ACL update
-	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, d.Id(), aclObject, "data", "inputs", "monitor")
+	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, url.PathEscape(d.Id()), aclObject, "data", "inputs", "monitor")
 	if err != nil {
 		return err
 	}

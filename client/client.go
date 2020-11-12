@@ -75,13 +75,7 @@ func (c *Client) BuildSplunkURL(queryValues url.Values, urlPathParts ...string) 
 	buildPath := ""
 	for _, pathPart := range urlPathParts {
 		pathPart = strings.ReplaceAll(pathPart, " ", "+") // url parameters cannot have spaces
-		if len(urlPathParts) > 5 && urlPathParts[4] == "searches" {
-			// URL encoding a search name will cause the special characters to be double encoded.
-			// for this reason we skip encoding this part of the URL when we are looking for a specific search
-			buildPath = path.Join(buildPath, pathPart)
-			continue
-		}
-		buildPath = path.Join(buildPath, url.PathEscape(pathPart))
+		buildPath = path.Join(buildPath, pathPart)
 	}
 	if queryValues == nil {
 		queryValues = url.Values{}
