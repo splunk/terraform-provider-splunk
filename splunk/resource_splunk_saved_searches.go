@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"net/http"
 	"regexp"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func savedSearches() *schema.Resource {
@@ -940,7 +941,7 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
 	// Now we read the configuration with proper owner and app
@@ -956,7 +957,7 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
 	if err = d.Set("name", d.Id()); err != nil {

@@ -1,10 +1,11 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
 	"strings"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 func (client *Client) CreateTCPGroupOutput(name string, owner string, app string, outputsTCPGroupObject *models.OutputsTCPGroupObject) error {
@@ -36,6 +37,9 @@ func (client *Client) ReadTCPGroupOutput(name, owner, app string) (*http.Respons
 
 func (client *Client) UpdateTCPGroupOutput(name string, owner string, app string, outputsTCPGroupObject *models.OutputsTCPGroupObject) error {
 	values, err := query.Values(&outputsTCPGroupObject)
+	if err != nil {
+		return err
+	}
 	values.Set("servers", strings.Join(outputsTCPGroupObject.Servers, ","))
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "outputs", "tcp", "group", name)
 	resp, err := client.Post(endpoint, values)

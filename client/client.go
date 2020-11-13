@@ -35,13 +35,12 @@ var defaultAuth = [2]string{"admin", "changeme"}
 
 // A Client is used to communicate with Splunkd endpoints
 type Client struct {
-	authToken          string
-	sessionKey         string
-	auth               [2]string
-	host               string
-	httpClient         *http.Client
-	insecureSkipVerify bool
-	userAgent          string
+	authToken  string
+	sessionKey string
+	auth       [2]string
+	host       string
+	httpClient *http.Client
+	userAgent  string
 }
 
 // NewRequest creates a new HTTP Request and set proper header
@@ -167,10 +166,10 @@ func (c *Client) Login() (e error) {
 	switch response.StatusCode {
 	case 200:
 		decoded := struct {
-			sessionKey string `json:"sessionKey"`
+			SessionKey string `json:"sessionKey"`
 		}{}
 		_ = json.NewDecoder(response.Body).Decode(&decoded)
-		c.sessionKey = decoded.sessionKey
+		c.sessionKey = decoded.SessionKey
 	default:
 		buf := new(bytes.Buffer)
 		_, _ = buf.ReadFrom(response.Body)

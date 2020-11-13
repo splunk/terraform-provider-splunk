@@ -36,6 +36,9 @@ func (client *Client) ReadMonitorInput(name, owner, app string) (*http.Response,
 
 func (client *Client) UpdateMonitorInput(name string, owner string, app string, inputsMonitorObject *models.InputsMonitorObject) error {
 	values, err := query.Values(&inputsMonitorObject)
+	if err != nil {
+		return err
+	}
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "monitor", url.PathEscape(name))
 	resp, err := client.Post(endpoint, values)
 	if err != nil {

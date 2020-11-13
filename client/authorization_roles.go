@@ -1,9 +1,10 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 func (client *Client) CreateAuthorizationRoles(name string, authorizationRolesObject *models.AuthorizationRolesObject) error {
@@ -33,6 +34,9 @@ func (client *Client) ReadAuthorizationRoles(name, owner, app string) (*http.Res
 
 func (client *Client) UpdateAuthorizationRoles(name string, authorizationRolesObject *models.AuthorizationRolesObject) error {
 	values, err := query.Values(&authorizationRolesObject)
+	if err != nil {
+		return err
+	}
 	// Not required for updating user information
 	values.Del("name")
 	endpoint := client.BuildSplunkURL(nil, "services", "authorization", "roles", name)

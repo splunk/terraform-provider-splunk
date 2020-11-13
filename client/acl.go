@@ -1,10 +1,11 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
 	"strings"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 //https://docs.splunk.com/Documentation/Splunk/8.0.4/RESTUM/RESTusing#Access_Control_List
@@ -23,6 +24,9 @@ func (client *Client) GetAcl(owner, app, name string, resources ...string) (*htt
 
 func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, resources ...string) error {
 	values, err := query.Values(&acl)
+	if err != nil {
+		return err
+	}
 	// remove app from url values during POST
 	values.Del("app")
 	values.Del("perms[read]")
@@ -45,6 +49,9 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 
 func (client *Client) Move(owner, app, name string, acl *models.ACLObject, resources ...string) error {
 	values, err := query.Values(&acl)
+	if err != nil {
+		return err
+	}
 	// Adding resources
 	resourcePath := []string{"servicesNS", owner, app}
 	resourcePath = append(resourcePath, resources...)

@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"net/http"
 	"regexp"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 func authenticationUsers() *schema.Resource {
@@ -110,7 +111,7 @@ func authenticationUsersRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
 	// Now we read the input configuration with proper owner and app
@@ -126,7 +127,7 @@ func authenticationUsersRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
 	if err = d.Set("default_app", entry.Content.DefaultApp); err != nil {

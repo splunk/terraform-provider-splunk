@@ -1,9 +1,10 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 func (client *Client) CreateUDPInput(name string, owner string, app string, inputsUDPObject *models.InputsUDPObject) error {
@@ -34,6 +35,9 @@ func (client *Client) ReadUDPInput(name, owner, app string) (*http.Response, err
 
 func (client *Client) UpdateUDPInput(name string, owner string, app string, inputsUDPObject *models.InputsUDPObject) error {
 	values, err := query.Values(&inputsUDPObject)
+	if err != nil {
+		return err
+	}
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "udp", name)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {

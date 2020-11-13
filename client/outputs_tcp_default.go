@@ -1,9 +1,10 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 func (client *Client) CreateTCPDefaultOutput(name string, owner string, app string, outputsTCPDefaultObject *models.OutputsTCPDefaultObject) error {
@@ -34,6 +35,9 @@ func (client *Client) ReadTCPDefaultOutput(name, owner, app string) (*http.Respo
 
 func (client *Client) UpdateTCPDefaultOutput(name string, owner string, app string, outputsTCPDefaultObject *models.OutputsTCPDefaultObject) error {
 	values, err := query.Values(&outputsTCPDefaultObject)
+	if err != nil {
+		return err
+	}
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "outputs", "tcp", "default", name)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {

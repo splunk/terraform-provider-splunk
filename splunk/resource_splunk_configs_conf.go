@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strconv"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func configsConf() *schema.Resource {
@@ -30,7 +31,7 @@ func configsConf() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.StringMatch(regexp.MustCompile("^[a-zA-Z0-9\\-.]+/[a-zA-Z0-9\\-.]+"), "A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza"),
+				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^[a-zA-Z0-9\-.]+/[a-zA-Z0-9\-.]+`), "A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza"),
 				Description:  `A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza`,
 			},
 			"acl": aclSchema(),
@@ -91,7 +92,7 @@ func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
 	// Now we read the input configuration with proper owner and app
@@ -110,13 +111,16 @@ func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 	var result map[string]interface{}
 	b, _ := ioutil.ReadAll(contentResp.Body)
 
-	json.Unmarshal(b, &result)
+	err = json.Unmarshal(b, &result)
+	if err != nil {
+		return err
+	}
 	content := result["entry"].([]interface{})[0].(map[string]interface{})["content"].(map[string]interface{})
 
-	for key, _ := range content {
-		result, _ := regexp.MatchString(`eai:.*`, key)
+	re := regexp.MustCompile(`eai:.*`)
 
-		if result {
+	for key := range content {
+		if re.MatchString(key) {
 			delete(content, key)
 		}
 	}

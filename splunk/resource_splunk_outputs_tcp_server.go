@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"net/http"
 	"regexp"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 )
 
 func outputsTCPServer() *schema.Resource {
@@ -96,7 +97,7 @@ func outputsTCPServer() *schema.Resource {
 	}
 }
 
-var validTCPServer = regexp.MustCompile("^[a-zA-Z0-9\\-.]*:\\d+")
+var validTCPServer = regexp.MustCompile(`^[a-zA-Z0-9\-.]*:\d+`)
 
 // Functions
 func outputsTCPServerCreate(d *schema.ResourceData, meta interface{}) error {
@@ -142,7 +143,7 @@ func outputsTCPServerRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", d.Id()))
+		return fmt.Errorf("Unable to find resource: %v", d.Id())
 	}
 
 	// Now we read the input configuration with proper owner and app
@@ -158,7 +159,7 @@ func outputsTCPServerRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", d.Id()))
+		return fmt.Errorf("Unable to find resource: %v", d.Id())
 	}
 
 	if err = d.Set("name", d.Id()); err != nil {
@@ -268,6 +269,9 @@ func getOutputsTCPServerConfigByName(name string, httpResponse *http.Response) (
 	switch httpResponse.StatusCode {
 	case 200, 201:
 		err = json.NewDecoder(httpResponse.Body).Decode(&response)
+		if err != nil {
+			return nil, err
+		}
 		re := regexp.MustCompile(`(.*)`)
 		for _, e := range response.Entry {
 			if name == re.FindStringSubmatch(e.Name)[1] {

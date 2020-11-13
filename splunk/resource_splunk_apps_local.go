@@ -141,7 +141,7 @@ func appsLocalRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
 	resp, err = (*provider.Client).ReadAppsLocalObject(name)
@@ -154,7 +154,7 @@ func appsLocalRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if entry == nil {
-		return errors.New(fmt.Sprintf("Unable to find resource: %v", name))
+		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
 	if err = d.Set("author", entry.Content.Author); err != nil {
