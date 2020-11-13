@@ -1,3 +1,8 @@
+## 1.3.3 (November 13, 2020)
+* Fix: Fix URL encoding for resource names #32
+* Enhancements: Added linting `golangci-lint`
+* go mod path update to `github.com/terraform-providers/terraform-provider-splunk`
+
 ## 1.3.2 (October 21, 2020)
 * Fix: Feature Request for saved search to support additional attributes #24
 * Fix: `saved_search` default is_visible to true #3
