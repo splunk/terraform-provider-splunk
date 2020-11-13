@@ -41,6 +41,30 @@ func TestBuildSplunkURLNoURLPath(t *testing.T) {
 	}
 }
 
+func TestBuildSplunkURLSpecialCharactersInSearch(t *testing.T) {
+	client := NewDefaultSplunkdClient()
+	url := client.BuildSplunkURL(nil, "servicesNS", "admin", "search", "saved", "searches", "[some search]")
+
+	if got, want := url.Hostname(), "localhost"; got != want {
+		t.Errorf("hostname invalid, got %s, want %s", got, want)
+	}
+	if got, want := url.Scheme, defaultScheme; got != want {
+		t.Errorf("scheme invalid, got %s, want %s", got, want)
+	}
+	if got, want := url.Port(), "8089"; got != want {
+		t.Errorf("port invalid, got %s, want %s", got, want)
+	}
+	if got, want := url.Path, "servicesNS/admin/search/saved/searches/[some+search]"; got != want {
+		t.Errorf("path invalid, got %s, want %s", got, want)
+	}
+	if got, want := url.Fragment, ""; got != want {
+		t.Errorf("fragment invalid, got %s, want %s", got, want)
+	}
+	if url.User != nil {
+		t.Errorf("user invalid, got %s, want %v", url.User, nil)
+	}
+}
+
 func TestBuildSplunkURLNoHost(t *testing.T) {
 	client := NewDefaultSplunkdClient()
 	url := client.BuildSplunkURL(nil, "services",

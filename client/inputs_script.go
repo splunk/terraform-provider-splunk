@@ -1,9 +1,11 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
+	"net/url"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 func (client *Client) CreateScriptedInput(name string, owner string, app string, inputsScriptObject *models.InputsScriptObject) error {
@@ -23,7 +25,7 @@ func (client *Client) CreateScriptedInput(name string, owner string, app string,
 }
 
 func (client *Client) ReadScriptedInput(name, owner, app string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "script", name)
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "script", url.PathEscape(name))
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
@@ -34,7 +36,7 @@ func (client *Client) ReadScriptedInput(name, owner, app string) (*http.Response
 
 func (client *Client) UpdateScriptedInput(name string, owner string, app string, inputsScriptObject *models.InputsScriptObject) error {
 	values, err := query.Values(&inputsScriptObject)
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "script", name)
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "script", url.PathEscape(name))
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -44,7 +46,7 @@ func (client *Client) UpdateScriptedInput(name string, owner string, app string,
 }
 
 func (client *Client) DeleteScriptedInput(name, owner, app string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "script", name)
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "script", url.PathEscape(name))
 	resp, err := client.Delete(endpoint)
 	if err != nil {
 		return nil, err

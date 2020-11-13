@@ -75,7 +75,7 @@ func (c *Client) BuildSplunkURL(queryValues url.Values, urlPathParts ...string) 
 	buildPath := ""
 	for _, pathPart := range urlPathParts {
 		pathPart = strings.ReplaceAll(pathPart, " ", "+") // url parameters cannot have spaces
-		buildPath = path.Join(buildPath, url.PathEscape(pathPart))
+		buildPath = path.Join(buildPath, pathPart)
 	}
 	if queryValues == nil {
 		queryValues = url.Values{}

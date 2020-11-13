@@ -1,9 +1,11 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
 	"net/http"
+	"net/url"
 	"terraform-provider-splunk/client/models"
+
+	"github.com/google/go-querystring/query"
 )
 
 func (client *Client) CreateSplunkTCPTokenInput(owner string, app string, inputsSplunkTCPTokenObject *models.InputsSplunkTCPTokenObject) error {
@@ -23,7 +25,7 @@ func (client *Client) CreateSplunkTCPTokenInput(owner string, app string, inputs
 }
 
 func (client *Client) ReadSplunkTCPTokenInput(name, owner, app string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "tcp", "splunktcptoken", name)
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "tcp", "splunktcptoken", url.PathEscape(name))
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
@@ -34,7 +36,7 @@ func (client *Client) ReadSplunkTCPTokenInput(name, owner, app string) (*http.Re
 
 func (client *Client) UpdateSplunkTCPTokenInput(name string, owner string, app string, inputsSplunkTCPTokenObject *models.InputsSplunkTCPTokenObject) error {
 	values, err := query.Values(&inputsSplunkTCPTokenObject)
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "tcp", "splunktcptoken", name)
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "tcp", "splunktcptoken", url.PathEscape(name))
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -44,7 +46,7 @@ func (client *Client) UpdateSplunkTCPTokenInput(name string, owner string, app s
 }
 
 func (client *Client) DeleteSplunkTCPTokenInput(name, owner, app string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "tcp", "splunktcptoken", name)
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "tcp", "splunktcptoken", url.PathEscape(name))
 	resp, err := client.Delete(endpoint)
 	if err != nil {
 		return nil, err
