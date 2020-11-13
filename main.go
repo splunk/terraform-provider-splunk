@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/plugin"
-	"terraform-provider-splunk/splunk"
+	"github.com/terraform-providers/terraform-provider-splunk/splunk"
 )
 
 func main() {

@@ -4,7 +4,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"os"
-	"terraform-provider-splunk/client"
+	"github.com/terraform-providers/terraform-provider-splunk/client"
 	"testing"
 	"time"
 )

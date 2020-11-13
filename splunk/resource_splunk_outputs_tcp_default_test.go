@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"net/http"
-	"terraform-provider-splunk/client/models"
+	"github.com/terraform-providers/terraform-provider-splunk/client/models"
 	"testing"
 )
 

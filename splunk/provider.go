@@ -1,7 +1,7 @@
 package splunk
 
 import (
-	"terraform-provider-splunk/client"
+	"github.com/terraform-providers/terraform-provider-splunk/client"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"

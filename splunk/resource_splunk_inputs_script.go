@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
-	"terraform-provider-splunk/client/models"
+	"github.com/terraform-providers/terraform-provider-splunk/client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
