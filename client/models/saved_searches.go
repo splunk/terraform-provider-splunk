@@ -81,6 +81,11 @@ type SavedSearchObject struct {
 	ActionSummaryIndexMaxTime          int     `json:"action.summary_index.maxtime,omitempty" url:"action.summary_index.maxtime,omitempty"`
 	ActionSummaryIndexTrackAlert       bool    `json:"action.summary_index.track_alert" url:"action.summary_index.track_alert"`
 	ActionSummaryIndexTTL              string  `json:"action.summary_index.ttl,omitempty" url:"action.summary_index.ttl,omitempty"`
+	ActionSlackParamAttachment         string  `json:"action.slack.param.attachment,omitempty" url:"action.slack.param.attachment"`
+	ActionSlackParamChannel            string  `json:"action.slack.param.channel,omitempty" url:"action.slack.param.channel"`
+	ActionSlackParamFields             string  `json:"action.slack.param.fields,omitempty" url:"action.slack.param.fields"`
+	ActionSlackParamMessage            string  `json:"action.slack.param.message,omitempty" url:"action.slack.param.message"`
+	ActionSlackParamWebhookUrlOverride string  `json:"action.slack.param.webhook_url_override,omitempty" url:"action.slack.param.webhook_url_override"`
 	AlertDigestMode                    bool    `json:"alert.digest_mode" url:"alert.digest_mode"`
 	AlertExpires                       string  `json:"alert.expires,omitempty" url:"alert.expires,omitempty"`
 	AlertSeverity                      int     `json:"alert.severity,omitempty" url:"alert.severity,omitempty"`

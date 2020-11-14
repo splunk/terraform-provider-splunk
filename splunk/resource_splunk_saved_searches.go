@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+
 	"github.com/terraform-providers/terraform-provider-splunk/client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -472,6 +473,36 @@ func savedSearches() *schema.Resource {
 				Computed: true,
 				Description: "Valid values are: Integer[p] Specifies the minimum time-to-live in seconds of the search artifacts if this action is triggered. " +
 					"If p follows Integer, specifies the number of scheduled periods. Defaults to 86400 (24 hours).",
+			},
+			"action_slack_param_channel": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "TODO",
+			},
+			"action_slack_param_fields": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "TODO",
+			},
+			"action_slack_param_attachment": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "TODO -- valid values are 'message' or 'alert_link'",
+			},
+			"action_slack_param_message": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "TODO",
+			},
+			"action_slack_param_webhook_url_override": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "TODO",
 			},
 			"alert_digest_mode": {
 				Type:     schema.TypeBool,
@@ -1167,6 +1198,21 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_summary_index_ttl", entry.Content.ActionSummaryIndexTTL); err != nil {
 		return err
 	}
+	if err = d.Set("action_slack_param_attachment", entry.Content.ActionSlackParamAttachment); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_param_channel", entry.Content.ActionSlackParamChannel); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_param_fields", entry.Content.ActionSlackParamFields); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_param_message", entry.Content.ActionSlackParamMessage); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_param_webhook_url_override", entry.Content.ActionSlackParamWebhookUrlOverride); err != nil {
+		return err
+	}
 	if err = d.Set("alert_digest_mode", entry.Content.AlertDigestMode); err != nil {
 		return err
 	}
@@ -1469,6 +1515,11 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionSummaryIndexName:             d.Get("action_summary_index_name").(string),
 		ActionSummaryIndexTrackAlert:       d.Get("action_summary_index_track_alert").(bool),
 		ActionSummaryIndexTTL:              d.Get("action_summary_index_ttl").(string),
+		ActionSlackParamAttachment:         d.Get("action_slack_param_attachment").(string),
+		ActionSlackParamChannel:            d.Get("action_slack_param_channel").(string),
+		ActionSlackParamFields:             d.Get("action_slack_param_fields").(string),
+		ActionSlackParamMessage:            d.Get("action_slack_param_message").(string),
+		ActionSlackParamWebhookUrlOverride: d.Get("action_slack_param_webhook_url_override").(string),
 		AlertComparator:                    d.Get("alert_comparator").(string),
 		AlertCondition:                     d.Get("alert_condition").(string),
 		AlertDigestMode:                    d.Get("alert_digest_mode").(bool),
