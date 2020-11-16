@@ -1,4 +1,4 @@
-module github.com/terraform-providers/terraform-provider-splunk
+module github.com/splunk/terraform-provider-splunk
 
 go 1.14
 
