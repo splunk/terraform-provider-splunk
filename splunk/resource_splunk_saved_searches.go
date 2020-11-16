@@ -477,26 +477,23 @@ func savedSearches() *schema.Resource {
 			"action_slack_param_channel": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
 				Description: "Slack channel to send the message to (Should start with # or @)",
 			},
 			"action_slack_param_fields": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Computed: true,
 				Description: "Show one or more fields from the search results below your Slack message. " +
 					"Comma-separated list of field names. Allows wildcards. eg. index,source*",
 			},
 			"action_slack_param_attachment": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
+				Default:     "none",
 				Description: "Optionally include a message attachment. Valid values are 'message' or 'alert_link'",
 			},
 			"action_slack_param_message": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
 				Description: "Enter the chat message to send to the Slack channel. The message can include tokens that insert text based on the results of the search.",
 			},
 			"action_slack_param_webhook_url_override": {
