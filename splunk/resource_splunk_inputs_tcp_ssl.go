@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
-	"github.com/terraform-providers/terraform-provider-splunk/client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )

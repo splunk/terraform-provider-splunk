@@ -5,8 +5,8 @@ import (
 	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
-	"github.com/terraform-providers/terraform-provider-splunk/client/models"
 )
 
 func globalHttpEventCollector() *schema.Resource {

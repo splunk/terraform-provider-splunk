@@ -14,7 +14,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"github.com/terraform-providers/terraform-provider-splunk/client/utils"
+	"github.com/splunk/terraform-provider-splunk/client/utils"
 	"time"
 )
 
