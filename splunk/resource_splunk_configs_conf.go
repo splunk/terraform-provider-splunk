@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strconv"
-	"github.com/terraform-providers/terraform-provider-splunk/client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"

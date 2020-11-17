@@ -7,9 +7,8 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/terraform-providers/terraform-provider-splunk/client/models"
-
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
 func savedSearches() *schema.Resource {

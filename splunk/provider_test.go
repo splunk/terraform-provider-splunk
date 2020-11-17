@@ -3,8 +3,8 @@ package splunk
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/splunk/terraform-provider-splunk/client"
 	"os"
-	"github.com/terraform-providers/terraform-provider-splunk/client"
 	"testing"
 	"time"
 )

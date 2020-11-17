@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
-	"github.com/terraform-providers/terraform-provider-splunk/client/models"
 	"testing"
 )
 
