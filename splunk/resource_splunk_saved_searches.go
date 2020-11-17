@@ -489,7 +489,7 @@ func savedSearches() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Default:     "none",
-				Description: "Optionally include a message attachment. Valid values are 'message' or 'alert_link'",
+				Description: "Optionally include a message attachment. Valid values are message, alert_link, or none",
 			},
 			"action_slack_param_message": {
 				Type:        schema.TypeString,
