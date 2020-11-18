@@ -24,15 +24,15 @@ provider "splunk" {
 }
 
 resource "splunk_admin_saml_groups" "saml-group01" {
-  name              = "mygroup"
-  roles             = ["admin", "power"]
+  name  = "mygroup"
+  roles = ["admin", "power"]
 }
 
 resource "splunk_authorization_roles" "role01" {
-  name           = "terraform-user01-role"
-  default_app    = "search"
-  imported_roles = ["power", "user"]
-  capabilities   = ["accelerate_datamodel", "change_authentication", "restart_splunkd"]
+  name                   = "terraform-user01-role"
+  default_app            = "search"
+  imported_roles         = ["power", "user"]
+  capabilities           = ["accelerate_datamodel", "change_authentication", "restart_splunkd"]
   search_indexes_allowed = ["_audit", "_internal", "main"]
   search_indexes_default = ["_audit", "_internal", "main"]
 }

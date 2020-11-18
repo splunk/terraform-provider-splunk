@@ -1,3 +1,7 @@
+## 1.3.4 (November 18, 2020)
+* Fix: Adding Slack actions to saved_searches resource #33
+* Revert go mod path update
+
 ## 1.3.3 (November 13, 2020)
 * Fix: Fix URL encoding for resource names #32
 * Enhancements: Added linting `golangci-lint`

@@ -16,7 +16,7 @@ default: build
 
 fmt:
 	go fmt ./...
-	@terraform fmt
+	@terraform fmt -recursive
 
 build:
 	go build -o terraform-provider-splunk .

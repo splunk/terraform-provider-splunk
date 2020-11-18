@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/splunk/terraform-provider-splunk/client/utils"
 	"io"
 	"net/http"
 	"net/url"
@@ -14,7 +15,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"github.com/splunk/terraform-provider-splunk/client/utils"
 	"time"
 )
 
