@@ -122,7 +122,7 @@ resource "splunk_saved_searches" "test" {
 `
 
 const newSavedSearchesSlack = `
-resource "splunk_saved_searches" "slack_alert" {
+resource "splunk_saved_searches" "test" {
 	name = "Test Slack Alert"
 	actions = "slack"
 	action_slack_param_attachment = "alert_link"
