@@ -72,7 +72,8 @@ resource "splunk_saved_searches" "test" {
     actions = "email"
     action_email_include_search = 0
     action_email_include_trigger = 1
-    action_email_format = "table"
+	action_email_format = "table"
+	action_email_message_alert = "a non-default message"
     action_email_max_time = "5m"
     action_email_max_results = 10
     action_email_send_csv = 1
@@ -210,6 +211,7 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "action_email", "true"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_include_search", "0"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_include_trigger", "1"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_message_alert", "a non-default message"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_format", "table"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_max_time", "5m"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_max_results", "10"),

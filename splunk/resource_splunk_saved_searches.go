@@ -141,6 +141,12 @@ func savedSearches() *schema.Resource {
 				Description: "Valid values are Integer[m|s|h|d]." +
 					"Specifies the maximum amount of time the execution of an email action takes before the action is aborted. Defaults to 5m.",
 			},
+			"action_email_message_alert": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Message sent in the emailed alert. Defaults to: The alert condition for '$name$' was triggered.",
+			},
 			"action_email_pdfview": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -1044,6 +1050,9 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_email_max_time", entry.Content.ActionEmailMaxTime); err != nil {
 		return err
 	}
+	if err = d.Set("action_email_message_alert", entry.Content.ActionEmailMessageAlert); err != nil {
+		return err
+	}
 	if err = d.Set("action_email_pdfview", entry.Content.ActionEmailPDFView); err != nil {
 		return err
 	}
@@ -1464,6 +1473,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionEmailMailserver:              d.Get("action_email_mailserver").(string),
 		ActionEmailMaxResults:              d.Get("action_email_max_results").(int),
 		ActionEmailMaxTime:                 d.Get("action_email_max_time").(string),
+		ActionEmailMessageAlert:            d.Get("action_email_message_alert").(string),
 		ActionEmailPDFView:                 d.Get("action_email_pdfview").(string),
 		ActionEmailPreprocessResults:       d.Get("action_email_preprocess_results").(string),
 		ActionEmailReportCIDFontList:       d.Get("action_email_report_cid_font_list").(string),
