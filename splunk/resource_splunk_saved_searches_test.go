@@ -72,8 +72,8 @@ resource "splunk_saved_searches" "test" {
     actions = "email"
     action_email_include_search = 0
     action_email_include_trigger = 1
-	action_email_format = "table"
-	action_email_message_alert = "a non-default message"
+    action_email_format = "table"
+    action_email_message_alert = "a non-default message"
     action_email_max_time = "5m"
     action_email_max_results = 10
     action_email_send_csv = 1
@@ -145,16 +145,16 @@ resource "splunk_saved_searches" "test" {
 
 const newSavedSearchesReport = `
 resource "splunk_saved_searches" "test" {
-	name = "Test Report"
+    name = "Test Report"
     search = "index=main"
     actions = "email"
     action_email_include_search = 0
     action_email_include_trigger = 1
-	action_email_format = "table"
-	action_email_to = "splunk@splunk.com"
-	is_scheduled = true
-	action_email_message_report = "a non-default message"
-	cron_schedule = "*/5 * * * *"
+    action_email_format = "table"
+    action_email_to = "splunk@splunk.com"
+    is_scheduled = true
+    action_email_message_report = "a non-default message"
+    cron_schedule = "*/5 * * * *"
 }
 `
 
