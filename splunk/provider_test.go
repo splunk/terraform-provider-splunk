@@ -10,7 +10,6 @@ import (
 	"github.com/splunk/terraform-provider-splunk/client"
 )
 
-// add a comment
 var testAccProviders map[string]terraform.ResourceProvider
 var testAccProvider *schema.Provider
 
