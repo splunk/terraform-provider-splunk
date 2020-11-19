@@ -32,6 +32,7 @@ type SavedSearchObject struct {
 	ActionEmailMaxResults              int     `json:"action.email.maxresults,omitempty" url:"action.email.maxresults,omitempty"`
 	ActionEmailMaxTime                 string  `json:"action.email.maxtime,omitempty" url:"action.email.maxtime,omitempty"`
 	ActionEmailMessageAlert            string  `json:"action.email.message.alert,omitempty" url:"action.email.message.alert,omitempty"`
+	ActionEmailMessageReport           string  `json:"action.email.message.report,omitempty" url:"action.email.message.report,omitempty"`
 	ActionEmailPDFView                 string  `json:"action.email.pdfview,omitempty" url:"action.email.pdfview,omitempty"`
 	ActionEmailPreprocessResults       string  `json:"action.email.preprocess_results,omitempty" url:"action.email.preprocess_results,omitempty"`
 	ActionEmailReportCIDFontList       string  `json:"action.email.reportCIDFontList,omitempty" url:"action.email.reportCIDFontList,omitempty"`

@@ -143,6 +143,21 @@ resource "splunk_saved_searches" "test" {
 }
 `
 
+const newSavedSearchesReport = `
+resource "splunk_saved_searches" "test" {
+	name = "Test Report"
+    search = "index=main"
+    actions = "email"
+    action_email_include_search = 0
+    action_email_include_trigger = 1
+	action_email_format = "table"
+	action_email_to = "splunk@splunk.com"
+	is_scheduled = true
+	action_email_message_report = "a non-default message"
+	cron_schedule = "*/5 * * * *"
+}
+`
+
 func TestAccSplunkSavedSearches(t *testing.T) {
 	resourceName := "splunk_saved_searches.test"
 	resource.Test(t, resource.TestCase{
@@ -272,6 +287,21 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
 					resource.TestCheckResourceAttr(resourceName, "realtime_schedule", "true"),
 					resource.TestCheckResourceAttr(resourceName, "search", "index=main level=error"),
+				),
+			},
+			{
+				Config: newSavedSearchesReport,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Report"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "email"),
+					resource.TestCheckResourceAttr(resourceName, "action_email", "true"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_include_search", "0"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_include_trigger", "1"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_message_report", "a non-default message"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_format", "table"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_to", "splunk@splunk.com"),
+					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/5 * * * *"),
 				),
 			},
 			{
