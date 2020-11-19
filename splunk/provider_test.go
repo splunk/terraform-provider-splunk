@@ -1,14 +1,16 @@
 package splunk
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/splunk/terraform-provider-splunk/client"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/splunk/terraform-provider-splunk/client"
 )
 
+// add a comment
 var testAccProviders map[string]terraform.ResourceProvider
 var testAccProvider *schema.Provider
 
