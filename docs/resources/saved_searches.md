@@ -49,6 +49,7 @@ This resource block supports the following arguments:
 * `action_email_mailserver` - (Optional) Set the address of the MTA server to be used to send the emails.Defaults to <LOCALHOST> or whatever is set in alert_actions.conf.
 * `action_email_max_results` - (Optional) Sets the global maximum number of search results to send when email.action is enabled. Defaults to 100.
 * `action_email_max_time` - (Optional) Valid values are Integer[m|s|h|d].Specifies the maximum amount of time the execution of an email action takes before the action is aborted. Defaults to 5m.
+* `action_email_message_alert` - (Optional) Customize the message sent in the emailed alert. Defaults to: The alert condition for '$name$' was triggered.
 * `action_email_pdfview` - (Optional) The name of the view to deliver if sendpdf is enabled
 * `action_email_preprocess_results` - (Optional) Search string to preprocess results before emailing them. Defaults to empty string (no preprocessing).Usually the preprocessing consists of filtering out unwanted internal fields.
 * `action_email_report_cid_font_list` - (Optional) Space-separated list. Specifies the set (and load order) of CID fonts for handling Simplified Chinese(gb), Traditional Chinese(cns), Japanese(jp), and Korean(kor) in Integrated PDF Rendering.If multiple fonts provide a glyph for a given character code, the glyph from the first font specified in the list is used.To skip loading any CID fonts, specify the empty string.Defaults to 'gb cns jp kor'
