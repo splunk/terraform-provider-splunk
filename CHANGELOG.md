@@ -1,3 +1,6 @@
+## 1.3.5 (December 1, 2020)
+Add email message field for reports & alerts #38
+
 ## 1.3.4 (November 18, 2020)
 * Fix: Adding Slack actions to saved_searches resource #33
 * Revert go mod path update
