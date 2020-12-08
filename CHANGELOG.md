@@ -1,3 +1,6 @@
+## 1.3.6 (December 8, 2020)
+* Fix: Pass HEC token as input with http event collector resource
+
 ## 1.3.5 (December 1, 2020)
 Add email message field for reports & alerts #38
 
