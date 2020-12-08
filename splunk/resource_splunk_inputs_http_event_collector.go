@@ -233,6 +233,7 @@ func getHttpEventCollectorConfig(d *schema.ResourceData) (httpInputConfigObject 
 	httpInputConfigObject = &models.HttpEventCollectorObject{}
 	httpInputConfigObject.Host = d.Get("host").(string)
 	httpInputConfigObject.Index = d.Get("index").(string)
+	httpInputConfigObject.Token = d.Get("token").(string)
 	httpInputConfigObject.Indexes = d.Get("indexes").([]interface{})
 	httpInputConfigObject.Source = d.Get("source").(string)
 	httpInputConfigObject.SourceType = d.Get("sourcetype").(string)
