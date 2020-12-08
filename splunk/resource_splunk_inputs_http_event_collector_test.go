@@ -49,6 +49,28 @@ resource "splunk_inputs_http_event_collector" "new-token" {
 }
 `
 
+const newHttpEventCollectorInputWithToken = `
+resource "splunk_global_http_event_collector" "http" {
+  disabled     = false
+  enable_ssl   = true
+}
+
+resource "splunk_inputs_http_event_collector" "new-token" {
+    name = "new-token"
+    token = "12345678-0000-0000-0000-123456780000"
+    source = "new"
+    disabled = false
+    use_ack = 0
+
+    acl {
+      app = "launcher"
+      sharing = "global"
+    }
+
+    depends_on = ["splunk_global_http_event_collector.http"]
+}
+`
+
 func TestAccSplunkHttpEventCollectorInput(t *testing.T) {
 	resourceName := "splunk_inputs_http_event_collector.new-token"
 	resource.Test(t, resource.TestCase{
@@ -86,6 +108,42 @@ func TestAccSplunkHttpEventCollectorInput(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "indexes.1", "history"),
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
 					resource.TestCheckResourceAttr(resourceName, "use_ack", "1"),
+					resource.TestCheckResourceAttr(resourceName, "acl.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "launcher"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "nobody"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.sharing", "global"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.read.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.read.0", "admin"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.write.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.write.0", "admin"),
+				),
+			},
+			{
+				ResourceName:      "splunk_inputs_http_event_collector.new-token",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+func TestAccSplunkHttpEventCollectorInputWithToken(t *testing.T) {
+	resourceName := "splunk_inputs_http_event_collector.new-token"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testAccSplunkHttpEventCollectorInputDestroyResources,
+		Steps: []resource.TestStep{
+			{
+				Config: newHttpEventCollectorInputWithToken,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "source", "new"),
+					resource.TestCheckResourceAttr(resourceName, "index", "default"),
+					resource.TestCheckResourceAttr(resourceName, "token", "12345678-0000-0000-0000-123456780000"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "use_ack", "0"),
 					resource.TestCheckResourceAttr(resourceName, "acl.#", "1"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "launcher"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "nobody"),
