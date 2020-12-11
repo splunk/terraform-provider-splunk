@@ -1,3 +1,6 @@
+## 1.3.7 (December 8, 2020)
+* Fix: http client overrides default transport and no longer supports environment proxy settings. (#46)
+
 ## 1.3.6 (December 8, 2020)
 * Fix: Pass HEC token as input with http event collector resource
 

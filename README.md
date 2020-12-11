@@ -38,8 +38,7 @@ Build the provider: `make build`
 * For importing existing resources use `terraform import`
 * To remove all terraform managed resources use `terraform destroy`
 
-**NOTE:** When developing or testing with terraform `>= 0.13` you must replace the provider location from remote (registry.terraform.io) to local build.
-
+**NOTE:** When developing and testing local provider builds, if terraform version `>= 0.13` you would have to replace the provider binaries in the `.terraform` folder with your local build.
 Follow guidelines: https://github.com/hashicorp/terraform/blob/master/website/upgrade-guides/0-13.html.markdown
 
 ### Contributions
