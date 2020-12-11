@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/splunk/terraform-provider-splunk/client/utils"
+	"github.com/jaware-splunk/terraform-provider-splunk/client/utils"
 	"io"
 	"net/http"
 	"net/url"

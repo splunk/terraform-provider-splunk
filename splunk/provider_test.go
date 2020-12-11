@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/splunk/terraform-provider-splunk/client"
+	"github.com/jaware-splunk/terraform-provider-splunk/client"
 )
 
 var testAccProviders map[string]terraform.ResourceProvider
