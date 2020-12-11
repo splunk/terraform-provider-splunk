@@ -292,6 +292,7 @@ func NewSplunkdHTTPClient(timeout time.Duration, skipValidateTLS bool) *http.Cli
 	return &http.Client{
 		Timeout: timeout,
 		Transport: &http.Transport{
+			Proxy: http.DefaultTransport.(*http.Transport).Proxy,
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: skipValidateTLS},
 		},
 	}
