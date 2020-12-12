@@ -105,7 +105,7 @@ func clusterManagerRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
 	//
-	resp, err := (*provider.Client).ReadClusterManagerObject()
+	resp, err := (*provider.Client).ReadClusterManager(name)
 	if err != nil {
 		return err
 	}
@@ -165,7 +165,7 @@ func clusterManagerRead(d *schema.ResourceData, meta interface{}) error {
 func clusterManagerUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	clusterManagerObject := getClusterManagerConfig(d)
-	err := (*provider.Client).UpdateClusterManagerObject(d.Id(), clusterManagerObject)
+	err := (*provider.Client).UpdateClusterManager(d.Id(), clusterManagerObject)
 	if err != nil {
 		return err
 	}
@@ -176,7 +176,7 @@ func clusterManagerUpdate(d *schema.ResourceData, meta interface{}) error {
 func clusterManagerDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
-	resp, err := (*provider.Client).DeleteClusterManagerObject(d.Id())
+	resp, err := (*provider.Client).DeleteClusterManager(d.Id())
 	if err != nil {
 		return err
 	}
