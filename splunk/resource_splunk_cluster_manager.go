@@ -175,7 +175,6 @@ func clusterManagerUpdate(d *schema.ResourceData, meta interface{}) error {
 
 func clusterManagerDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
-	aclObject := getACLConfig(d.Get("acl").([]interface{}))
 	resp, err := (*provider.Client).DeleteClusterManager(d.Id())
 	if err != nil {
 		return err
