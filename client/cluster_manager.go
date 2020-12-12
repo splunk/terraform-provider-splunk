@@ -8,7 +8,7 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-func (client *Client) CreateClusterManager(name string, clusterManagerObj *models.ClusterManagerObject) error {
+func (client *Client) CreateClusterManager(name string, clusterManagerObject *models.ClusterManagerObject) error {
 	values, err := query.Values(clusterManagerObject)
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func (client *Client) ReadClusterManager(name string) (*http.Response, error) {
 	return resp, nil
 }
 
-func (client *Client) UpdateClusterManager(name string, ClusterManagerObject *models.ClusterManagerObject) error {
+func (client *Client) UpdateClusterManager(name string, clusterManagerObject *models.ClusterManagerObject) error {
 	values, err := query.Values(&clusterManagerObject)
 	if err != nil {
 		return err
