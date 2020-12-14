@@ -24,7 +24,7 @@ func (client *Client) CreateClusterManager(name string, clusterManagerObject *mo
 }
 
 func (client *Client) ReadClusterManager(name string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "cluster", "config", "config")
+	endpoint := client.BuildSplunkURL(nil, "services", "cluster", "config", name)
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
