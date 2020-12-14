@@ -41,7 +41,6 @@ func clusterManagerConfig() *schema.Resource {
 			"mode": {
 				Type:         schema.TypeString,
 				Required:     true,
-				Computed:     true,
 				ValidateFunc: validation.StringInSlice([]string{"master", "slave", "searchhead", "disabled"}, false),
 				Description:  `Valid values: (master | slave | searchhead | disabled)`,
 			},
@@ -54,7 +53,6 @@ func clusterManagerConfig() *schema.Resource {
 			"replication_factor": {
 				Type:        schema.TypeInt,
 				Required:    true,
-				Computed:    true,
 				Description: `Only valid for the master node in a cluster configuration. Time, in seconds, before a master considers a peer down. Once a peer is down, the master initiates steps to replicate buckets from the dead peer to its live peers. Defaults to 60 seconds`,
 			},
 			"restart_timeout": {
@@ -66,7 +64,6 @@ func clusterManagerConfig() *schema.Resource {
 			"search_factor": {
 				Type:        schema.TypeInt,
 				Required:    true,
-				Computed:    true,
 				Description: `Only valid for the master node in a cluster configuration. Time, in seconds, before a master considers a peer down. Once a peer is down, the master initiates steps to replicate buckets from the dead peer to its live peers. Defaults to 60 seconds`,
 			},
 			"use_batch_mask_changes": {
