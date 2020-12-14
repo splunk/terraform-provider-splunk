@@ -14,7 +14,7 @@ func (client *Client) CreateClusterManager(name string, clusterManagerObject *mo
 		return err
 	}
 
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", "cluster", "config", "config")
+	endpoint := client.BuildSplunkURL(nil, "services", "cluster", "config", "config")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -24,7 +24,7 @@ func (client *Client) CreateClusterManager(name string, clusterManagerObject *mo
 }
 
 func (client *Client) ReadClusterManager(name string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", "cluster", "config", "config")
+	endpoint := client.BuildSplunkURL(nil, "services", "cluster", "config", "config")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (client *Client) UpdateClusterManager(name string, clusterManagerObject *mo
 	}
 	values.Del("cluster_label")
 	values.Del("mode")
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", "cluster", "config", "config")
+	endpoint := client.BuildSplunkURL(nil, "services", "cluster", "config", "config")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (client *Client) UpdateClusterManager(name string, clusterManagerObject *mo
 }
 
 func (client *Client) DeleteClusterManager(name string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", "cluster", "config", "config")
+	endpoint := client.BuildSplunkURL(nil, "services", "cluster", "config", "config")
 	resp, err := client.Delete(endpoint)
 	if err != nil {
 		return nil, err
