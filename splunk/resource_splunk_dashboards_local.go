@@ -24,7 +24,7 @@ func splunkDashboards() *schema.Resource {
 			"eai_data": {
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    true,
+				ForceNew:    false,
 				Description: "Dashboard XML definition.",
 			},
 			"acl": aclSchema(),
@@ -103,7 +103,11 @@ func splunkDashboardsRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
-	if err = d.Set("name", d.Id()); err != nil {
+	if err = d.Set("name", entry.Name); err != nil {
+		return err
+	}
+
+	if err = d.Set("eai_data", entry.Content.EAIData); err != nil {
 		return err
 	}
 
@@ -117,26 +121,32 @@ func splunkDashboardsRead(d *schema.ResourceData, meta interface{}) error {
 
 func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
-	splunkDashboardsObj := getHttpEventCollectorConfig(d)
+	name := d.Get("name").(string)
+	splunkDashboardsObj := getSplunkDashboardsConfig(d)
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
-	err := (*provider.Client).UpdateHttpEventCollectorObject(d.Id(), aclObject.Owner, aclObject.App, splunkDashboardsObj)
+	err := (*provider.Client).UpdateDashboardObject(aclObject.Owner, aclObject.App, name, splunkDashboardsObj)
 	if err != nil {
 		return err
 	}
 
 	//ACL update
-	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, d.Id(), aclObject, "data", "inputs", "http")
-	if err != nil {
-		return err
+	if _, ok := d.GetOk("acl"); ok {
+		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "inputs", "ui", "views")
+		if err != nil {
+			return err
+		}
 	}
 
-	return httpEventCollectorInputRead(d, meta)
+	return splunkDashboardsRead(d, meta)
 }
 
 func splunkDashboardsDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
+	name := d.Id()
+	// name := d.Get("name").(string)
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
-	resp, err := (*provider.Client).DeleteHttpEventCollectorObject(d.Id(), aclObject.Owner, aclObject.App)
+	// splunkDashboardsObj := getSplunkDashboardsConfig(d)
+	resp, err := (*provider.Client).DeleteDashboardObject(aclObject.Owner, aclObject.App, name)
 	if err != nil {
 		return err
 	}
@@ -147,7 +157,7 @@ func splunkDashboardsDelete(d *schema.ResourceData, meta interface{}) error {
 		return nil
 
 	default:
-		errorResponse := &models.HECResponse{}
+		errorResponse := &models.DashboardResponse{}
 		_ = json.NewDecoder(resp.Body).Decode(errorResponse)
 		err := errors.New(errorResponse.Messages[0].Text)
 		return err
@@ -174,7 +184,7 @@ func getDashboardByName(name string, httpResponse *http.Response) (dashboardEntr
 		if err != nil {
 			return nil, err
 		}
-		re := regexp.MustCompile(`http://(.*)`)
+		re := regexp.MustCompile(`(.*)`)
 		for _, entry := range response.Entry {
 			if name == re.FindStringSubmatch(entry.Name)[1] {
 				return &entry, nil

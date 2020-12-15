@@ -9,8 +9,8 @@ import (
 const splunkDashboardsObject = `
 
 resource "splunk_dashboards" "dashboard" {
-  name     = "test"
-  eai_data = "<dashboard><label>the_new_label</label></dashboard>"
+  name     = "Terraform_Test_Dashboard"
+  eai_data = "<dashboard><label>Terraform Test Dashboard</label></dashboard>"
 }
 `
 
@@ -25,8 +25,8 @@ func TestAccSplunkDashboards(t *testing.T) {
 			{
 				Config: splunkDashboardsObject,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "name", "test"),
-					resource.TestCheckResourceAttr(resourceName, "eai_data", "<dashboard><label>the_new_label</label></dashboard>"),
+					resource.TestCheckResourceAttr(resourceName, "name", "Terraform_Test_Dashboard"),
+					resource.TestCheckResourceAttr(resourceName, "eai_data", "<dashboard><label>Terraform Test Dashboard</label></dashboard>"),
 				),
 			},
 			{

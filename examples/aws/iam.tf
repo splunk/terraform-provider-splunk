@@ -79,12 +79,12 @@ data "aws_iam_policy_document" "lambda_policy_doc" {
 }
 
 resource "aws_iam_policy" "lambda_transform_policy" {
-  name   = "lambda_function_policy"
+  name = "lambda_function_policy"
   policy = data.aws_iam_policy_document.lambda_policy_doc.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_policy_role_attachment" {
-  role       = aws_iam_role.kinesis_firehose_lambda.name
+  role = aws_iam_role.kinesis_firehose_lambda.name
   policy_arn = aws_iam_policy.lambda_transform_policy.arn
 }
 
@@ -208,10 +208,10 @@ data "aws_iam_policy_document" "cloudwatch_to_fh_access_policy" {
 
 resource "aws_iam_policy" "cloudwatch_to_fh_access_policy" {
   description = "Cloudwatch to Firehose Subscription Policy"
-  policy      = data.aws_iam_policy_document.cloudwatch_to_fh_access_policy.json
+  policy = data.aws_iam_policy_document.cloudwatch_to_fh_access_policy.json
 }
 
 resource "aws_iam_role_policy_attachment" "cloudwatch_to_fh" {
-  role       = aws_iam_role.cloudwatch_to_firehose_trust.name
+  role = aws_iam_role.cloudwatch_to_firehose_trust.name
   policy_arn = aws_iam_policy.cloudwatch_to_fh_access_policy.arn
 }

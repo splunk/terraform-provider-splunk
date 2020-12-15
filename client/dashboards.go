@@ -33,12 +33,13 @@ func (client *Client) ReadDashboardObject(name, owner, app string) (*http.Respon
 	return resp, nil
 }
 
-func (client *Client) UpdateDashboardObject(httpInputConfigObj models.GlobalHttpEventCollectorObject) error {
-	values, err := query.Values(&httpInputConfigObj)
+func (client *Client) UpdateDashboardObject(owner string, app string, name string, splunkDashboardsObj *models.SplunkDashboardsObject) error {
+	values, err := query.Values(&splunkDashboardsObj)
 	if err != nil {
 		return err
 	}
-	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "http", "http")
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "ui", "views", name)
+	//Add name.
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -48,8 +49,23 @@ func (client *Client) UpdateDashboardObject(httpInputConfigObj models.GlobalHttp
 	return nil
 }
 
+func (client *Client) DeleteDashboardObject(owner string, app string, name string) (*http.Response, error) {
+	// values, err := query.Values(&splunkDashboardsObj)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "ui", "views", name)
+	resp, err := client.Delete(endpoint)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return resp, nil
+}
+
 func (client *Client) ReadAllDashboardObject() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", "data", "ui", "views")
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "ui", "views")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
