@@ -14,5 +14,5 @@ type DashboardEntry struct {
 
 type SplunkDashboardsObject struct {
 	Name    string `json:"name,omitempty" url:"name,omitempty"`
-	EAIData string `json:"eai_data,omitempty" url:"eai:data,omitempty"`
+	EAIData string `json:"eai:data,omitempty" url:"eai:data,omitempty"`
 }

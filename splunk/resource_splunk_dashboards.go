@@ -24,7 +24,6 @@ func splunkDashboards() *schema.Resource {
 			"eai_data": {
 				Type:        schema.TypeString,
 				Required:    true,
-				ForceNew:    false,
 				Description: "Dashboard XML definition.",
 			},
 			"acl": aclSchema(),
@@ -49,8 +48,8 @@ func splunkDashboardsCreate(d *schema.ResourceData, meta interface{}) error {
 		aclObject = getACLConfig(r.([]interface{}))
 	} else {
 		aclObject.App = "search"
-		aclObject.Owner = "nobody"
-		aclObject.Sharing = "app"
+		aclObject.Owner = "admin"
+		aclObject.Sharing = "user"
 	}
 	err := (*provider.Client).CreateDashboardObject(aclObject.Owner, aclObject.App, splunkDashboardsObj)
 	if err != nil {
@@ -58,7 +57,8 @@ func splunkDashboardsCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if _, ok := d.GetOk("acl"); ok {
-		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "inputs", "ui", "views")
+		aclObject.Sharing = "user" // hard-coding to avoid to user input; because changing object sharing permissions messes deletion of object
+		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views")
 		if err != nil {
 			return err
 		}
@@ -131,7 +131,8 @@ func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	//ACL update
 	if _, ok := d.GetOk("acl"); ok {
-		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "inputs", "ui", "views")
+		aclObject.Sharing = "user" // hard-coding to avoid to user input; because changing object sharing permissions messes deletion of object
+		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views")
 		if err != nil {
 			return err
 		}
@@ -143,9 +144,7 @@ func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 func splunkDashboardsDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
-	// name := d.Get("name").(string)
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
-	// splunkDashboardsObj := getSplunkDashboardsConfig(d)
 	resp, err := (*provider.Client).DeleteDashboardObject(aclObject.Owner, aclObject.App, name)
 	if err != nil {
 		return err
@@ -174,8 +173,6 @@ func getSplunkDashboardsConfig(d *schema.ResourceData) (splunkDashboardsObject *
 
 func getDashboardByName(name string, httpResponse *http.Response) (dashboardEntry *models.DashboardEntry, err error) {
 	response := &models.DashboardResponse{}
-	//body, err := ioutil.ReadAll(httpResponse.Body)
-	//fmt.Println(body)
 	switch httpResponse.StatusCode {
 	case 200, 201:
 

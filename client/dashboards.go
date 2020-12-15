@@ -35,11 +35,11 @@ func (client *Client) ReadDashboardObject(name, owner, app string) (*http.Respon
 
 func (client *Client) UpdateDashboardObject(owner string, app string, name string, splunkDashboardsObj *models.SplunkDashboardsObject) error {
 	values, err := query.Values(&splunkDashboardsObj)
+	values.Del("name")
 	if err != nil {
 		return err
 	}
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "ui", "views", name)
-	//Add name.
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -50,10 +50,6 @@ func (client *Client) UpdateDashboardObject(owner string, app string, name strin
 }
 
 func (client *Client) DeleteDashboardObject(owner string, app string, name string) (*http.Response, error) {
-	// values, err := query.Values(&splunkDashboardsObj)
-	// if err != nil {
-	// 	return nil, err
-	// }
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "ui", "views", name)
 	resp, err := client.Delete(endpoint)
 	if err != nil {
