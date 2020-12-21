@@ -19,7 +19,7 @@ func splunkDashboards() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
-				Description: "App context for the dashboard.",
+				Description: "Dashboard Name.",
 			},
 			"eai_data": {
 				Type:        schema.TypeString,
@@ -71,7 +71,6 @@ func splunkDashboardsCreate(d *schema.ResourceData, meta interface{}) error {
 func splunkDashboardsRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
-	// We first get list of inputs to get owner and app name for the specific input
 	resp, err := (*provider.Client).ReadAllDashboardObject()
 	if err != nil {
 		return err
@@ -87,7 +86,6 @@ func splunkDashboardsRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
-	// Now we read the input configuration with proper owner and app
 	resp, err = (*provider.Client).ReadDashboardObject(name, entry.ACL.Owner, entry.ACL.App)
 	if err != nil {
 		return err

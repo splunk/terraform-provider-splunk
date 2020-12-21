@@ -91,7 +91,7 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_saved_searches":              savedSearches(),
 		"splunk_indexes":                     index(),
 		"splunk_configs_conf":                configsConf(),
-		"splunk_dashboards":                  splunkDashboards(),
+		"splunk_data_ui_views":               splunkDashboards(),
 	}
 }
 

@@ -2,15 +2,16 @@ package splunk
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"net/http"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 )
 
 const splunkDashboardsObject = `
-resource "splunk_dashboards" "dashboard" {
+resource "splunk_data_ui_views" "dashboard" {
   name     = "Terraform_Test_Dashboard"
   eai_data = "<dashboard><label>Terraform Test Dashboard</label></dashboard>"
   acl {
@@ -22,14 +23,14 @@ resource "splunk_dashboards" "dashboard" {
 
 const updateSplunkDashboardsObject = `
 
-resource "splunk_dashboards" "dashboard" {
+resource "splunk_data_ui_views" "dashboard" {
   name     = "Terraform_Test_Dashboard"
   eai_data = "<dashboard><label>Terraform Test Dashboard Update</label></dashboard>"
 }
 `
 
 func TestAccSplunkDashboards(t *testing.T) {
-	resourceName := "splunk_dashboards.dashboard"
+	resourceName := "splunk_data_ui_views.dashboard"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -52,7 +53,7 @@ func TestAccSplunkDashboards(t *testing.T) {
 				),
 			},
 			{
-				ResourceName:      "splunk_dashboards.dashboard",
+				ResourceName:      "splunk_data_ui_views.dashboard",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
@@ -64,7 +65,7 @@ func testAccSplunkDashboardDestroyResources(s *terraform.State) error {
 	client := newTestClient()
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
-		case "splunk_dashboards":
+		case "splunk_data_ui_views":
 			endpoint := client.BuildSplunkURL(nil, "servicesNS", "admin", "search", "data", "ui", "views", rs.Primary.ID)
 			resp, err := client.Get(endpoint)
 			if resp.StatusCode != http.StatusNotFound {
