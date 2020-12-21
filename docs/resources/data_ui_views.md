@@ -4,7 +4,13 @@ Create and manage splunk dashboards/views.
 ```
 resource "splunk_data_ui_views" "dashboard" {
   name     = "Terraform_Test_Dashboard"
-  eai_data = "<dashboard><label>Terraform Test Dashboard</label></dashboard>"
+  eai_data = "<<EOF
+  <dashboard>
+    <label> 
+      Terraform Test Dashboard
+    </label>
+  </dashboard>
+  EOF"
   acl {
     owner = "admin"
     app = "search"
