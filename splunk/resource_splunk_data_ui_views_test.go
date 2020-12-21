@@ -13,13 +13,7 @@ import (
 const splunkDashboardsObject = `
 resource "splunk_data_ui_views" "dashboard" {
   name     = "Terraform_Test_Dashboard"
-  eai_data = <<EOF
-  <dashboard>
-    <label> 
-      Terraform Test Dashboard
-    </label>
-  </dashboard>
-  EOF
+  eai_data = "<dashboard><label>Terraform Test Dashboard</label></dashboard>"
   acl {
     owner = "admin"
     app = "search"
@@ -31,13 +25,7 @@ const updateSplunkDashboardsObject = `
 
 resource "splunk_data_ui_views" "dashboard" {
   name     = "Terraform_Test_Dashboard"
-  eai_data = <<EOF
-  <dashboard>
-    <label> 
-      Terraform Test Dashboard
-    </label>
-  </dashboard>
-  EOF
+  eai_data = "<dashboard><label>Terraform Test Dashboard</label></dashboard>"
 }
 `
 
@@ -61,7 +49,7 @@ func TestAccSplunkDashboards(t *testing.T) {
 				Config: updateSplunkDashboardsObject,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", "Terraform_Test_Dashboard"),
-					resource.TestCheckResourceAttr(resourceName, "eai_data", "<dashboard><label>Terraform Test Dashboard Update</label></dashboard>"),
+					resource.TestCheckResourceAttr(resourceName, "eai_data", "<dashboard><label>Terraform Test Dashboard</label></dashboard>"),
 				),
 			},
 			{
