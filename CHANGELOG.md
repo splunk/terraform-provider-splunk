@@ -1,3 +1,7 @@
+## 1.3.8 (January 5, 2021)
+* Fix: Unable to create a Metric index (#48)
+* Fix: TestAccCreateSplunkIndex is randomly failing (#39)
+
 ## 1.3.7 (December 8, 2020)
 * Fix: http client overrides default transport and no longer supports environment proxy settings. (#46)
 
