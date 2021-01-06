@@ -1,3 +1,6 @@
+## 1.3.9 (January 6, 2021)
+* Support to create dashboards and views resource #45
+
 ## 1.3.8 (January 5, 2021)
 * Fix: Unable to create a Metric index (#48)
 * Fix: TestAccCreateSplunkIndex is randomly failing (#39)
