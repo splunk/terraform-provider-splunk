@@ -1,8 +1,9 @@
 package splunk
 
 import (
-	"github.com/splunk/terraform-provider-splunk/client"
 	"time"
+
+	"github.com/splunk/terraform-provider-splunk/client"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
@@ -90,6 +91,7 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_saved_searches":              savedSearches(),
 		"splunk_indexes":                     index(),
 		"splunk_configs_conf":                configsConf(),
+		"splunk_data_ui_views":               splunkDashboards(),
 	}
 }
 

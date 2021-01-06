@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/splunk/terraform-provider-splunk/client/utils"
 	"io"
 	"net/http"
 	"net/url"
@@ -16,6 +15,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/splunk/terraform-provider-splunk/client/utils"
 )
 
 // Declare constants for service package
