@@ -3,7 +3,7 @@ package client
 import (
 	"net/http"
 
-	"github.com/jaware-splunk/terraform-provider-splunk/client/models"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 
 	"github.com/google/go-querystring/query"
 )
@@ -23,8 +23,8 @@ func (client *Client) CreateClusterManager(name string, clusterManagerObject *mo
 	return nil
 }
 
-func (client *Client) ReadClusterManager(name string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "cluster", "config", name)
+func (client *Client) ReadClusterManager() (*http.Response, error) {
+	endpoint := client.BuildSplunkURL(nil, "services", "cluster", "master", "info")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,11 @@ func (client *Client) UpdateClusterManager(name string, clusterManagerObject *mo
 		return err
 	}
 	values.Del("cluster_label")
-	values.Del("mode")
+	values.Del("search_factor")
+	values.Del("replication_factor")
+
+	values.Set("replication_factor", "replication_factor[0]")
+	//values.Del("mode")
 	endpoint := client.BuildSplunkURL(nil, "services", "cluster", "config", "config")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/jaware-splunk/terraform-provider-splunk/client/models"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -102,7 +102,7 @@ func clusterManagerRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
 	//
-	resp, err := (*provider.Client).ReadClusterManager(name)
+	resp, err := (*provider.Client).ReadClusterManager()
 	if err != nil {
 		return err
 	}
@@ -114,7 +114,7 @@ func clusterManagerRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return fmt.Errorf("Unable to find resource: %v", name)
+		return fmt.Errorf("Unable to find resource: %v", d.Id())
 	}
 
 	if err = d.Set("available_sites", entry.Content.AvailableSites); err != nil {

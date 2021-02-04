@@ -2,7 +2,7 @@ package splunk
 
 import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/jaware-splunk/terraform-provider-splunk/client/models"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
 func aclSchema() *schema.Schema {
