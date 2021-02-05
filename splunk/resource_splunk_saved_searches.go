@@ -86,7 +86,7 @@ func savedSearches() *schema.Resource {
 			"action_email_include_results_link": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
+				Default:     1,
 				Description: "Specify whether to include a link to the results. [1|0]",
 			},
 			"action_email_include_search": {
@@ -110,7 +110,7 @@ func savedSearches() *schema.Resource {
 			"action_email_include_view_link": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
+				Default:     1,
 				Description: "Specify whether to show the title and a link to enable the user to edit the saved search. [1|0]",
 			},
 			"action_email_inline": {
