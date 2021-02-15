@@ -13,6 +13,17 @@ provider "splunk" {
 }
 ```
 
+Terraform 0.13 and later must add:
+```
+terraform {
+   required_providers {
+    splunk = {
+      source  = "splunk/splunk"
+    }
+  }
+}
+```
+
 ## Argument Reference
 
 Below arguments for the provider can also be set as environment variables.
