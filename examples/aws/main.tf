@@ -2,6 +2,13 @@
 # The Splunk provider creates a new index, a HEC token and installs the AWS kinesis firehose TA with knowledge objects to detect AWS data sources.
 # The AWS provider creates a firehose delivery stream with splunk as destination using the above HEC token, S3 configurations to create a splash bucket for failed events, lambda transformation required by firehose to format VPC flow logs correctly and a cloudwatch subscription filter.
 # The iam roles required for all the AWS resources are in separate file. (iam.tf)
+terraform {
+  required_providers {
+    splunk = {
+      source = "splunk/splunk"
+    }
+  }
+}
 
 provider "aws" {
   // Environment variables used:
@@ -12,6 +19,10 @@ provider "aws" {
 
 provider "splunk" {
   // Provide splunk instance credentials and details either via resource block or env variables
+  url                  = "localhost:8089"
+  username             = "admin"
+  password             = "changeme"
+  insecure_skip_verify = true
 }
 
 resource "splunk_indexes" "vpc-flow-logs-index" {
