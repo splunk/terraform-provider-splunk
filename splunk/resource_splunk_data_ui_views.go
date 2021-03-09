@@ -57,7 +57,6 @@ func splunkDashboardsCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if _, ok := d.GetOk("acl"); ok {
-		aclObject.Sharing = "user" // hard-coding to avoid to user input; because changing object sharing permissions messes deletion of object
 		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views")
 		if err != nil {
 			return err
@@ -83,7 +82,7 @@ func splunkDashboardsRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return fmt.Errorf("Unable to find resource: %v", name)
+		return fmt.Errorf("unable to find resource: %v", name)
 	}
 
 	resp, err = (*provider.Client).ReadDashboardObject(name, entry.ACL.Owner, entry.ACL.App)
@@ -98,7 +97,7 @@ func splunkDashboardsRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
-		return fmt.Errorf("Unable to find resource: %v", name)
+		return fmt.Errorf("unable to find resource: %v", name)
 	}
 
 	if err = d.Set("name", entry.Name); err != nil {
@@ -121,7 +120,14 @@ func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
 	splunkDashboardsObj := getSplunkDashboardsConfig(d)
-	aclObject := getACLConfig(d.Get("acl").([]interface{}))
+	aclObject := &models.ACLObject{}
+	if r, ok := d.GetOk("acl"); ok {
+		aclObject = getACLConfig(r.([]interface{}))
+	} else {
+		aclObject.App = "search"
+		aclObject.Owner = "admin"
+		aclObject.Sharing = "user"
+	}
 	err := (*provider.Client).UpdateDashboardObject(aclObject.Owner, aclObject.App, name, splunkDashboardsObj)
 	if err != nil {
 		return err
@@ -129,7 +135,6 @@ func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 
 	//ACL update
 	if _, ok := d.GetOk("acl"); ok {
-		aclObject.Sharing = "user" // hard-coding to avoid to user input; because changing object sharing permissions messes deletion of object
 		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views")
 		if err != nil {
 			return err
@@ -142,7 +147,17 @@ func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 func splunkDashboardsDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
-	aclObject := getACLConfig(d.Get("acl").([]interface{}))
+	aclObject := &models.ACLObject{}
+	if r, ok := d.GetOk("acl"); ok {
+		aclObject = getACLConfig(r.([]interface{}))
+	} else {
+		aclObject.App = "search"
+		aclObject.Owner = "admin"
+		aclObject.Sharing = "user"
+	}
+	if aclObject.Sharing != "user" {
+		aclObject.Owner = "nobody"
+	}
 	resp, err := (*provider.Client).DeleteDashboardObject(aclObject.Owner, aclObject.App, name)
 	if err != nil {
 		return err
