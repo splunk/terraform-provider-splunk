@@ -1,3 +1,7 @@
+## 1.4.0 (March 9, 2021)
+* Data UI Views does not persist permissions on creation #59
+* Updated Examples
+
 ## 1.3.9 (January 6, 2021)
 * Support to create dashboards and views resource #45
 
