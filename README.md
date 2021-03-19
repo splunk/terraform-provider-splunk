@@ -54,10 +54,12 @@ After merging, our team will update the changelog.MD file and create a version t
 
 #### Notes and Troubleshooting
 * When conflicts arise during resource creation, import the resource first using `terraform import` command and make modifications to the resource.
-* Testing errors mentioning `too many open files` may be related to `ulimit` on your machine. Check current and increase the maximum number of open files `1024` using `ulimit -n 1024`
-* If conf files are edited or deleted <b>manually</b>, restart Splunk to ensure state consistency before applying or reapplying a template.
-* Splunk environments with numerous indexes, saved searches, knowledge objects, etc. may cause issues with the provided tests. To avoid these errors, use a fresh or lightly configured Splunk environment.
+* The error `too many open files` may be due to `ulimit` settings on your machine. Check current and increase the maximum number of open files `1024` using `ulimit -n 1024`
+* When deleting or editing conf files <b>manually</b>, restart Splunk to ensure state consistency before applying or reapplying a template.
+* Splunk environment with numerous indexes, saved searches, knowledge objects, etc. may cause issues with the provided tests. To avoid these errors, use a fresh or lightly configured Splunk environment.
 
 ### Support
 Use the [GitHub issue tracker](https://github.com/splunk/terraform-provider-splunk/issues) to submit bugs or request features.
+* Please add the Terraform and provider version, and the version of Splunk Enterprise used.
+
 [Splunk Ideas](https://ideas.splunk.com/) is another place for your suggestions and [Splunk Answers](https://community.splunk.com/t5/Community/ct-p/en-us) for questions.

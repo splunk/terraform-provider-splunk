@@ -1,3 +1,6 @@
+## 1.4.1 (March 9, 2021)
+* Fix: State not accurate w/r/t splunk_saved_searches->alert_track #65
+
 ## 1.4.0 (March 9, 2021)
 * Data UI Views does not persist permissions on creation #59
 * Updated Examples
