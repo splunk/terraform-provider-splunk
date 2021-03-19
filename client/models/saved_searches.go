@@ -94,7 +94,7 @@ type SavedSearchObject struct {
 	AlertSuppress                      bool    `json:"alert.suppress" url:"alert.suppress"`
 	AlertSuppressFields                string  `json:"alert.suppress.fields,omitempty" url:"alert.suppress.fields,omitempty"`
 	AlertSuppressPeriod                string  `json:"alert.suppress.period,omitempty" url:"alert.suppress.period,omitempty"`
-	AlertTrack                         string  `json:"alert.track,omitempty" url:"alert.track,omitempty"`
+	AlertTrack                         bool    `json:"alert.track" url:"alert.track"`
 	AlertComparator                    string  `json:"alert_comparator,omitempty" url:"alert_comparator,omitempty"`
 	AlertCondition                     string  `json:"alert_condition,omitempty" url:"alert_condition,omitempty"`
 	AlertThreshold                     string  `json:"alert_threshold,omitempty" url:"alert_threshold,omitempty"`

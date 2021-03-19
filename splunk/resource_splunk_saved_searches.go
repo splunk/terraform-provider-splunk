@@ -555,7 +555,7 @@ func savedSearches() *schema.Resource {
 					"Use [number][time-unit] to specify a time. For example: 60 = 60 seconds, 1m = 1 minute, 1h = 60 minutes = 1 hour. ",
 			},
 			"alert_track": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeBool,
 				Optional: true,
 				Computed: true,
 				Description: "Valid values: (true | false | auto) Specifies whether to track the actions triggered by this scheduled search." +
@@ -1545,7 +1545,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		AlertSuppressFields:                d.Get("alert_suppress_fields").(string),
 		AlertSuppressPeriod:                d.Get("alert_suppress_period").(string),
 		AlertThreshold:                     d.Get("alert_threshold").(string),
-		AlertTrack:                         d.Get("alert_track").(string),
+		AlertTrack:                         d.Get("alert_track").(bool),
 		AlertType:                          d.Get("alert_type").(string),
 		AutoSummarize:                      d.Get("auto_summarize").(bool),
 		AutoSummarizeCommand:               d.Get("auto_summarize_command").(string),
