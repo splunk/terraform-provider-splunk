@@ -1,3 +1,6 @@
+## 1.4.2 (April 1, 2021)
+* Support to create indexes on Splunk Cloud (Beta)
+
 ## 1.4.1 (March 9, 2021)
 * Fix: State not accurate w/r/t splunk_saved_searches->alert_track #65
 
