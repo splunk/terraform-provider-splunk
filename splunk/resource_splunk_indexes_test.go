@@ -5,6 +5,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"net/http"
+	"reflect"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -68,3 +70,29 @@ func testAccSplunkIndexDestroyResources(s *terraform.State) error {
 	}
 	return nil
 }
+
+func testResourceExampleInstanceStateDataV0() map[string]interface{} {
+	return map[string]interface{}{
+		"max_hot_buckets": 3,
+	}
+}
+
+func testResourceExampleInstanceStateDataV1() map[string]interface{} {
+	v0 := testResourceExampleInstanceStateDataV0()
+	return map[string]interface{}{
+		"max_hot_buckets": strconv.Itoa(v0["max_hot_buckets"].(int)),
+	}
+}
+
+func TestResourceExampleInstanceStateUpgradeV0(t *testing.T) {
+	expected := testResourceExampleInstanceStateDataV1()
+	actual, err := resourceExampleInstanceStateUpgradeV0(testResourceExampleInstanceStateDataV0(), nil)
+	if err != nil {
+		t.Fatalf("error migrating state: %s", err)
+	}
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Fatalf("\n\nexpected:\n\n%#v\n\ngot:\n\n%#v\n\n", expected, actual)
+	}
+}
+

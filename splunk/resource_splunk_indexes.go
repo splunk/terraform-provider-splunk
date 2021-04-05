@@ -7,6 +7,7 @@ import (
 	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
 	"regexp"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -146,7 +147,7 @@ func index() *schema.Resource {
 				Note: The precise size of your warm buckets may vary from maxDataSize, due to post-processing and timing issues with the rolling policy.`,
 			},
 			"max_hot_buckets": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				Description: `Maximum hot buckets that can exist per index. Defaults to 3.
@@ -350,6 +351,14 @@ func index() *schema.Resource {
 			},
 			"acl": aclSchema(),
 		},
+		SchemaVersion: 1,
+		StateUpgraders: []schema.StateUpgrader{
+			{
+				Type:    resourceExampleInstanceResourceV0().CoreConfigSchema().ImpliedType(),
+				Upgrade: resourceExampleInstanceStateUpgradeV0,
+				Version: 0,
+			},
+		},
 		Read:   indexRead,
 		Create: indexCreate,
 		Delete: indexDelete,
@@ -358,6 +367,26 @@ func index() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 	}
+}
+
+func resourceExampleInstanceResourceV0() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"max_hot_buckets": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+				Description: `Maximum hot buckets that can exist per index. Defaults to 3.
+				When maxHotBuckets is exceeded, Splunk software rolls the least recently used (LRU) hot bucket to warm.
+Both normal hot buckets and quarantined hot buckets count towards this total. This setting operates independently of maxHotIdleSecs, which can also cause hot buckets to roll.`,
+			},
+		},
+	}
+}
+
+func resourceExampleInstanceStateUpgradeV0(rawState map[string]interface{}, meta interface{}) (map[string]interface{}, error) {
+	rawState["max_hot_buckets"] = strconv.Itoa(rawState["max_hot_buckets"].(int))
+	return rawState, nil
 }
 
 // Functions
@@ -637,7 +666,7 @@ func getIndexConfig(d *schema.ResourceData) (indexConfigObject *models.IndexObje
 	indexConfigObject.MaxBloomBackfillBucketAge = d.Get("max_bloom_backfill_bucket_age").(string)
 	indexConfigObject.MaxConcurrentOptimizes = d.Get("max_concurrent_optimizes").(int)
 	indexConfigObject.MaxDataSize = d.Get("max_data_size").(string)
-	indexConfigObject.MaxHotBuckets = d.Get("max_hot_buckets").(int)
+	indexConfigObject.MaxHotBuckets = d.Get("max_hot_buckets").(string)
 	indexConfigObject.MaxHotIdleSecs = d.Get("max_hot_idle_secs").(int)
 	indexConfigObject.MaxHotSpanSecs = d.Get("max_hot_span_secs").(int)
 	indexConfigObject.MaxMemMB = d.Get("max_mem_mb").(int)
