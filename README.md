@@ -37,6 +37,7 @@ Build the provider: `make build`
 * To update run `terraform plan` first to check config diff
 * For importing existing resources use `terraform import`
 * To remove all terraform managed resources use `terraform destroy`
+* Use `terraform refresh` for state migrations to be applied
 
 **NOTE:** When developing and testing local provider builds, if terraform version `>= 0.13` you would have to replace the provider binaries in the `.terraform` folder with your local build. [Follow these guidelines](https://github.com/hashicorp/terraform/blob/master/website/upgrade-guides/0-13.html.markdown)
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/splunk/terraform-provider-splunk/client/models"
@@ -926,6 +927,14 @@ func savedSearches() *schema.Resource {
 			},
 			"acl": aclSchema(),
 		},
+		SchemaVersion: 1,
+		StateUpgraders: []schema.StateUpgrader{
+			{
+				Type:    resourceAlertTrackV0().CoreConfigSchema().ImpliedType(),
+				Upgrade: resourceAlertTrackStateUpgradeV0,
+				Version: 0,
+			},
+		},
 		Create: savedSearchesCreate,
 		Read:   savedSearchesRead,
 		Update: savedSearchesUpdate,
@@ -935,6 +944,26 @@ func savedSearches() *schema.Resource {
 		},
 	}
 
+}
+
+func resourceAlertTrackV0() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"alert_track": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "Valid values: (true | false | auto) Specifies whether to track the actions triggered by this scheduled search." +
+					"auto - determine whether to track or not based on the tracking setting of each action, do not track scheduled searches that always trigger actions. " +
+					"Default value true - force alert tracking.false - disable alert tracking for this search.",
+			},
+		},
+	}
+}
+
+func resourceAlertTrackStateUpgradeV0(rawState map[string]interface{}, meta interface{}) (map[string]interface{}, error) {
+	rawState["alert_track"], _ = strconv.ParseBool(rawState["alert_track"].(string))
+	return rawState, nil
 }
 
 func savedSearchesCreate(d *schema.ResourceData, meta interface{}) error {

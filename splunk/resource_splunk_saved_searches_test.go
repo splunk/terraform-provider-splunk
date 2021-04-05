@@ -3,6 +3,8 @@ package splunk
 import (
 	"fmt"
 	"net/http"
+	"reflect"
+	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -330,4 +332,30 @@ func testAccSplunkSavedSearchesDestroyResources(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+func testResourceAlertTrackStateDataV0() map[string]interface{} {
+	return map[string]interface{}{
+		"alert_track": "true",
+	}
+}
+
+func testResourceAlertTrackStateDataV1() map[string]interface{} {
+	v0 := testResourceAlertTrackStateDataV0()
+	val, _ := strconv.ParseBool(v0["alert_track"].(string))
+	return map[string]interface{}{
+		"alert_track": val,
+	}
+}
+
+func TestResourceExampleInstanceStateUpgradeV0(t *testing.T) {
+	expected := testResourceAlertTrackStateDataV1()
+	actual, err := resourceAlertTrackStateUpgradeV0(testResourceAlertTrackStateDataV0(), nil)
+	if err != nil {
+		t.Fatalf("error migrating state: %s", err)
+	}
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Fatalf("\n\nexpected:\n\n%#v\n\ngot:\n\n%#v\n\n", expected, actual)
+	}
 }
