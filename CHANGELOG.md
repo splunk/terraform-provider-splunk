@@ -1,3 +1,6 @@
+## 1.4.3 (April 6, 2021)
+* Fix: State migration for alert_track #66
+
 ## 1.4.2 (April 1, 2021)
 * Support to create indexes on Splunk Cloud (Beta)
 
