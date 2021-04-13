@@ -20,5 +20,5 @@ type HttpEventCollectorObject struct {
 	SourceType string        `json:"sourcetype,omitempty" url:"sourcetype,omitempty"`
 	Token      string        `json:"token,omitempty" url:"token,omitempty"`
 	Disabled   bool          `json:"disabled,omitempty" url:"disabled"`
-	UseACK     int           `json:"useACK,string,omitempty" url:"useACK,omitempty"`
+	UseACK     int           `json:"useACK,string,omitempty" url:"useACK"`
 }
