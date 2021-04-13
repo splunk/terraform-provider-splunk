@@ -1,3 +1,6 @@
+## 1.4.4 (April 12, 2021)
+* Fix: use_ack disable update failure
+
 ## 1.4.3 (April 6, 2021)
 * Fix: State migration for alert_track #66
 
