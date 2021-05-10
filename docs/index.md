@@ -1,4 +1,4 @@
-# <provider> Provider
+# Splunk Provider
 
 The Splunk provider can interact with the resources supported by Splunk. The provider needs to be configured with the proper credentials before it can be used.
 
