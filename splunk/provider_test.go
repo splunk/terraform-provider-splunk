@@ -26,14 +26,18 @@ func init() {
 	}
 }
 
-func newTestClient() *client.Client {
-	client := client.NewSplunkdClient(
+func newTestClient() (*client.Client, error) {
+	http, err := client.NewSplunkdHTTPClient(30*time.Second, true)
+	if err != nil {
+		return nil, err
+	}
+	return client.NewSplunkdClient(
 		"",
 		[2]string{os.Getenv("SPLUNK_USERNAME"),
 			os.Getenv("SPLUNK_PASSWORD")},
 		os.Getenv("SPLUNK_URL"),
-		client.NewSplunkdHTTPClient(30*time.Second, true))
-	return client
+
+		http)
 }
 
 func testAccPreCheck(t *testing.T) {

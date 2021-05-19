@@ -70,7 +70,10 @@ func TestAccSplunkTCPRawInput(t *testing.T) {
 }
 
 func testAccSplunkTCPRawInputDestroyResources(s *terraform.State) error {
-	client := newTestClient()
+	client, err := newTestClient()
+	if err != nil {
+		return err
+	}
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
 		case "splunk_inputs_tcp_raw":

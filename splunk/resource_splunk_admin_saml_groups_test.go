@@ -60,7 +60,10 @@ func TestAccSplunkAdminSAMLGroups(t *testing.T) {
 }
 
 func testAccSplunkAdminSAMLGroupsInputDestroyResources(s *terraform.State) error {
-	client := newTestClient()
+	client, err := newTestClient()
+	if err != nil {
+		return err
+	}
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
 		case "splunk_authorization_roles":
