@@ -32,13 +32,13 @@ func authorizationRoles() *schema.Resource {
 			"cumulative_realtime_search_jobs_quota": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
+				Default:     0,
 				Description: "Maximum number of concurrently running real-time searches that all members of this role can have.",
 			},
 			"cumulative_search_jobs_quota": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
+				Default:     0,
 				Description: "Maximum number of concurrently running searches for all role members. Warning message logged when limit is reached.",
 			},
 			"default_app": {
@@ -62,13 +62,13 @@ func authorizationRoles() *schema.Resource {
 			"realtime_search_jobs_quota": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
+				Default:     6,
 				Description: "Specify the maximum number of concurrent real-time search jobs for this role. This count is independent from the normal search jobs limit.",
 			},
 			"search_disk_quota": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
+				Default:     100,
 				Description: "Specifies the maximum disk space in MB that can be used by a user's search jobs. For example, a value of 100 limits this role to 100 MB total.",
 			},
 			"search_filter": {
@@ -123,13 +123,13 @@ func authorizationRoles() *schema.Resource {
 			"search_jobs_quota": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
+				Default:     3,
 				Description: "The maximum number of concurrent searches a user with this role is allowed to run. For users with multiple roles, the maximum quota value among all of the roles applies.",
 			},
 			"search_time_win": {
 				Type:     schema.TypeInt,
 				Optional: true,
-				Computed: true,
+				Default:  -1,
 				Description: "Maximum time span of a search, in seconds. By default, searches are not limited to any specific time window. " +
 					"To override any search time windows from imported roles, set srchTimeWin to '0', as the 'admin' role does.",
 			},
