@@ -1,3 +1,6 @@
+##1.4.5 (June 14, 2021)
+* Fix: Enabling to explicitly set values to roles attributes #76
+
 ## 1.4.4 (April 12, 2021)
 * Fix: use_ack disable update failure
 
