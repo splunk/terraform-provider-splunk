@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"os"
 	"path"
@@ -251,51 +252,65 @@ func encodeValue(v interface{}) (string, error) {
 }
 
 // NewDefaultSplunkdClient creates a Client with default values
-func NewDefaultSplunkdClient() *Client {
-	httpClient := NewSplunkdHTTPClient(defaultTimeOut, true)
+func NewDefaultSplunkdClient() (*Client, error) {
+	httpClient, err := NewSplunkdHTTPClient(defaultTimeOut, true)
+	if err != nil {
+		return nil, err
+	}
 	c := &Client{auth: defaultAuth, host: defaultHost, httpClient: httpClient, userAgent: "splunk-simple-go-client"}
-	return c
+	return c, nil
 }
 
 // NewSplunkdClient creates a Client with custom values passed in
-func NewSplunkdClient(sessionKey string, auth [2]string, host string, httpClient *http.Client) *Client {
-	c := NewDefaultSplunkdClient()
+func NewSplunkdClient(sessionKey string, auth [2]string, host string, httpClient *http.Client) (*Client, error) {
+	c, err := NewDefaultSplunkdClient()
+	if err != nil {
+		return nil, err
+	}
 	c.auth = auth
 	c.host = host
 	c.sessionKey = sessionKey
 	if httpClient != nil {
 		c.httpClient = httpClient
 	}
-	return c
+	return c, nil
 }
 
 // NewSplunkdClient creates a Client with custom values passed in
-func NewSplunkdClientWithAuthToken(authToken string, auth [2]string, host string, httpClient *http.Client) *Client {
-	c := NewDefaultSplunkdClient()
+func NewSplunkdClientWithAuthToken(authToken string, auth [2]string, host string, httpClient *http.Client) (*Client, error) {
+	c, err := NewDefaultSplunkdClient()
+	if err != nil {
+		return nil, err
+	}
 	c.auth = auth
 	c.host = host
 	c.authToken = authToken
 	if httpClient != nil {
 		c.httpClient = httpClient
 	}
-	return c
+	return c, nil
 }
 
 // NewSplunkdHTTPClient returns a HTTP Client with timeout and tls validation setup
-func NewSplunkdHTTPClient(timeout time.Duration, skipValidateTLS bool) *http.Client {
+func NewSplunkdHTTPClient(timeout time.Duration, skipValidateTLS bool) (*http.Client, error) {
+	jar, err := cookiejar.New(nil)
+	if err != nil {
+		return nil, err
+	}
+
 	httpScheme := getEnv(envVarHTTPScheme, defaultScheme)
-	if httpScheme == "http" {
-		return &http.Client{
-			Timeout: timeout,
+	client := &http.Client{
+		Timeout: timeout,
+		Jar:     jar,
+	}
+
+	if httpScheme != "http" {
+		client.Transport = &http.Transport{
+			Proxy:           http.DefaultTransport.(*http.Transport).Proxy,
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: skipValidateTLS},
 		}
 	}
 
-	return &http.Client{
-		Timeout: timeout,
-		Transport: &http.Transport{
-			Proxy:           http.DefaultTransport.(*http.Transport).Proxy,
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: skipValidateTLS},
-		},
-	}
+	return client, nil
 
 }

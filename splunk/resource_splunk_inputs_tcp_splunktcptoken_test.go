@@ -41,7 +41,10 @@ func TestAccSplunkTCPTokenInput(t *testing.T) {
 }
 
 func testAccSplunkTCPTokenInputDestroyResources(s *terraform.State) error {
-	client := newTestClient()
+	client, err := newTestClient()
+	if err != nil {
+		return err
+	}
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
 		case "splunk_inputs_tcp_splunk_tcp_token":

@@ -103,23 +103,31 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	provider := &SplunkProvider{}
 	var splunkdClient *client.Client
 
-	if token, ok := d.GetOk("auth_token"); ok {
-		splunkdClient = client.NewSplunkdClientWithAuthToken(token.(string),
-			[2]string{d.Get("username").(string), d.Get("password").(string)},
-			d.Get("url").(string),
-			client.NewSplunkdHTTPClient(
-				time.Duration(d.Get("timeout").(int))*time.Second,
-				d.Get("insecure_skip_verify").(bool)))
-	} else {
-		splunkdClient = client.NewSplunkdClient("",
-			[2]string{d.Get("username").(string), d.Get("password").(string)},
-			d.Get("url").(string),
-			client.NewSplunkdHTTPClient(
-				time.Duration(d.Get("timeout").(int))*time.Second,
-				d.Get("insecure_skip_verify").(bool)))
+	httpClient, err := client.NewSplunkdHTTPClient(
+		time.Duration(d.Get("timeout").(int))*time.Second,
+		d.Get("insecure_skip_verify").(bool))
+	if err != nil {
+		return nil, err
+	}
 
+	if token, ok := d.GetOk("auth_token"); ok {
+		splunkdClient, err = client.NewSplunkdClientWithAuthToken(token.(string),
+			[2]string{d.Get("username").(string), d.Get("password").(string)},
+			d.Get("url").(string),
+			httpClient)
+		if err != nil {
+			return splunkdClient, err
+		}
+	} else {
+		splunkdClient, err = client.NewSplunkdClient("",
+			[2]string{d.Get("username").(string), d.Get("password").(string)},
+			d.Get("url").(string),
+			httpClient)
+		if err != nil {
+			return splunkdClient, err
+		}
 		// Login is required to get session key
-		err := splunkdClient.Login()
+		err = splunkdClient.Login()
 		if err != nil {
 			return splunkdClient, err
 		}

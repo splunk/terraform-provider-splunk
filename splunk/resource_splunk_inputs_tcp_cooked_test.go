@@ -60,7 +60,10 @@ func TestAccSplunkTCPCookedInput(t *testing.T) {
 }
 
 func testAccSplunkTCPCookedInputDestroyResources(s *terraform.State) error {
-	client := newTestClient()
+	client, err := newTestClient()
+	if err != nil {
+		return err
+	}
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
 		case "splunk_inputs_tcp_cooked":

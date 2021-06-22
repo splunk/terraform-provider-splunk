@@ -164,7 +164,10 @@ func TestAccSplunkHttpEventCollectorInputWithToken(t *testing.T) {
 }
 
 func testAccSplunkHttpEventCollectorInputDestroyResources(s *terraform.State) error {
-	client := newTestClient()
+	client, err := newTestClient()
+	if err != nil {
+		return err
+	}
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
 		case "splunk_inputs_http_event_collector":

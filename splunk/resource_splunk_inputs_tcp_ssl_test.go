@@ -56,7 +56,10 @@ func TestAccInputsTCPSSL(t *testing.T) {
 }
 
 func testAccTCPSSLInputDestroyResources(s *terraform.State) error {
-	client := newTestClient()
+	client, err := newTestClient()
+	if err != nil {
+		return err
+	}
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
 		default:
