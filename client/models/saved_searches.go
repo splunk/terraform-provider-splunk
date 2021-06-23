@@ -44,7 +44,7 @@ type SavedSearchObject struct {
 	ActionEmailSendCSV                 int     `json:"action.email.sendcsv,string,omitempty" url:"action.email.sendcsv,omitempty"`
 	ActionEmailSendPDF                 bool    `json:"action.email.sendpdf" url:"action.email.sendpdf"`
 	ActionEmailSendResults             bool    `json:"action.email.sendresults" url:"action.email.sendresults"`
-	ActionEmailSubject                 string  `json:"action.email.subject,omitempty" url:"action.email.subject,omitempty"`
+	ActionEmailSubject                 string  `json:"action.email.subject,omitempty" url:"action.email.subject"`
 	ActionEmailTo                      string  `json:"action.email.to,omitempty" url:"action.email.to,omitempty"`
 	ActionEmailTrackAlert              bool    `json:"action.email.track_alert" url:"action.email.track_alert"`
 	ActionEmailTTL                     string  `json:"action.email.ttl,omitempty" url:"action.email.ttl,omitempty"`
