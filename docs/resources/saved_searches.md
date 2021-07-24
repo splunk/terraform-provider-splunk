@@ -106,6 +106,7 @@ This resource block supports the following arguments:
 * `action_slack_param_attachment` - (Optional) Include a message attachment. Valid values are message, none, or alert_link
 * `action_slack_param_message` - (Optional) Enter the chat message to send to the Slack channel. The message can include tokens that insert text based on the results of the search.
 * `action_slack_param_webhook_url_override` - (Optional) You can override the Slack webhook URL here if you need to send the alert message to a different Slack team
+* `action_webhook_param_url` - (Optional) URL to send the HTTP POST request to. Must be accessible from the Splunk server
 * `actions` - (Optional) A comma-separated list of actions to enable. For example: rss,email
 * `alert_comparator` - (Optional) One of the following strings: greater than, less than, equal to, rises by, drops by, rises by perc, drops by percUsed with alert_threshold to trigger alert actions.
 * `alert_condition` - (Optional) Contains a conditional search that is evaluated against the results of the saved search. Defaults to an empty string.
