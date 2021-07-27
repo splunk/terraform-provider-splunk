@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/splunk/terraform-provider-splunk/client/models"
+	"strings"
 )
 
 func genericAcl() *schema.Resource {
@@ -22,6 +23,9 @@ func genericAcl() *schema.Resource {
 		// Update does the same thing as Create, because the resource being managed has to already exist
 		Update: genericAclCreate,
 		Delete: genericAclDelete,
+		Importer: &schema.ResourceImporter{
+			State: genericAclImportState,
+		},
 	}
 }
 
@@ -89,4 +93,31 @@ func genericAclRead(d *schema.ResourceData, meta interface{}) error {
 func genericAclDelete(d *schema.ResourceData, meta interface{}) error {
 	// Delete doesn't actually do anything, because an ACL can't be deleted.
 	return nil
+}
+
+func genericAclImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	id := d.Id()
+	idParts := strings.Split(id, ":")
+	if len(idParts) != 3 {
+		return nil, fmt.Errorf("import ID must be owner:app:path")
+	}
+
+	owner := idParts[0]
+	app := idParts[1]
+	d.SetId(idParts[2])
+
+	aclObject := &models.ACLObject{
+		Owner: owner,
+		App:   app,
+	}
+
+	if err := d.Set("acl", flattenACL(aclObject)); err != nil {
+		return nil, err
+	}
+
+	if err := d.Set("path", d.Id()); err != nil {
+		return nil, err
+	}
+
+	return []*schema.ResourceData{d}, nil
 }
