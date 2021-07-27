@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
 	"strings"
@@ -10,16 +11,36 @@ import (
 
 //https://docs.splunk.com/Documentation/Splunk/8.0.4/RESTUM/RESTusing#Access_Control_List
 func (client *Client) GetAcl(owner, app, name string, resources ...string) (*http.Response, error) {
-	resourcePath := []string{"services", owner, app}
+	resourcePath := []string{"servicesNS", owner, app}
 	resourcePath = append(resourcePath, resources...)
 	resourcePath = append(resourcePath, name, "acl")
 	endpoint := client.BuildSplunkURL(nil, resourcePath...)
 	resp, err := client.Get(endpoint)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GET failed for endpoint %s: %s", endpoint.Path, err)
 	}
 
 	return resp, nil
+}
+
+func (client *Client) ResourcesAndNameForPath(path string) (resources []string, name string, ok bool) {
+	parts := strings.Split(path, "/")
+
+	// an example path of apps/local/myapp would have parts:
+	// * [apps, local] - parts[0:1]
+	// * myapp         - parts[2]
+
+	// 2 is the absolute minimum number of path parts that are valid to be parsed into resources and name
+	if len(parts) < 2 {
+		ok = false
+		return
+	}
+
+	resources = parts[0 : len(parts)-1]
+	name = parts[len(parts)-1]
+	ok = true
+
+	return
 }
 
 func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, resources ...string) error {
@@ -41,7 +62,7 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 	endpoint := client.BuildSplunkURL(nil, resourcePath...)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
-		return err
+		return fmt.Errorf("GET failed for endpoint %s: %s", endpoint.Path, err)
 	}
 	defer resp.Body.Close()
 	return nil
