@@ -151,7 +151,7 @@ const newSavedSearchesWebhook = `
 resource "splunk_saved_searches" "test" {
 	name = "Test Slack Alert"
 	actions = "webhook"
-	action_webhook_param_url = "localhost:1234"
+	action_webhook_param_url = "http://localhost:1234"
 	alert_comparator    = "greater than"
 	alert_digest_mode   = true
 	alert_expires       = "30d"
@@ -319,7 +319,7 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", "Test Slack Alert"),
 					resource.TestCheckResourceAttr(resourceName, "actions", "webhook"),
-					resource.TestCheckResourceAttr(resourceName, "action_webhook_param_url", "localhost:1234"),
+					resource.TestCheckResourceAttr(resourceName, "action_webhook_param_url", "http://localhost:1234"),
 					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
 					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),

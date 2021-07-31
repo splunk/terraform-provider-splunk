@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
@@ -514,9 +515,10 @@ func savedSearches() *schema.Resource {
 				Description: "You can override the Slack webhook URL here if you need to send the alert message to a different Slack team.",
 			},
 			"action_webhook_param_url": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "URL to send the HTTP POST request to. Must be accessible from the Splunk server.",
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "URL to send the HTTP POST request to. Must be accessible from the Splunk server.",
+				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https?://[^\s]+$`), "Webhook URL is invalid"),
 			},
 			"alert_digest_mode": {
 				Type:     schema.TypeBool,
