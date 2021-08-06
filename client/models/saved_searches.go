@@ -88,6 +88,7 @@ type SavedSearchObject struct {
 	ActionSlackParamFields             string  `json:"action.slack.param.fields,omitempty" url:"action.slack.param.fields"`
 	ActionSlackParamMessage            string  `json:"action.slack.param.message,omitempty" url:"action.slack.param.message"`
 	ActionSlackParamWebhookUrlOverride string  `json:"action.slack.param.webhook_url_override,omitempty" url:"action.slack.param.webhook_url_override"`
+	ActionWebhookParamUrl              string  `json:"action.webhook.param.url,omitempty" url:"action.webhook.param.url"`
 	AlertDigestMode                    bool    `json:"alert.digest_mode" url:"alert.digest_mode"`
 	AlertExpires                       string  `json:"alert.expires,omitempty" url:"alert.expires,omitempty"`
 	AlertSeverity                      int     `json:"alert.severity,omitempty" url:"alert.severity,omitempty"`

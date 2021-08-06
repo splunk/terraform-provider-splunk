@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
@@ -512,6 +513,12 @@ func savedSearches() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "You can override the Slack webhook URL here if you need to send the alert message to a different Slack team.",
+			},
+			"action_webhook_param_url": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "URL to send the HTTP POST request to. Must be accessible from the Splunk server.",
+				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https?://[^\s]+$`), "Webhook URL is invalid"),
 			},
 			"alert_digest_mode": {
 				Type:     schema.TypeBool,
@@ -1256,6 +1263,9 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_slack_param_webhook_url_override", entry.Content.ActionSlackParamWebhookUrlOverride); err != nil {
 		return err
 	}
+	if err = d.Set("action_webhook_param_url", entry.Content.ActionWebhookParamUrl); err != nil {
+		return err
+	}
 	if err = d.Set("alert_digest_mode", entry.Content.AlertDigestMode); err != nil {
 		return err
 	}
@@ -1565,6 +1575,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionSlackParamFields:             d.Get("action_slack_param_fields").(string),
 		ActionSlackParamMessage:            d.Get("action_slack_param_message").(string),
 		ActionSlackParamWebhookUrlOverride: d.Get("action_slack_param_webhook_url_override").(string),
+		ActionWebhookParamUrl:              d.Get("action_webhook_param_url").(string),
 		AlertComparator:                    d.Get("alert_comparator").(string),
 		AlertCondition:                     d.Get("alert_condition").(string),
 		AlertDigestMode:                    d.Get("alert_digest_mode").(bool),
