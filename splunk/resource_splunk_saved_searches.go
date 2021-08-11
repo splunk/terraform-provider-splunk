@@ -275,6 +275,16 @@ func savedSearches() *schema.Resource {
 				Description: "Indicates whether columns should be sorted from least wide to most wide, left to right." +
 					"Only valid if format=text.",
 			},
+			"action_pagerduty_integration_url": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The pagerduty integration token.",
+			},
+			"action_pagerduty_integration_url_override": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The pagerduty integration token override.",
+			},
 			"action_populate_lookup": {
 				Type:     schema.TypeBool,
 				Computed: true,
@@ -1152,6 +1162,9 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_email_width_sort_columns", entry.Content.ActionEmailWidthSortColumns); err != nil {
 		return err
 	}
+	if err = d.Set("action_pagerduty_integration_url", entry.Content.ActionPagerdutyIntegrationURL); err != nil {
+		return err
+	}
 	if err = d.Set("action_populate_lookup", entry.Content.ActionPopulateLookup); err != nil {
 		return err
 	}
@@ -1541,6 +1554,8 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionEmailUseSSL:                  d.Get("action_email_use_ssl").(bool),
 		ActionEmailUseTLS:                  d.Get("action_email_use_tls").(bool),
 		ActionEmailWidthSortColumns:        d.Get("action_email_width_sort_columns").(bool),
+		ActionPagerdutyIntegrationURL:      d.Get("action_pagerduty_integration_url").(string),
+		ActionPagerdutyIntegrationURLOverride:      d.Get("action_pagerduty_integration_url_override").(string),
 		ActionPopulateLookupCommand:        d.Get("action_populate_lookup_command").(string),
 		ActionPopulateLookupDest:           d.Get("action_populate_lookup_dest").(string),
 		ActionPopulateLookupHostname:       d.Get("action_populate_lookup_hostname").(string),
