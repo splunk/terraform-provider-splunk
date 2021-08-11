@@ -278,12 +278,12 @@ func savedSearches() *schema.Resource {
 			"action_pagerduty_integration_url": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "The pagerduty integration token.",
+				Description: "The pagerduty integration URL. This integration uses Splunk's native webhooks to send events to PagerDuty.",
 			},
 			"action_pagerduty_integration_url_override": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "The pagerduty integration token override.",
+				Description: "The pagerduty integration URL override. This integration uses Splunk's native webhooks to send events to PagerDuty.",
 			},
 			"action_populate_lookup": {
 				Type:     schema.TypeBool,
