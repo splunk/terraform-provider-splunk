@@ -1,5 +1,6 @@
 # Resource: splunk_generic_acl
-Manage the ACL of any Splunk object.
+Manage the ACL of any Splunk object not already managed in Terraform. To define the ACL of an object that is itself
+managed in Terraform, use the `acl` block on that configured resource instead of using a `splunk_generic_acl` resource.
 
 Note: This resource doesn't actually create any remote resources, because ACLs can only exist (and always exist) for
 knowledge objects. They can, however, be managed separately.
@@ -43,3 +44,11 @@ This resource block supports the following arguments:
 In addition to all arguments above, This resource block exports the following arguments:
 
 * `id` - The ID of the resource
+
+## Import
+
+Generic ACL resources can be imported by specifying their owner, app, and path with a colon-delimited string as the ID:
+
+```
+terraform import splunk_generic_acl <owner>:<app>:<path>
+```
