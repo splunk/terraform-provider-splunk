@@ -1,3 +1,6 @@
+##1.4.8 (Aug 23, 2021)
+* Added splunk_generic_acl resource
+
 ##1.4.7 (Aug 06, 2021)
 * Support for webhook alert action in saved_searches
 
