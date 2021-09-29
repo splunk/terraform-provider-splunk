@@ -41,6 +41,13 @@ func TestAccSplunkAdminSAMLGroups(t *testing.T) {
 				),
 			},
 			{
+				// to test re-creation of remotely deleted or missing resources, delete the new saml group before updating it
+				PreConfig: func() {
+					client, _ := newTestClient()
+					if _, err := client.DeleteAdminSAMLGroups("new-saml-group"); err != nil {
+						t.Error("PreConfig deletion of new-saml-group failed")
+					}
+				},
 				Config: updateAdminSAMLGroupsInput,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", "new-saml-group"),
