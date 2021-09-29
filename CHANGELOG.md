@@ -1,3 +1,6 @@
+##1.4.9 (Sep 29, 2021)
+Handle missing SAML groups (#89)
+
 ##1.4.8 (Aug 23, 2021)
 * Added splunk_generic_acl resource
 
