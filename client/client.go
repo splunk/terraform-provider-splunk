@@ -148,7 +148,8 @@ func (c *Client) DoRequest(method string, requestURL url.URL, body interface{}) 
 	if err != nil {
 		return nil, err
 	}
-	return utils.ParseHTTPStatusCodeInResponse(response)
+
+	return response, nil
 }
 
 func (c *Client) Login() (e error) {
