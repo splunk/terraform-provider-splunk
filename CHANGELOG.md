@@ -1,18 +1,18 @@
-##1.4.9 (Sep 29, 2021)
+## 1.4.9 (Sep 29, 2021)
 Handle missing SAML groups (#89)
 
-##1.4.8 (Aug 23, 2021)
+## 1.4.8 (Aug 23, 2021)
 * Added splunk_generic_acl resource
 
-##1.4.7 (Aug 06, 2021)
+## 1.4.7 (Aug 06, 2021)
 * Support for webhook alert action in saved_searches
 
-##1.4.6 (June 22, 2021)
+## 1.4.6 (June 22, 2021)
 * Fix:  Adds Cookie handling (fixes #49) (#75)
 * Primarily helps with sending subsequent requests to the same SH when SH cluster is enabled with ELB.
 * Example: With AWS, `lb_cookie_stickiness_policy` has to configured for requests to be sent to the same SH.
 
-##1.4.5 (June 14, 2021)
+## 1.4.5 (June 14, 2021)
 * Fix: Enabling to explicitly set values to roles attributes #76
 
 ## 1.4.4 (April 12, 2021)
