@@ -1432,9 +1432,6 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("schedule_window", entry.Content.ScheduleWindow); err != nil {
 		return err
 	}
-	if err = d.Set("schedule_priority", entry.Content.SchedulePriority); err != nil {
-		return err
-	}
 	if err = d.Set("search", entry.Content.Search); err != nil {
 		return err
 	}
