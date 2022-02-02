@@ -1,3 +1,6 @@
+##1.4.10
+Role Capabilities are unordered (#95)
+
 ##1.4.9 (Sep 29, 2021)
 Handle missing SAML groups (#89)
 
