@@ -275,6 +275,25 @@ func savedSearches() *schema.Resource {
 				Description: "Indicates whether columns should be sorted from least wide to most wide, left to right." +
 					"Only valid if format=text.",
 			},
+			"action_pagerduty_custom_details": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "The PagerDuty custom details information.",
+			},
+			"action_pagerduty_integration_key": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "The PagerDuty integration Key." +
+					"NOTE: None.",
+			},
+			"action_pagerduty_integration_key_override": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "The PagerDuty integration Key override.",
+			},
 			"action_populate_lookup": {
 				Type:     schema.TypeBool,
 				Computed: true,
