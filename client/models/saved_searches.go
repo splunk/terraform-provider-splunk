@@ -53,6 +53,9 @@ type SavedSearchObject struct {
 	ActionEmailWidthSortColumns                  bool    `json:"action.email.width_sort_columns" url:"action.email.width_sort_columns"`
 	ActionPagerdutyIntegrationURL                string  `json:"action.pagerduty.param.integration_url,omitempty" url:"action.pagerduty.param.integration_url"`
 	ActionPagerdutyIntegrationURLOverride        string  `json:"action.pagerduty.param.integration_url_override,omitempty" url:"action.pagerduty.param.integration_url_override"`
+	ActionPagerdutyParamCustDetails              string  `json:"action.pagerduty.param.custom_details,omitempty" url:"action.pagerduty.param.custom_details,omitempty"`
+	ActionPagerdutyParamIntKey                   string  `json:"action.pagerduty.param.integration_key,omitempty" url:"action.pagerduty.param.integration_key,omitempty"`
+	ActionPagerdutyParamIntKeyOverride           string  `json:"action.pagerduty.param.integration_key_override,omitempty" url:"action.pagerduty.param.integration_key_override,omitempty"`
 	ActionPopulateLookup                         bool    `json:"action.populate_lookup" url:"action.populate_lookup"`
 	ActionPopulateLookupCommand                  string  `json:"action.populate_lookup.command,omitempty" url:"action.populate_lookup.command,omitempty"`
 	ActionPopulateLookupDest                     string  `json:"action.populate_lookup.dest,omitempty" url:"action.populate_lookup.dest,omitempty"`
