@@ -1,3 +1,6 @@
+##1.4.12
+* FIx: Don't read all searches just to find one search
+
 ##1.4.11
 * Fix: Don't read all views just to find one view
 
