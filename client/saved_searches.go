@@ -56,14 +56,3 @@ func (client *Client) DeleteSavedSearches(name, owner, app string) (*http.Respon
 
 	return resp, nil
 }
-
-// services/saved/searches
-func (client *Client) ReadAllSavedSearches() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "saved", "searches")
-	resp, err := client.Get(endpoint)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}

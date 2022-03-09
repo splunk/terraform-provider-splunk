@@ -977,22 +977,15 @@ func savedSearchesCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
 	savedSearchesConfig := getSavedSearchesConfig(d)
-	aclObject := &models.ACLObject{}
-	if r, ok := d.GetOk("acl"); ok {
-		aclObject = getACLConfig(r.([]interface{}))
-	} else {
-		aclObject.App = "search"
-		aclObject.Owner = "nobody"
-	}
+	aclObject := getResourceDataSearchACL(d)
 	err := (*provider.Client).CreateSavedSearches(name, aclObject.Owner, aclObject.App, savedSearchesConfig)
 	if err != nil {
 		return err
 	}
 
 	if _, ok := d.GetOk("acl"); ok {
-		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "saved", "searches")
-		if err != nil {
-			return err
+		if err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "saved", "searches"); err != nil {
+			return fmt.Errorf("savedSearchesCreate: updateacl: %s\n%#v", err, aclObject)
 		}
 	}
 
@@ -1003,30 +996,16 @@ func savedSearchesCreate(d *schema.ResourceData, meta interface{}) error {
 func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
-	// We first get list of searches to get owner and app name for the specific input
-	resp, err := (*provider.Client).ReadAllSavedSearches()
+
+	aclObject := getResourceDataSearchACL(d)
+
+	resp, err := (*provider.Client).ReadSavedSearches(name, aclObject.Owner, aclObject.App)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
 	entry, err := getSavedSearchesConfigByName(name, resp)
-	if err != nil {
-		return err
-	}
-
-	if entry == nil {
-		return fmt.Errorf("Unable to find resource: %v", name)
-	}
-
-	// Now we read the configuration with proper owner and app
-	resp, err = (*provider.Client).ReadSavedSearches(name, entry.ACL.Owner, entry.ACL.App)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	entry, err = getSavedSearchesConfigByName(name, resp)
 	if err != nil {
 		return err
 	}
@@ -1657,4 +1636,17 @@ func getSavedSearchesConfigByName(name string, httpResponse *http.Response) (sav
 	}
 
 	return savedSearchesEntry, nil
+}
+
+// getResourceDataSearchACL implements psuedo-defaults for the acl field for search resources.
+func getResourceDataSearchACL(d *schema.ResourceData) *models.ACLObject {
+	aclObject := &models.ACLObject{}
+	if r, ok := d.GetOk("acl"); ok {
+		aclObject = getACLConfig(r.([]interface{}))
+	} else {
+		aclObject.App = "search"
+		aclObject.Owner = "nobody"
+	}
+
+	return aclObject
 }
