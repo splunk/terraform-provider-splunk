@@ -43,24 +43,15 @@ func splunkDashboardsCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
 	splunkDashboardsObj := getSplunkDashboardsConfig(d)
-	aclObject := &models.ACLObject{}
-	if r, ok := d.GetOk("acl"); ok {
-		aclObject = getACLConfig(r.([]interface{}))
-	} else {
-		aclObject.App = "search"
-		aclObject.Owner = "admin"
-		aclObject.Sharing = "user"
-	}
+	aclObject := getResourceDataViewACL(d)
+
 	err := (*provider.Client).CreateDashboardObject(aclObject.Owner, aclObject.App, splunkDashboardsObj)
 	if err != nil {
 		return err
 	}
 
-	if _, ok := d.GetOk("acl"); ok {
-		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views")
-		if err != nil {
-			return err
-		}
+	if err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views"); err != nil {
+		return err
 	}
 
 	d.SetId(name)
@@ -70,28 +61,16 @@ func splunkDashboardsCreate(d *schema.ResourceData, meta interface{}) error {
 func splunkDashboardsRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
-	resp, err := (*provider.Client).ReadAllDashboardObject()
+
+	aclObject := getResourceDataViewACL(d)
+
+	resp, err := (*provider.Client).ReadDashboardObject(name, aclObject.Owner, aclObject.App)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
 	entry, err := getDashboardByName(name, resp)
-	if err != nil {
-		return err
-	}
-
-	if entry == nil {
-		return fmt.Errorf("unable to find resource: %v", name)
-	}
-
-	resp, err = (*provider.Client).ReadDashboardObject(name, entry.ACL.Owner, entry.ACL.App)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	entry, err = getDashboardByName(name, resp)
 	if err != nil {
 		return err
 	}
@@ -120,25 +99,14 @@ func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
 	splunkDashboardsObj := getSplunkDashboardsConfig(d)
-	aclObject := &models.ACLObject{}
-	if r, ok := d.GetOk("acl"); ok {
-		aclObject = getACLConfig(r.([]interface{}))
-	} else {
-		aclObject.App = "search"
-		aclObject.Owner = "admin"
-		aclObject.Sharing = "user"
-	}
-	err := (*provider.Client).UpdateDashboardObject(aclObject.Owner, aclObject.App, name, splunkDashboardsObj)
-	if err != nil {
+	aclObject := getResourceDataViewACL(d)
+
+	if err := (*provider.Client).UpdateDashboardObject(aclObject.Owner, aclObject.App, name, splunkDashboardsObj); err != nil {
 		return err
 	}
 
-	//ACL update
-	if _, ok := d.GetOk("acl"); ok {
-		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views")
-		if err != nil {
-			return err
-		}
+	if err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views"); err != nil {
+		return err
 	}
 
 	return splunkDashboardsRead(d, meta)
@@ -147,14 +115,7 @@ func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 func splunkDashboardsDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
-	aclObject := &models.ACLObject{}
-	if r, ok := d.GetOk("acl"); ok {
-		aclObject = getACLConfig(r.([]interface{}))
-	} else {
-		aclObject.App = "search"
-		aclObject.Owner = "admin"
-		aclObject.Sharing = "user"
-	}
+	aclObject := getResourceDataViewACL(d)
 	if aclObject.Sharing != "user" {
 		aclObject.Owner = "nobody"
 	}
@@ -208,4 +169,18 @@ func getDashboardByName(name string, httpResponse *http.Response) (dashboardEntr
 	}
 
 	return dashboardEntry, nil
+}
+
+// getResourceDataViewACL implements psuedo-defaults for the acl field for view resources.
+func getResourceDataViewACL(d *schema.ResourceData) *models.ACLObject {
+	aclObject := &models.ACLObject{}
+	if r, ok := d.GetOk("acl"); ok {
+		aclObject = getACLConfig(r.([]interface{}))
+	} else {
+		aclObject.App = "search"
+		aclObject.Owner = "admin"
+		aclObject.Sharing = "user"
+	}
+
+	return aclObject
 }
