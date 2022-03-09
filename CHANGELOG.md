@@ -1,3 +1,6 @@
+##1.4.11
+* Fix: Don't read all views just to find one view
+
 ##1.4.10
 Role Capabilities are unordered (#95)
 
