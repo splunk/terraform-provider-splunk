@@ -31,7 +31,7 @@ func configsConf() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^[a-zA-Z0-9\-.]+/[a-zA-Z0-9\-.]+`), "A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza"),
+				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^[a-zA-Z0-9_\-.]+/[a-zA-Z0-9_\-.]+`), "A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza"),
 				Description:  `A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza`,
 			},
 			"acl": aclSchema(),
