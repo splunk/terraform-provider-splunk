@@ -1,16 +1,21 @@
 package splunk
 
 import (
+	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/splunk/terraform-provider-splunk/client"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/splunk/go-splunk-client/pkg/authenticators"
+	externalclient "github.com/splunk/go-splunk-client/pkg/client"
 )
 
 type SplunkProvider struct {
-	Client *client.Client
+	Client         *client.Client
+	ExternalClient *externalclient.Client
 }
 
 func Provider() terraform.ResourceProvider {
@@ -104,12 +109,30 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	provider := &SplunkProvider{}
 	var splunkdClient *client.Client
 
+	// go-splunk-client requires a full URL, but this provider has historically permitted the URL to be missing
+	// its scheme. here we try add https:// to the configured URL if we're unable to parse it as-is.
+	externalClientURL := d.Get("url").(string)
+	parsedURL, err := url.Parse(externalClientURL)
+	if err != nil || (parsedURL.Scheme != "http" && parsedURL.Scheme != "https") {
+		externalClientURL = fmt.Sprintf("https://%s", externalClientURL)
+		if _, err := url.Parse(externalClientURL); err != nil {
+			return nil, fmt.Errorf("splunk: unable to determine valid splunkd URL from %q", d.Get("url").(string))
+		}
+	}
+
+	externalClient := externalclient.Client{
+		URL: externalClientURL,
+	}
+
 	httpClient, err := client.NewSplunkdHTTPClient(
 		time.Duration(d.Get("timeout").(int))*time.Second,
 		d.Get("insecure_skip_verify").(bool))
 	if err != nil {
 		return nil, err
 	}
+
+	externalClient.TLSInsecureSkipVerify = d.Get("insecure_skip_verify").(bool)
+	externalClient.Timeout = time.Duration(d.Get("timeout").(int)) * time.Second
 
 	if token, ok := d.GetOk("auth_token"); ok {
 		splunkdClient, err = client.NewSplunkdClientWithAuthToken(token.(string),
@@ -118,6 +141,10 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 			httpClient)
 		if err != nil {
 			return splunkdClient, err
+		}
+
+		externalClient.Authenticator = authenticators.Token{
+			Token: token.(string),
 		}
 	} else {
 		splunkdClient, err = client.NewSplunkdClient("",
@@ -132,8 +159,14 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		if err != nil {
 			return splunkdClient, err
 		}
+
+		externalClient.Authenticator = &authenticators.Password{
+			Username: d.Get("username").(string),
+			Password: d.Get("password").(string),
+		}
 	}
 
 	provider.Client = splunkdClient
+	provider.ExternalClient = &externalClient
 	return provider, nil
 }
