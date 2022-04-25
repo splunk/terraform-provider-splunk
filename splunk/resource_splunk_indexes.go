@@ -615,7 +615,10 @@ func indexDelete(d *schema.ResourceData, meta interface{}) error {
 
 	default:
 		errorResponse := &models.IndexResponse{}
-		_ = json.NewDecoder(resp.Body).Decode(errorResponse)
+		if err := json.NewDecoder(resp.Body).Decode(errorResponse); err != nil {
+			return err
+		}
+
 		err := errors.New(errorResponse.Messages[0].Text)
 		return err
 	}
@@ -668,7 +671,9 @@ func getIndexConfigByName(name string, httpResponse *http.Response) (indexEntry 
 	response := &models.IndexResponse{}
 	switch httpResponse.StatusCode {
 	case 200, 201:
-		_ = json.NewDecoder(httpResponse.Body).Decode(&response)
+		if err := json.NewDecoder(httpResponse.Body).Decode(&response); err != nil {
+			return nil, err
+		}
 		re := regexp.MustCompile(`(.*)`)
 		for _, entry := range response.Entry {
 			if name == re.FindStringSubmatch(entry.Name)[1] {
