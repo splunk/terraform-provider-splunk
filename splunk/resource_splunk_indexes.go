@@ -24,7 +24,7 @@ func index() *schema.Resource {
 				A recommended value is 100.`,
 			},
 			"bucket_rebuild_memory_hint": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 				Description: `Suggestion for the bucket rebuild process for the size of the time-series (tsidx) file to make.
@@ -146,7 +146,7 @@ func index() *schema.Resource {
 				Note: The precise size of your warm buckets may vary from maxDataSize, due to post-processing and timing issues with the rolling policy.`,
 			},
 			"max_hot_buckets": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				Description: `Maximum hot buckets that can exist per index. Defaults to 3.
@@ -284,7 +284,7 @@ func index() *schema.Resource {
 				WARNING: This is an advanced parameter. Only change it if you are instructed to do so by Splunk Support.`,
 			},
 			"rep_factor": {
-				Type:     schema.TypeString,
+				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
 				Description: `Index replication control. This parameter applies to only clustering slaves.
@@ -628,7 +628,7 @@ func indexDelete(d *schema.ResourceData, meta interface{}) error {
 func getIndexConfig(d *schema.ResourceData) (indexConfigObject *models.IndexObject) {
 	indexConfigObject = &models.IndexObject{}
 	indexConfigObject.BlockSignSize = d.Get("block_sign_size").(int)
-	indexConfigObject.BucketRebuildMemoryHint = d.Get("bucket_rebuild_memory_hint").(string)
+	indexConfigObject.BucketRebuildMemoryHint = d.Get("bucket_rebuild_memory_hint").(int)
 	indexConfigObject.ColdPath = d.Get("cold_path").(string)
 	indexConfigObject.ColdToFrozenDir = d.Get("cold_to_frozen_dir").(string)
 	indexConfigObject.ColdToFrozenScript = d.Get("cold_to_frozen_script").(string)
@@ -640,7 +640,7 @@ func getIndexConfig(d *schema.ResourceData) (indexConfigObject *models.IndexObje
 	indexConfigObject.MaxBloomBackfillBucketAge = d.Get("max_bloom_backfill_bucket_age").(string)
 	indexConfigObject.MaxConcurrentOptimizes = d.Get("max_concurrent_optimizes").(int)
 	indexConfigObject.MaxDataSize = d.Get("max_data_size").(string)
-	indexConfigObject.MaxHotBuckets = d.Get("max_hot_buckets").(int)
+	indexConfigObject.MaxHotBuckets = d.Get("max_hot_buckets").(string)
 	indexConfigObject.MaxHotIdleSecs = d.Get("max_hot_idle_secs").(int)
 	indexConfigObject.MaxHotSpanSecs = d.Get("max_hot_span_secs").(int)
 	indexConfigObject.MaxMemMB = d.Get("max_mem_mb").(int)
@@ -656,7 +656,7 @@ func getIndexConfig(d *schema.ResourceData) (indexConfigObject *models.IndexObje
 	indexConfigObject.QuarantineFutureSecs = d.Get("quarantine_future_secs").(int)
 	indexConfigObject.QuarantinePastSecs = d.Get("quarantine_past_secs").(int)
 	indexConfigObject.RawChunkSizeBytes = d.Get("raw_chunk_size_bytes").(int)
-	indexConfigObject.RepFactor = d.Get("rep_factor").(string)
+	indexConfigObject.RepFactor = d.Get("rep_factor").(int)
 	indexConfigObject.RotatePeriodInSecs = d.Get("rotate_period_in_secs").(int)
 	indexConfigObject.ServiceMetaPeriod = d.Get("service_meta_period").(int)
 	indexConfigObject.SyncMeta = d.Get("sync_meta").(bool)
