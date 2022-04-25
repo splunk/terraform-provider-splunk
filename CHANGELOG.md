@@ -1,3 +1,15 @@
+##1.5.0
+
+**WARNING: POTENTIAL BREAKING CHANGES**
+* Change splunk_indexes field types:
+    * bucket_rebuild_memory_hint - Int
+    * max_hot_buckets - String
+    * rep_factor - Int
+
+These settings must be changed to be of the correct type in the Terraform configuration. They were the incorrect type previously, and as such their values were never updated during state refresh.
+
+* Deprecated splunk_indexes field `rep_factor`
+
 ##1.4.12
 * FIx: Don't read all searches just to find one search
 
