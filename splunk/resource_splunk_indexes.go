@@ -287,6 +287,11 @@ func index() *schema.Resource {
 				Type:     schema.TypeInt,
 				Optional: true,
 				Computed: true,
+				Deprecated: `rep_factor is deprecated in this Terraform Provider.
+				
+				The REST API returns a 0 for both "repFactor = 0" and "repFactor = auto". These are the two valid values for repFactor, yet they cannot be detected as different from the API's response.
+				
+				Additionally, repFactor only has meaning on clustered indexes, which should be configured by the Indexer Cluster Manager, not via REST.`,
 				Description: `Index replication control. This parameter applies to only clustering slaves.
 				auto = Use the master index replication configuration value.
 
