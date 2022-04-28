@@ -9,8 +9,8 @@ import (
 )
 
 const newConfigsConf = `
-resource "splunk_configs_conf" "tftest-stanza" {
-	name = "tftest/tftest_stanza"
+resource "splunk_configs_conf" "tf_test-stanza" {
+	name = "tf_test/tftest_stanza"
 	variables = {
         "disabled": "false"
 		"key": "value"
@@ -19,8 +19,8 @@ resource "splunk_configs_conf" "tftest-stanza" {
 `
 
 const updateConfigsConf = `
-resource "splunk_configs_conf" "tftest-stanza" {
-	name = "tftest/tftest_stanza"
+resource "splunk_configs_conf" "tf_test-stanza" {
+	name = "tf_test/tftest_stanza"
 	variables = {
         "disabled": "false"
 		"key": "new-value"
@@ -52,7 +52,7 @@ func TestAccCreateSplunkConfigsConf(t *testing.T) {
 				),
 			},
 			{
-				ResourceName:      "splunk_configs_conf.tftest-stanza",
+				ResourceName:      "splunk_configs_conf.tf_test-stanza",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
