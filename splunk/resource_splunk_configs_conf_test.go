@@ -19,7 +19,7 @@ resource "splunk_configs_conf" "tf_test-stanza" {
 `
 
 const updateConfigsConf = `
-resource "splunk_configs_conf" "tf_test-stanza" {
+resource "splunk_configs_conf" "tftest-stanza" {
 	name = "tf_test/tftest_stanza"
 	variables = {
         "disabled": "false"
