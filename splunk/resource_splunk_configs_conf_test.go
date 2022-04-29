@@ -52,7 +52,7 @@ func TestAccCreateSplunkConfigsConf(t *testing.T) {
 				),
 			},
 			{
-				ResourceName:      "splunk_configs_conf.tf_test-stanza",
+				ResourceName:      resourceName,
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
