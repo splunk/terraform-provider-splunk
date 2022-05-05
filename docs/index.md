@@ -35,6 +35,9 @@ Below arguments for the provider can also be set as environment variables.
 If specified, auth token takes priority over username/password.
 * `insecure_skip_verify` or `SPLUNK_INSECURE_SKIP_VERIFY` - (Optional) Insecure skip verification flag (Defaults to `true`)
 * `timeout` or `SPLUNK_TIMEOUT` -  (Optional) Timeout when making calls to Splunk server. (Defaults to `60 seconds`)
+* `use_client_default` - Determines the default behavior for resources that implement use_client. Permitted values are legacy and external.
+Currently defaults to legacy, but will default to external in a future version.
+The legacy client is being replaced by a standalone Splunk client with improved error and drift handling. The legacy client will be deprecated in a future version.
 
 (NOTE: Auth token can only be used with certain type of Splunk deployments.
 Read more on authentication with tokens here: https://docs.splunk.com/Documentation/Splunk/latest/Security/Setupauthenticationwithtokens)
