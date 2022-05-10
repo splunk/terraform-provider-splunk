@@ -87,9 +87,15 @@ To disable, set to 0, but this is NOT recommended. Highest legal value is 214748
                                         This is a mechanism to prevent main hot buckets from being polluted with fringe events.
 * `quarantine_past_secs` - (Optional) Events with timestamp of quarantinePastSecs older than "now" are dropped into quarantine bucket. Defaults to 77760000 (900 days). This is a mechanism to prevent the main hot buckets from being polluted with fringe events.
 * `raw_chunk_size_bytes` - (Optional) Target uncompressed size in bytes for individual raw slice in the rawdata journal of the index. Defaults to 131072 (128KB). 0 is not a valid value. If 0 is specified, rawChunkSizeBytes is set to the default value.
-* `rep_factor` - (Optional) Index replication control. This parameter applies to only clustering slaves.
+* `rep_factor` - (Deprecated, Optional) Index replication control. This parameter applies to only clustering slaves.
                             auto = Use the master index replication configuration value.
                             0 = Turn off replication for this index.
+
+  `rep_factor` is deprecated in this Terraform Provider.
+				
+  The REST API returns a 0 for both `repFactor = 0` and `repFactor = auto`. These are the two valid values for `repFactor`, yet they cannot be detected as different from the API's response.
+				
+  Additionally, `repFactor` only has meaning on clustered indexes, which should be configured by the Indexer Cluster Manager, not via REST.
 * `rotate_period_in_secs` - (Optional) How frequently (in seconds) to check if a new hot bucket needs to be created. Also, how frequently to check if there are any warm/cold buckets that should be rolled/frozen.
 * `service_meta_period` - (Optional) Defines how frequently metadata is synced to disk, in seconds. Defaults to 25 (seconds).
                                      You may want to set this to a higher value if the sum of your metadata file sizes is larger than many tens of megabytes, to avoid the hit on I/O in the indexing fast path.

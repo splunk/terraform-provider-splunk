@@ -13,7 +13,7 @@ type IndexEntry struct {
 
 type IndexObject struct {
 	BlockSignSize                 int    `json:"blockSignSize,omitempty" url:"blockSignSize,omitempty"`
-	BucketRebuildMemoryHint       string `json:"bucketRebuildMemoryHint,omitempty" url:"bucketRebuildMemoryHint,omitempty"`
+	BucketRebuildMemoryHint       int    `json:"bucketRebuildMemoryHint,omitempty" url:"bucketRebuildMemoryHint,omitempty"`
 	ColdPath                      string `json:"coldPath,omitempty" url:"coldPath,omitempty"`
 	ColdToFrozenDir               string `json:"coldToFrozenDir,omitempty" url:"coldToFrozenDir,omitempty"`
 	ColdToFrozenScript            string `json:"coldToFrozenScript,omitempty" url:"coldToFrozenScript,omitempty"`
@@ -25,7 +25,7 @@ type IndexObject struct {
 	MaxBloomBackfillBucketAge     string `json:"maxBloomBackfillBucketAge,omitempty" url:"maxBloomBackfillBucketAge,omitempty"`
 	MaxConcurrentOptimizes        int    `json:"maxConcurrentOptimizes,omitempty" url:"maxConcurrentOptimizes,omitempty"`
 	MaxDataSize                   string `json:"maxDataSize,omitempty" url:"maxDataSize,omitempty"`
-	MaxHotBuckets                 int    `json:"maxHotBuckets,omitempty" url:"maxHotBuckets,omitempty"`
+	MaxHotBuckets                 string `json:"maxHotBuckets,omitempty" url:"maxHotBuckets,omitempty"`
 	MaxHotIdleSecs                int    `json:"maxHotIdleSecs,omitempty" url:"maxHotIdleSecs,omitempty"`
 	MaxHotSpanSecs                int    `json:"maxHotSpanSecs,omitempty" url:"maxHotSpanSecs,omitempty"`
 	MaxMemMB                      int    `json:"maxMemMB,omitempty" url:"maxMemMB,omitempty"`
@@ -41,7 +41,7 @@ type IndexObject struct {
 	QuarantineFutureSecs          int    `json:"quarantineFutureSecs,omitempty" url:"quarantineFutureSecs,omitempty"`
 	QuarantinePastSecs            int    `json:"quarantinePastSecs,omitempty" url:"quarantinePastSecs,omitempty"`
 	RawChunkSizeBytes             int    `json:"rawChunkSizeBytes,omitempty" url:"rawChunkSizeBytes,omitempty"`
-	RepFactor                     string `json:"repFactor,omitempty" url:"repFactor,omitempty"`
+	RepFactor                     int    `json:"repFactor,omitempty" url:"repFactor,omitempty"`
 	RotatePeriodInSecs            int    `json:"rotatePeriodInSecs,omitempty" url:"rotatePeriodInSecs,omitempty"`
 	ServiceMetaPeriod             int    `json:"serviceMetaPeriod,omitempty" url:"serviceMetaPeriod,omitempty"`
 	SyncMeta                      bool   `json:"syncMeta,omitempty" url:"syncMeta,omitempty"`
