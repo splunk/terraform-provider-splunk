@@ -1,10 +1,11 @@
 module github.com/splunk/terraform-provider-splunk
 
-go 1.17
+go 1.18
 
 require (
 	github.com/google/go-querystring v1.0.0
 	github.com/hashicorp/terraform-plugin-sdk v1.15.0
+	github.com/splunk/go-splunk-client v0.0.1
 )
 
 require (
