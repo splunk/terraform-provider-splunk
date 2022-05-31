@@ -25,7 +25,7 @@ type IndexObject struct {
 	MaxBloomBackfillBucketAge     string `json:"maxBloomBackfillBucketAge,omitempty" url:"maxBloomBackfillBucketAge,omitempty"`
 	MaxConcurrentOptimizes        int    `json:"maxConcurrentOptimizes,omitempty" url:"maxConcurrentOptimizes,omitempty"`
 	MaxDataSize                   string `json:"maxDataSize,omitempty" url:"maxDataSize,omitempty"`
-	MaxHotBuckets                 int    `json:"maxHotBuckets,omitempty" url:"maxHotBuckets,omitempty"`
+	MaxHotBuckets                 string `json:"maxHotBuckets,omitempty" url:"maxHotBuckets,omitempty"`
 	MaxHotIdleSecs                int    `json:"maxHotIdleSecs,omitempty" url:"maxHotIdleSecs,omitempty"`
 	MaxHotSpanSecs                int    `json:"maxHotSpanSecs,omitempty" url:"maxHotSpanSecs,omitempty"`
 	MaxMemMB                      int    `json:"maxMemMB,omitempty" url:"maxMemMB,omitempty"`

@@ -146,10 +146,10 @@ func index() *schema.Resource {
 				Note: The precise size of your warm buckets may vary from maxDataSize, due to post-processing and timing issues with the rolling policy.`,
 			},
 			"max_hot_buckets": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
-				Description: `Maximum hot buckets that can exist per index. Defaults to 3.
+				Description: `Maximum hot buckets that can exist per index. Defaults to auto.
 				When maxHotBuckets is exceeded, Splunk software rolls the least recently used (LRU) hot bucket to warm. Both normal hot buckets and quarantined hot buckets count towards this total. This setting operates independently of maxHotIdleSecs, which can also cause hot buckets to roll.`,
 			},
 			"max_hot_idle_secs": {
