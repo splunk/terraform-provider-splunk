@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/splunk/terraform-provider-splunk/client/models"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -109,7 +109,7 @@ func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 	defer contentResp.Body.Close()
 
 	var result map[string]interface{}
-	b, _ := ioutil.ReadAll(contentResp.Body)
+	b, _ := io.ReadAll(contentResp.Body)
 
 	err = json.Unmarshal(b, &result)
 	if err != nil {
