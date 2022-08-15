@@ -103,7 +103,7 @@ type SavedSearchObject struct {
 	AlertThreshold                        string  `json:"alert_threshold,omitempty" url:"alert_threshold,omitempty"`
 	AlertType                             string  `json:"alert_type,omitempty" url:"alert_type,omitempty"`
 	AllowSkew                             string  `json:"allow_skew,omitempty" url:"allow_skew,omitempty"`
-	AutoSummarize                         bool    `json:"auto_summarize" url:"auto_summarize"`
+	AutoSummarize                         bool    `json:"auto_summarize,omitempty" url:"auto_summarize,omitempty"`
 	AutoSummarizeCommand                  string  `json:"auto_summarize.command,omitempty" url:"auto_summarize.command,omitempty"`
 	AutoSummarizeCronSchedule             string  `json:"auto_summarize.cron_schedule,omitempty" url:"auto_summarize.cron_schedule,omitempty"`
 	AutoSummarizeDispatchEarliestTime     string  `json:"auto_summarize.dispatch.earliest_time,omitempty" url:"auto_summarize.dispatch.earliest_time,omitempty"`
