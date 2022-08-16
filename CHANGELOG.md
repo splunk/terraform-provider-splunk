@@ -1,3 +1,6 @@
+##1.4.14
+* Fix: Omit auto_summarize field in saved_searches when empty
+
 ##1.4.13
 * Fix: configs_conf permits underscores in conf filename
 
