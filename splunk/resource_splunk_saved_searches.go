@@ -88,7 +88,7 @@ func savedSearches() *schema.Resource {
 			"action_email_include_results_link": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
+				Default:     1,
 				Description: "Specify whether to include a link to the results. [1|0]",
 			},
 			"action_email_include_search": {
@@ -112,7 +112,7 @@ func savedSearches() *schema.Resource {
 			"action_email_include_view_link": {
 				Type:        schema.TypeInt,
 				Optional:    true,
-				Computed:    true,
+				Default:     1,
 				Description: "Specify whether to show the title and a link to enable the user to edit the saved search. [1|0]",
 			},
 			"action_email_inline": {
@@ -244,7 +244,7 @@ func savedSearches() *schema.Resource {
 			"action_email_track_alert": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     true,
 				Description: "Indicates whether the execution of this action signifies a trackable alert.",
 			},
 			"action_email_ttl": {
@@ -271,7 +271,7 @@ func savedSearches() *schema.Resource {
 			"action_email_width_sort_columns": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Computed: true,
+				Default:  true,
 				Description: "Indicates whether columns should be sorted from least wide to most wide, left to right." +
 					"Only valid if format=text.",
 			},
@@ -416,7 +416,7 @@ func savedSearches() *schema.Resource {
 			"action_script_track_alert": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     true,
 				Description: "Indicates whether the execution of this action signifies a trackable alert.",
 			},
 			"action_script_ttl": {
@@ -457,7 +457,7 @@ func savedSearches() *schema.Resource {
 			"action_summary_index_inline": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Computed: true,
+				Default:  true,
 				Description: "Determines whether to execute the summary indexing action as part of the scheduled search." +
 					"NOTE: This option is considered only if the summary index action is enabled and is always executed (in other words, if counttype = always).Defaults to true ",
 			},
@@ -523,7 +523,7 @@ func savedSearches() *schema.Resource {
 			"alert_digest_mode": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Computed: true,
+				Default:  true,
 				Description: "Specifies whether alert actions are applied to the entire result set or on each individual result." +
 					"Defaults to 1 (true).",
 			},
@@ -774,7 +774,7 @@ func savedSearches() *schema.Resource {
 			"dispatch_lookups": {
 				Type:        schema.TypeBool,
 				Optional:    true,
-				Computed:    true,
+				Default:     true,
 				Description: "Enables or disables the lookups for this search. Defaults to 1. ",
 			},
 			"dispatch_max_count": {
@@ -812,7 +812,7 @@ func savedSearches() *schema.Resource {
 			"dispatch_spawn_process": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Computed: true,
+				Default:  true,
 				Description: "Specifies whether a new search process spawns when this saved search is executed. " +
 					"Defaults to 1. Searches against indexes must run in a separate process. ",
 			},
@@ -864,7 +864,7 @@ func savedSearches() *schema.Resource {
 			"realtime_schedule": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Computed: true,
+				Default:  true,
 				Description: "Defaults to 1. Controls the way the scheduler computes the next execution time of a scheduled search. " +
 					"If this value is set to 1, the scheduler bases its determination of the next scheduled search execution time on the current time. " +
 					"If this value is set to 0, the scheduler bases its determination of the next scheduled search on the last search execution time. " +
@@ -887,7 +887,7 @@ func savedSearches() *schema.Resource {
 			"restart_on_searchpeer_add": {
 				Type:     schema.TypeBool,
 				Optional: true,
-				Computed: true,
+				Default:  true,
 				Description: "Specifies whether to restart a real-time search managed by the scheduler when a search peer becomes available for this saved search. " +
 					"Defaults to 1. ",
 			},
