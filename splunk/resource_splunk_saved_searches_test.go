@@ -126,6 +126,33 @@ resource "splunk_saved_searches" "test" {
 }
 `
 
+const newSavedSearchesXsoar = `
+resource "splunk_saved_searches" "test" {
+	name = "Test XSOAR Alert"
+	actions = "create_xsoar_incident"
+	action_create_xsoar_incident = 1
+	action_create_xsoar_incident_param_send_all_servers = 1
+	action_create_xsoar_incident_param_server_url = "https://xsoar.example.com"
+	action_create_xsoar_incident_param_incident_name = "$name$"
+	action_create_xsoar_incident_param_details = "This is a test alert."
+	action_create_xsoar_incident_param_custom_fields = "logsource:Demisto,mycustomfield:Test"
+	action_create_xsoar_incident_param_severity = 1
+	action_create_xsoar_incident_param_occurred = "$trigger_time$"
+	action_create_xsoar_incident_param_type = "Unclassified"
+	alert_comparator    = "greater than"
+	alert_digest_mode   = true
+	alert_expires       = "30d"
+	alert_threshold     = "0"
+	alert_type          = "number of events"
+	cron_schedule       = "*/1 * * * *"
+	disabled            = false
+	is_scheduled        = true
+	is_visible          = true
+	realtime_schedule   = true
+	search              = "index=main level=error"
+}
+`
+
 const newSavedSearchesSlack = `
 resource "splunk_saved_searches" "test" {
 	name = "Test Slack Alert"
