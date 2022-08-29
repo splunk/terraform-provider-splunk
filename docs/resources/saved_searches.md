@@ -101,20 +101,17 @@ This resource block supports the following arguments:
 * `action_summary_index_name` - (Optional) Specifies the name of the summary index where the results of the scheduled search are saved.Defaults to summary.
 * `action_summary_index_track_alert` - (Optional) Indicates whether the execution of this action signifies a trackable alert.
 * `action_summary_index_ttl` - (Optional) Valid values are: Integer[p] Specifies the minimum time-to-live in seconds of the search artifacts if this action is triggered. If p follows Integer, specifies the number of scheduled periods. Defaults to 86400 (24 hours).
-* `action_create_xsoar_incident` - (Optional) Enable XSOAR alerting (Should by 1 (Enabled) or 0 (Disabled))
-* `action_create_xsoar_incident_param_send_all_servers` - (Optional) Enable XSOAR alerting sending to all servers (Should by 1 (Enabled) or 0 (Disabled)
-* `action_create_xsoar_incident_param_server_url` - (Optional) XSOAR Server instance URL (Should start with https:// || http://)
-* `action_create_xsoar_incident_param_incident_name` - (Optional) XSOAR incident name
-* `action_create_xsoar_incident_param_details` - (Optional) XSOAR incident description
-* `action_create_xsoar_incident_param_custom_fields` - (Optional) XSOAR custom incident fields (should be a comma separated list)
-* `action_create_xsoar_incident_param_severity` - (Optional) XSOAR Severity (1 - Low, 2 - Medium, 3 - High, 4 - Critical)
-* `action_create_xsoar_incident_param_occurred` - (Optional) XSOAR incident time
-* `action_create_xsoar_incident_param_type` - (Optional) XSOAR incident type
 * `action_slack_param_channel` - (Optional) Slack channel to send the message to (Should start with # or @)
 * `action_slack_param_fields` - (Optional) Show one or more fields from the search results below your Slack message. Comma-separated list of field names. Allows wildcards. eg. index,source*
 * `action_slack_param_attachment` - (Optional) Include a message attachment. Valid values are message, none, or alert_link
 * `action_slack_param_message` - (Optional) Enter the chat message to send to the Slack channel. The message can include tokens that insert text based on the results of the search.
 * `action_slack_param_webhook_url_override` - (Optional) You can override the Slack webhook URL here if you need to send the alert message to a different Slack team
+* `action_jira_service_desk_param_account` - (Optional) Jira Service Desk account name
+* `action_jira_service_desk_param_jira_project` - (Optional) Jira Project name
+* `action_jira_service_desk_param_jira_issue_type` - (Optional) Jira issue type name
+* `action_jira_service_desk_param_jira_summary` - (Optional) Jira issue title/summary
+* `action_jira_service_desk_param_jira_priority` - (Optional) Jira priority of issue
+* `action_jira_service_desk_param_jira_description` - (Optional) Jira issue description
 * `action_webhook_param_url` - (Optional) URL to send the HTTP POST request to. Must be accessible from the Splunk server
 * `actions` - (Optional) A comma-separated list of actions to enable. For example: rss,email
 * `alert_comparator` - (Optional) One of the following strings: greater than, less than, equal to, rises by, drops by, rises by perc, drops by percUsed with alert_threshold to trigger alert actions.
