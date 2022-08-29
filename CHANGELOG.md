@@ -1,3 +1,6 @@
+##1.4.15
+* Support for jira service desk actions in saved_searches
+
 ##1.4.14
 * Fix: Omit auto_summarize field in saved_searches when empty
 
