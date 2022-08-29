@@ -147,6 +147,30 @@ resource "splunk_saved_searches" "test" {
 }
 `
 
+const newSavedSearchesJiraServiceDesk = `
+resource "splunk_saved_searches" "test" {
+	name = "Test Jira Alert Ticket"
+	actions = "jira_service_desk"
+	action_jira_service_desk_param_account = "test_account"
+	action_jira_service_desk_param_jira_project = "test_project"
+	action_jira_service_desk_param_jira_issue_type = "Task"
+	action_jira_service_desk_param_jira_summary = "error message"
+	action_jira_service_desk_param_jira_priority = "Normal"
+	action_jira_service_desk_param_jira_description = "test ticket creation"
+	alert_comparator    = "greater than"
+	alert_digest_mode   = true
+	alert_expires       = "30d"
+	alert_threshold     = "0"
+	alert_type          = "number of events"
+	cron_schedule       = "*/1 * * * *"
+	disabled            = false
+	is_scheduled        = true
+	is_visible          = true
+	realtime_schedule   = true
+	search              = "index=main level=error"
+}
+`
+
 const newSavedSearchesWebhook = `
 resource "splunk_saved_searches" "test" {
 	name = "Test Webhook Alert"
@@ -301,6 +325,30 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "action_slack_param_attachment", "alert_link"),
 					resource.TestCheckResourceAttr(resourceName, "action_slack_param_channel", "#channel"),
 					resource.TestCheckResourceAttr(resourceName, "action_slack_param_message", "error message"),
+					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
+					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
+					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),
+					resource.TestCheckResourceAttr(resourceName, "alert_threshold", "0"),
+					resource.TestCheckResourceAttr(resourceName, "alert_type", "number of events"),
+					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/1 * * * *"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "is_scheduled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
+					resource.TestCheckResourceAttr(resourceName, "realtime_schedule", "true"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main level=error"),
+				),
+			},
+			{
+				Config: newSavedSearchesJiraServiceDesk,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Jira Alert Ticket"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "jira_service_desk"),
+					resource.TestCheckResourceAttr(resourceName, "action_jira_service_desk_param_account", "test_account"),
+					resource.TestCheckResourceAttr(resourceName, "action_jira_service_desk_param_jira_project", "test_project"),
+					resource.TestCheckResourceAttr(resourceName, "action_jira_service_desk_param_jira_issue_type", "Task"),
+					resource.TestCheckResourceAttr(resourceName, "action_jira_service_desk_param_jira_summary", "error message"),
+					resource.TestCheckResourceAttr(resourceName, "action_jira_service_desk_param_jira_priority", "Normal"),
+					resource.TestCheckResourceAttr(resourceName, "action_jira_service_desk_param_jira_description", "test ticket creation"),
 					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
 					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),
