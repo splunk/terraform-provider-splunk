@@ -487,6 +487,54 @@ func savedSearches() *schema.Resource {
 				Description: "Valid values are: Integer[p] Specifies the minimum time-to-live in seconds of the search artifacts if this action is triggered. " +
 					"If p follows Integer, specifies the number of scheduled periods. Defaults to 86400 (24 hours).",
 			},
+			"action_create_xsoar_incident": {
+		    Type:     schema.TypeInt,
+		    Optional: true,
+		    Computed: true,
+		    Description: "Enabled XSOAR Alert Sending.",
+			},
+			"action_create_xsoar_incident_param_send_all_servers": {
+		    Type:     schema.TypeInt,
+		    Optional: true,
+		    Computed: true,
+		    Description: "Enabled XSOAR alert sending to all servers.",
+			},
+			"action_create_xsoar_incident_param_server_url": {
+		    Type:        schema.TypeString,
+		    Optional:    true,
+		    Description: "Enter the XSOAR server URL.",
+			},
+			"action_create_xsoar_incident_param_incident_name": {
+		    Type:        schema.TypeString,
+		    Optional:    true,
+		    Description: "Enter the XSOAR incident name.",
+			},
+			"action_create_xsoar_incident_param_details": {
+		    Type:        schema.TypeString,
+		    Optional:    true,
+		    Description: "Enter the XSOAR incident details.",
+			},
+			"action_create_xsoar_incident_param_custom_fields": {
+		    Type:        schema.TypeString,
+		    Optional:    true,
+		    Description: "Enter the XSOAR incident custom_fields.",
+			},
+			"action_create_xsoar_incident_param_severity": {
+		    Type:     schema.TypeInt,
+		    Optional: true,
+		    Computed: true,
+		    Description: "Enter the XSOAR incident serverity.",
+			},
+			"action_create_xsoar_incident_param_occurred": {
+		    Type:     schema.TypeString,
+		    Optional: true,
+		    Description: "Eneter the XSOAR incident occurred datetime.",
+			},
+			"action_create_xsoar_incident_param_type": {
+		    Type:        schema.TypeString,
+		    Optional:    true,
+		    Description: "Enter the XSOAR incident type.",
+			},
 			"action_slack_param_channel": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -1256,6 +1304,33 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	}
 	if err = d.Set("action_summary_index_ttl", entry.Content.ActionSummaryIndexTTL); err != nil {
 		return err
+	}
+	if err = d.Set("action_create_xsoar_incident", entry.Content.ActionCreateXsoarIncident); err != nil {
+	  return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_send_all_servers", entry.Content.ActionCreateXsoarIncidentParamSendAllServers); err != nil {
+	  return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_server_url", entry.Content.ActionCreateXsoarIncidentParamServerUrl); err != nil {
+	  return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_incident_name", entry.Content.ActionCreateXsoarIncidentParamIncidentName); err != nil {
+	  return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_details", entry.Content.ActionCreateXsoarIncidentParamDetails); err != nil {
+	  return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_custom_fields", entry.Content.ActionCreateXsoarIncidentParamCustomFields); err != nil {
+	  return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_severity", entry.Content.ActionCreateXsoarIncidentParamSeverity); err != nil {
+	  return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_occurred", entry.Content.ActionCreateXsoarIncidentParamOccurred); err != nil {
+	  return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_type", entry.Content.ActionCreateXsoarIncidentParamType); err != nil {
+	  return err
 	}
 	if err = d.Set("action_slack_param_attachment", entry.Content.ActionSlackParamAttachment); err != nil {
 		return err
