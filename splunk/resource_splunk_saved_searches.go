@@ -524,6 +524,36 @@ func savedSearches() *schema.Resource {
 				Optional:    true,
 				Description: "You can override the Slack webhook URL here if you need to send the alert message to a different Slack team.",
 			},
+			"action_jira_service_desk_param_account": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "This is where you would put the account name you set in the Jira Service Desk",
+			},
+			"action_jira_service_desk_param_jira_project": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Jira Project where the issue will be created",
+			},
+			"action_jira_service_desk_param_jira_issue_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Jira Issue Type you would like to create",
+			},
+			"action_jira_service_desk_param_jira_summary": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Jira Issue Summary or title",
+			},
+			"action_jira_service_desk_param_jira_priority": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Priority of issue created",
+			},
+			"action_jira_service_desk_param_jira_description": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enter the description of issue created",
+			},
 			"action_webhook_param_url": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -1255,6 +1285,24 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_slack_param_webhook_url_override", entry.Content.ActionSlackParamWebhookUrlOverride); err != nil {
 		return err
 	}
+	if err = d.Set("action_jira_service_desk_param_account", entry.Content.ActionJiraServiceDeskParamAccount); err != nil {
+		return err
+	}
+	if err = d.Set("action_jira_service_desk_param_jira_project", entry.Content.ActionJiraServiceDeskParamJiraProject); err != nil {
+		return err
+	}
+	if err = d.Set("action_jira_service_desk_param_jira_issue_type", entry.Content.ActionJiraServiceDeskParamJiraIssueType); err != nil {
+		return err
+	}
+	if err = d.Set("action_jira_service_desk_param_jira_summary", entry.Content.ActionJiraServiceDeskParamJiraSummary); err != nil {
+		return err
+	}
+	if err = d.Set("action_jira_service_desk_param_jira_priority", entry.Content.ActionJiraServiceDeskParamJiraPriority); err != nil {
+		return err
+	}
+	if err = d.Set("action_jira_service_desk_param_jira_description", entry.Content.ActionJiraServiceDeskParamJiraDescription); err != nil {
+		return err
+	}
 	if err = d.Set("action_webhook_param_url", entry.Content.ActionWebhookParamUrl); err != nil {
 		return err
 	}
@@ -1569,6 +1617,12 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionSlackParamFields:                d.Get("action_slack_param_fields").(string),
 		ActionSlackParamMessage:               d.Get("action_slack_param_message").(string),
 		ActionSlackParamWebhookUrlOverride:    d.Get("action_slack_param_webhook_url_override").(string),
+		ActionJiraServiceDeskParamAccount:         d.Get("action_jira_service_desk_param_account").(string),
+		ActionJiraServiceDeskParamJiraProject:     d.Get("action_jira_service_desk_param_jira_project").(string),
+		ActionJiraServiceDeskParamJiraIssueType:   d.Get("action_jira_service_desk_param_jira_issue_type").(string),
+		ActionJiraServiceDeskParamJiraSummary:     d.Get("action_jira_service_desk_param_jira_summary").(string),
+		ActionJiraServiceDeskParamJiraPriority:    d.Get("action_jira_service_desk_param_jira_priority").(string),
+		ActionJiraServiceDeskParamJiraDescription: d.Get("action_jira_service_desk_param_jira_description").(string),
 		ActionWebhookParamUrl:                 d.Get("action_webhook_param_url").(string),
 		AlertComparator:                       d.Get("alert_comparator").(string),
 		AlertCondition:                        d.Get("alert_condition").(string),

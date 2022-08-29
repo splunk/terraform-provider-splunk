@@ -154,6 +154,19 @@ resource "splunk_saved_searches" "test" {
 	actions = "pagerduty"
 	action_pagerduty_integration_url = "abcd"
 	action_pagerduty_integration_url_override = "efgh"
+}
+`
+
+const newSavedSearchesJiraServiceDesk = `
+resource "splunk_saved_searches" "test" {
+	name = "Test Jira Alert Ticket"
+	actions = "jira_service_desk"
+	action_jira_service_desk_param_account = "test_account"
+	action_jira_service_desk_param_jira_project = "test_project"
+	action_jira_service_desk_param_jira_issue_type = "Task"
+	action_jira_service_desk_param_jira_summary = "error message"
+	action_jira_service_desk_param_jira_priority = "Normal"
+	action_jira_service_desk_param_jira_description = "test ticket creation"
 	alert_comparator    = "greater than"
 	alert_digest_mode   = true
 	alert_expires       = "30d"
@@ -342,6 +355,19 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "actions", "pagerduty"),
 					resource.TestCheckResourceAttr(resourceName, "action_pagerduty_integration_url", "abcd"),
 					resource.TestCheckResourceAttr(resourceName, "action_pagerduty_integration_url_override", "efgh"),
+				),
+			},
+			{
+				Config: newSavedSearchesJiraServiceDesk,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Jira Alert Ticket"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "jira_service_desk"),
+					resource.TestCheckResourceAttr(resourceName, "action_jira_service_desk_param_account", "test_account"),
+					resource.TestCheckResourceAttr(resourceName, "action_jira_service_desk_param_jira_project", "test_project"),
+					resource.TestCheckResourceAttr(resourceName, "action_jira_service_desk_param_jira_issue_type", "Task"),
+					resource.TestCheckResourceAttr(resourceName, "action_jira_service_desk_param_jira_summary", "error message"),
+					resource.TestCheckResourceAttr(resourceName, "action_jira_service_desk_param_jira_priority", "Normal"),
+					resource.TestCheckResourceAttr(resourceName, "action_jira_service_desk_param_jira_description", "test ticket creation"),
 					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
 					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),
