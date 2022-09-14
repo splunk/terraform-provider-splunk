@@ -1,3 +1,6 @@
+##1.4.16
+* Fix incorrect revert in v1.4.15
+
 ##1.4.15
 * Support for jira service desk actions in saved_searches
 
