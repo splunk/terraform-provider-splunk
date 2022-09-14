@@ -1,3 +1,6 @@
+##1.4.17
+* Support for XSOAR alert actions
+
 ##1.4.16
 * Fix incorrect revert in v1.4.15
 
