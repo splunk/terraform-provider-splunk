@@ -103,6 +103,15 @@ This resource block supports the following arguments:
 * `action_summary_index_name` - (Optional) Specifies the name of the summary index where the results of the scheduled search are saved.Defaults to summary.
 * `action_summary_index_track_alert` - (Optional) Indicates whether the execution of this action signifies a trackable alert.
 * `action_summary_index_ttl` - (Optional) Valid values are: Integer[p] Specifies the minimum time-to-live in seconds of the search artifacts if this action is triggered. If p follows Integer, specifies the number of scheduled periods. Defaults to 86400 (24 hours).
+* `action_create_xsoar_incident` - (Optional) Enable XSOAR alerting (Should by 1 (Enabled) or 0 (Disabled))
+* `action_create_xsoar_incident_param_send_all_servers` - (Optional) Enable XSOAR alerting sending to all servers (Should by 1 (Enabled) or 0 (Disabled)
+* `action_create_xsoar_incident_param_server_url` - (Optional) XSOAR Server instance URL (Should start with https:// || http://)
+* `action_create_xsoar_incident_param_incident_name` - (Optional) XSOAR incident name
+* `action_create_xsoar_incident_param_details` - (Optional) XSOAR incident description
+* `action_create_xsoar_incident_param_custom_fields` - (Optional) XSOAR custom incident fields (should be a comma separated list)
+* `action_create_xsoar_incident_param_severity` - (Optional) XSOAR Severity (1 - Low, 2 - Medium, 3 - High, 4 - Critical)
+* `action_create_xsoar_incident_param_occurred` - (Optional) XSOAR incident time
+* `action_create_xsoar_incident_param_type` - (Optional) XSOAR incident type
 * `action_slack_param_channel` - (Optional) Slack channel to send the message to (Should start with # or @)
 * `action_slack_param_fields` - (Optional) Show one or more fields from the search results below your Slack message. Comma-separated list of field names. Allows wildcards. eg. index,source*
 * `action_slack_param_attachment` - (Optional) Include a message attachment. Valid values are message, none, or alert_link
