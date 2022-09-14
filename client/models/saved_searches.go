@@ -83,7 +83,7 @@ type SavedSearchObject struct {
 	ActionSummaryIndexMaxTime                    int     `json:"action.summary_index.maxtime,omitempty" url:"action.summary_index.maxtime,omitempty"`
 	ActionSummaryIndexTrackAlert                 bool    `json:"action.summary_index.track_alert" url:"action.summary_index.track_alert"`
 	ActionSummaryIndexTTL                        string  `json:"action.summary_index.ttl,omitempty" url:"action.summary_index.ttl,omitempty"`
-	ActionCreateXsoarIncident                    string	 `json:"action.create_xsoar_incident,omitempty" url:"action.create_xsoar_incident"`
+	ActionCreateXsoarIncident                    string  `json:"action.create_xsoar_incident,omitempty" url:"action.create_xsoar_incident"`
 	ActionCreateXsoarIncidentParamSendAllServers string  `json:"action.create_xsoar_incident.param.send_all_servers,omitempty" url:"action.create_xsoar_incident.param.send_all_servers"`
 	ActionCreateXsoarIncidentParamServerUrl      string  `json:"action.create_xsoar_incident.param.server_url,omitempty" url:"action.create_xsoar_incident.param.server_url"`
 	ActionCreateXsoarIncidentParamIncidentName   string  `json:"action.create_xsoar_incident.param.incident_name,omitempty" url:"action.create_xsoar_incident.param.incident_name"`

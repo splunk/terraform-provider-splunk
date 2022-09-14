@@ -9,7 +9,7 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-//https://docs.splunk.com/Documentation/Splunk/8.0.4/RESTUM/RESTusing#Access_Control_List
+// https://docs.splunk.com/Documentation/Splunk/8.0.4/RESTUM/RESTusing#Access_Control_List
 func (client *Client) GetAcl(owner, app, name string, resources ...string) (*http.Response, error) {
 	resourcePath := []string{"servicesNS", owner, app}
 	resourcePath = append(resourcePath, resources...)

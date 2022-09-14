@@ -1,6 +1,6 @@
 package models
 
-//https://docs.splunk.com/Documentation/Splunk/8.0.4/RESTUM/RESTusing#Access_Control_List
+// https://docs.splunk.com/Documentation/Splunk/8.0.4/RESTUM/RESTusing#Access_Control_List
 type ACLObject struct {
 	App            string      `json:"app,omitempty" url:"app,omitempty"`
 	CanChangePerms bool        `json:"can_change_perms,omitempty" url:"can_change_perms,omitempty"`
