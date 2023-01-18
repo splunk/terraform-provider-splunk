@@ -36,7 +36,7 @@ func newTestClient() (*client.Client, error) {
 		[2]string{os.Getenv("SPLUNK_USERNAME"),
 			os.Getenv("SPLUNK_PASSWORD")},
 		os.Getenv("SPLUNK_URL"),
-
+		"",
 		http)
 }
 
