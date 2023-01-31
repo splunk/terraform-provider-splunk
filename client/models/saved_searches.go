@@ -78,7 +78,7 @@ type SavedSearchObject struct {
 	ActionSnowEventParamNode                     string  `json:"action.snow_event.param.node,omitempty" url:"action.snow_event.param.node,omitempty"`
 	ActionSnowEventParamType                     string  `json:"action.snow_event.param.type,omitempty" url:"action.snow_event.param.type,omitempty"`
 	ActionSnowEventParamResource                 string  `json:"action.snow_event.param.resource,omitempty" url:"action.snow_event.param.resource,omitempty"`
-	ActionSnowEventParamSeverity                 int     `json:"action.snow_event.param.severity,omitempty" url:"action.snow_event.param.severity,omitempty"`
+	ActionSnowEventParamSeverity                 int     `json:"action.snow_event.param.severity,string,omitempty" url:"action.snow_event.param.severity,omitempty"`
 	ActionSnowEventParamDescription              string  `json:"action.snow_event.param.description,omitempty" url:"action.snow_event.param.description,omitempty"`
 	ActionSnowEventParamCiIdentifier             string  `json:"action.snow_event.param.ci_identifier,omitempty" url:"action.snow_event.param.ci_identifier,omitempty"`
 	ActionSnowEventParamCustomFields             string  `json:"action.snow_event.param.custom_fields,omitempty" url:"action.snow_event.param.custom_fields,omitempty"`
