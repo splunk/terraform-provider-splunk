@@ -76,6 +76,15 @@ type SavedSearchObject struct {
 	ActionScriptMaxTime                          int     `json:"action.script.maxtime,omitempty" url:"action.script.maxtime,omitempty"`
 	ActionScriptTrackAlert                       bool    `json:"action.script.track_alert" url:"action.script.track_alert"`
 	ActionScriptTTL                              string  `json:"action.script.ttl,omitempty" url:"action.script.ttl,omitempty"`
+	ActionSnowEventParamAccount                  string  `json:"action.snow_event.param.account,omitempty" url:"action.snow_event.param.account,omitempty"`
+	ActionSnowEventParamNode                     string  `json:"action.snow_event.param.node,omitempty" url:"action.snow_event.param.node,omitempty"`
+	ActionSnowEventParamType                     string  `json:"action.snow_event.param.type,omitempty" url:"action.snow_event.param.type,omitempty"`
+	ActionSnowEventParamResource                 string  `json:"action.snow_event.param.resource,omitempty" url:"action.snow_event.param.resource,omitempty"`
+	ActionSnowEventParamSeverity                 int     `json:"action.snow_event.param.severity,string,omitempty" url:"action.snow_event.param.severity,omitempty"`
+	ActionSnowEventParamDescription              string  `json:"action.snow_event.param.description,omitempty" url:"action.snow_event.param.description,omitempty"`
+	ActionSnowEventParamCiIdentifier             string  `json:"action.snow_event.param.ci_identifier,omitempty" url:"action.snow_event.param.ci_identifier,omitempty"`
+	ActionSnowEventParamCustomFields             string  `json:"action.snow_event.param.custom_fields,omitempty" url:"action.snow_event.param.custom_fields,omitempty"`
+	ActionSnowEventParamAdditionalInfo           string  `json:"action.snow_event.param.additional_info,omitempty" url:"action.snow_event.param.additional_info,omitempty"`
 	ActionSummaryIndex                           bool    `json:"action.summary_index,omitempty" url:"action.summary_index"`
 	ActionSummaryIndexName                       string  `json:"action.summary_index._name,omitempty" url:"action.summary_index._name,omitempty"`
 	ActionSummaryIndexCommand                    string  `json:"action.summary_index.command,omitempty" url:"action.summary_index.command,omitempty"`
