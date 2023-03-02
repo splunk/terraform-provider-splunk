@@ -1,3 +1,7 @@
+## 1.4.18
+* Support for SNOW alert actions
+* Prerequisite: Install ServiceNow Addon into Splunk instance.
+
 ## 1.4.17
 * Support for XSOAR alert actions
 
