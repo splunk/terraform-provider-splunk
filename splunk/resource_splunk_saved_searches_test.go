@@ -296,6 +296,14 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 				),
 			},
 			{
+				// to test re-creation of remotely deleted or missing resources, delete the new saved serarch before updating it
+				PreConfig: func() {
+					client, _ := newTestClient()
+
+					if _, err := client.DeleteSavedSearches("Test New Alert", "nobody", "search"); err != nil {
+						t.Error("PreConfig deletion of Test New Alert failed")
+					}
+				},
 				Config: updatedSavedSearches,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", "Test New Alert"),
