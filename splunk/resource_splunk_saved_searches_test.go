@@ -441,6 +441,7 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 				),
 			},
 			{
+<<<<<<< HEAD
 				Config: newSavedSearchesPagerduty,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", "Test Pagerduty Alert"),
@@ -450,6 +451,8 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 				),
 			},
 			{
+=======
+>>>>>>> sortigoza-sortigoza/feat/pagerduty-alert
 				Config: newSavedSearchesJiraServiceDesk,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", "Test Jira Alert Ticket"),
