@@ -177,10 +177,20 @@ resource "splunk_saved_searches" "test" {
 const newSavedSearchesPagerduty = `
 resource "splunk_saved_searches" "test" {
 	name = "Test Pagerduty Alert"
-	actions = "slack"
 	actions = "pagerduty"
 	action_pagerduty_integration_url = "abcd"
 	action_pagerduty_integration_url_override = "efgh"
+	alert_comparator    = "greater than"
+	alert_digest_mode   = true
+	alert_expires       = "30d"
+	alert_threshold     = "0"
+	alert_type          = "number of events"
+	cron_schedule       = "*/1 * * * *"
+	disabled            = false
+	is_scheduled        = true
+	is_visible          = true
+	realtime_schedule   = true
+	search              = "index=main level=error"
 }
 `
 
