@@ -1,3 +1,6 @@
+## 1.4.19
+* Support for Pager Duty fields in saved_searches
+
 ## 1.4.18
 * Support for SNOW alert actions
 * Prerequisite: Install ServiceNow Addon into Splunk instance.
