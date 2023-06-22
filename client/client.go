@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -147,6 +148,16 @@ func (c *Client) DoRequest(method string, requestURL url.URL, body interface{}) 
 	response, err := c.Do(request)
 	if err != nil {
 		return nil, err
+	}
+	if response == nil {
+		return nil, fmt.Errorf("nil response for '%s' request", &requestURL)
+	}
+	if response.StatusCode != 200 && response.StatusCode != 201 {
+		body, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return nil, err
+		}
+		return response, fmt.Errorf("%s: %s", response.Status, string(body))
 	}
 
 	return response, nil
