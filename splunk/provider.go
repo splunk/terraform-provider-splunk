@@ -1,16 +1,28 @@
 package splunk
 
 import (
+	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/splunk/terraform-provider-splunk/client"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/splunk/go-splunk-client/pkg/authenticators"
+	externalclient "github.com/splunk/go-splunk-client/pkg/client"
+)
+
+const (
+	useClientUnset    = ""
+	useClientLegacy   = "legacy"
+	useClientExternal = "external"
 )
 
 type SplunkProvider struct {
-	Client *client.Client
+	Client           *client.Client
+	ExternalClient   *externalclient.Client
+	useClientDefault string
 }
 
 func Provider() terraform.ResourceProvider {
@@ -65,6 +77,15 @@ func providerSchema() map[string]*schema.Schema {
 			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_TIMEOUT", 60),
 			Description: "Timeout when making calls to Splunk server. Defaults to 60 seconds",
 		},
+		"use_client_default": {
+			Type:         schema.TypeString,
+			Optional:     true,
+			Default:      useClientLegacy,
+			ValidateFunc: validateClientValueFunc(false),
+			Description: "Determines the default behavior for resources that implement use_client. Permitted values are legacy and external. " +
+				"Currently defaults to legacy, but will default to external in a future version. " +
+				"The legacy client is being replaced by a standalone Splunk client with improved error and drift handling. The legacy client will be deprecated in a future version.",
+		},
 	}
 }
 
@@ -97,12 +118,38 @@ func providerResources() map[string]*schema.Resource {
 	}
 }
 
+// canonicalizeSplunkURL returns a URL string from originalURL that includes a default https scheme.
+// go-splunk-client requires a full URL, but this provider has historically permitted the URL to be missing
+// its scheme.
+func canonicalizeSplunkURL(originalURL string) (string, error) {
+	externalClientURL := originalURL
+
+	parsedURL, err := url.Parse(externalClientURL)
+	if err != nil || (parsedURL.Scheme != "http" && parsedURL.Scheme != "https") {
+		externalClientURL = fmt.Sprintf("https://%s", externalClientURL)
+		if _, err := url.Parse(externalClientURL); err != nil {
+			return "", fmt.Errorf("splunk: unable to determine valid splunkd URL from %q", originalURL)
+		}
+	}
+
+	return externalClientURL, nil
+}
+
 // This is the function used to fetch the configuration params given
 // to our provider which we will use to initialise splunk client that
 // interacts with the API.
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	provider := &SplunkProvider{}
 	var splunkdClient *client.Client
+
+	externalClientURL, err := canonicalizeSplunkURL(d.Get("url").(string))
+	if err != nil {
+		return nil, err
+	}
+
+	externalClient := externalclient.Client{
+		URL: externalClientURL,
+	}
 
 	httpClient, err := client.NewSplunkdHTTPClient(
 		time.Duration(d.Get("timeout").(int))*time.Second,
@@ -111,6 +158,9 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		return nil, err
 	}
 
+	externalClient.TLSInsecureSkipVerify = d.Get("insecure_skip_verify").(bool)
+	externalClient.Timeout = time.Duration(d.Get("timeout").(int)) * time.Second
+
 	if token, ok := d.GetOk("auth_token"); ok {
 		splunkdClient, err = client.NewSplunkdClientWithAuthToken(token.(string),
 			[2]string{d.Get("username").(string), d.Get("password").(string)},
@@ -118,6 +168,10 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 			httpClient)
 		if err != nil {
 			return splunkdClient, err
+		}
+
+		externalClient.Authenticator = authenticators.Token{
+			Token: token.(string),
 		}
 	} else {
 		splunkdClient, err = client.NewSplunkdClient("",
@@ -132,8 +186,35 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		if err != nil {
 			return splunkdClient, err
 		}
+
+		externalClient.Authenticator = &authenticators.Password{
+			Username: d.Get("username").(string),
+			Password: d.Get("password").(string),
+		}
 	}
 
 	provider.Client = splunkdClient
+	provider.ExternalClient = &externalClient
+	provider.useClientDefault = d.Get("use_client_default").(string)
+
 	return provider, nil
+}
+
+// validateClientValueFunc returns a schema.SchemaValidateFunc that validates the value
+// of use_client (or use_client_default).
+func validateClientValueFunc(allowEmpty bool) schema.SchemaValidateFunc {
+	return func(v interface{}, name string) ([]string, []error) {
+		clientV := v.(string)
+		switch clientV {
+		default:
+			return nil, []error{fmt.Errorf("%s invalid value %q", name, clientV)}
+		case useClientUnset:
+			if !allowEmpty {
+				return nil, []error{fmt.Errorf("%s invalid empty value", name)}
+			}
+		case useClientLegacy, useClientExternal:
+		}
+
+		return nil, nil
+	}
 }

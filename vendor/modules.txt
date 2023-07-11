@@ -268,6 +268,19 @@ github.com/posener/complete/match
 ## explicit
 github.com/spf13/afero
 github.com/spf13/afero/mem
+# github.com/splunk/go-splunk-client v0.0.1
+## explicit; go 1.18
+github.com/splunk/go-splunk-client/pkg/attributes
+github.com/splunk/go-splunk-client/pkg/authenticators
+github.com/splunk/go-splunk-client/pkg/client
+github.com/splunk/go-splunk-client/pkg/deepset
+github.com/splunk/go-splunk-client/pkg/entry
+github.com/splunk/go-splunk-client/pkg/internal/checks
+github.com/splunk/go-splunk-client/pkg/internal/paths
+github.com/splunk/go-splunk-client/pkg/messages
+github.com/splunk/go-splunk-client/pkg/selective
+github.com/splunk/go-splunk-client/pkg/service
+github.com/splunk/go-splunk-client/pkg/values
 # github.com/ulikunitz/xz v0.5.5
 ## explicit
 github.com/ulikunitz/xz
@@ -329,6 +342,7 @@ golang.org/x/net/http2
 golang.org/x/net/http2/hpack
 golang.org/x/net/idna
 golang.org/x/net/internal/timeseries
+golang.org/x/net/publicsuffix
 golang.org/x/net/trace
 # golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 ## explicit; go 1.11
@@ -343,6 +357,12 @@ golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 # golang.org/x/text v0.3.6
 ## explicit; go 1.11
+golang.org/x/text/cases
+golang.org/x/text/internal
+golang.org/x/text/internal/language
+golang.org/x/text/internal/language/compact
+golang.org/x/text/internal/tag
+golang.org/x/text/language
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
