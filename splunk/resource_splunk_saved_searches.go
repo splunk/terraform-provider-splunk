@@ -58,9 +58,9 @@ func savedSearches() *schema.Resource {
 					"4 - Warning",
 			},
 			"action_snow_event_param_description": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
 				Description: "	A brief description of the event.",
 			},
 			"action_snow_event_param_ci_identifier": {
