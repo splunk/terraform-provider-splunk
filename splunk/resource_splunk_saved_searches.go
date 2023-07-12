@@ -22,6 +22,72 @@ func savedSearches() *schema.Resource {
 				Computed:    true,
 				Description: "A comma-separated list of actions to enable. For example: rss,email ",
 			},
+			"action_snow_event_param_account": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Account(s) for which the event is/ are to be created across ServiceNow instance(s).",
+			},
+			"action_snow_event_param_node": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The node, formatted to follow your organization's ITIL standards and mapping. If the node value matches a CI with the same host name, the event is automatically assigned to the matching CI.",
+			},
+			"action_snow_event_param_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The type, formatted to follow your organization's ITIL standards and mapping. For example, type='Virtual Machine'.",
+			},
+			"action_snow_event_param_resource": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The resource, formatted to follow your organization's ITIL standards and mapping. For example, resource='CPU'.",
+			},
+			"action_snow_event_param_severity": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+				Description: "The severity associated with the event. " +
+					"0 - Clear " +
+					"1 - Critical " +
+					"2 - Major " +
+					"3 - Minor " +
+					"4 - Warning",
+			},
+			"action_snow_event_param_description": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "	A brief description of the event.",
+			},
+			"action_snow_event_param_ci_identifier": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "String that represents a configuration item in your network. You can pass value as || separated key-value format. For example, k1=v1||k2=v2.",
+			},
+			"action_snow_event_param_custom_fields": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "The custom fields which are configured at the ServiceNow Instance. " +
+					"You can pass the custom fields and their values in the || separated format. For example, custom_field1=value1||custom_field2=value2||..." +
+					"custom_fields used must be present in the em_event table of ServiceNow.",
+			},
+			"action_snow_event_param_additional_info": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "You can pass additional information that might be of use to the user. " +
+					"This field can also be used to supply the URL of your Splunk search head. " +
+					"When you use the snow_event.py alert-triggered script, the Splunk platform uses the URL to create a deep link that allows a ServiceNow user to navigate back to this Splunk platform search. " +
+					"You can find the resulting full URL for navigation from ServiceNow to the Splunk platform search by clicking Splunk Drilldown in the event page in ServiceNow. See an example below. " +
+					"Note that if you create events using the commands snowevent or snoweventstream, you must supply the URL in this field." +
+					"You can pass the URL of Splunk as url=<value>. You can also pass other fields and their values by || separated key-value format. For example, url=<value>||k1=v1||k2=v2||....",
+			},
 			"action_email": {
 				Type:     schema.TypeBool,
 				Computed: true,
@@ -274,6 +340,16 @@ func savedSearches() *schema.Resource {
 				Computed: true,
 				Description: "Indicates whether columns should be sorted from least wide to most wide, left to right." +
 					"Only valid if format=text.",
+			},
+			"action_pagerduty_integration_url": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The pagerduty integration URL. This integration uses Splunk's native webhooks to send events to PagerDuty.",
+			},
+			"action_pagerduty_integration_url_override": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The pagerduty integration URL override. This integration uses Splunk's native webhooks to send events to PagerDuty.",
 			},
 			"action_populate_lookup": {
 				Type:     schema.TypeBool,
@@ -1095,6 +1171,33 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("actions", entry.Content.Actions); err != nil {
 		return err
 	}
+	if err = d.Set("action_snow_event_param_account", entry.Content.ActionSnowEventParamAccount); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_node", entry.Content.ActionSnowEventParamNode); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_type", entry.Content.ActionSnowEventParamType); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_resource", entry.Content.ActionSnowEventParamResource); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_severity", entry.Content.ActionSnowEventParamSeverity); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_description", entry.Content.ActionSnowEventParamDescription); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_ci_identifier", entry.Content.ActionSnowEventParamCiIdentifier); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_custom_fields", entry.Content.ActionSnowEventParamCustomFields); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_additional_info", entry.Content.ActionSnowEventParamAdditionalInfo); err != nil {
+		return err
+	}
 	if err = d.Set("action_email", entry.Content.ActionEmail); err != nil {
 		return err
 	}
@@ -1204,6 +1307,9 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if err = d.Set("action_email_width_sort_columns", entry.Content.ActionEmailWidthSortColumns); err != nil {
+		return err
+	}
+	if err = d.Set("action_pagerduty_integration_url", entry.Content.ActionPagerdutyIntegrationURL); err != nil {
 		return err
 	}
 	if err = d.Set("action_populate_lookup", entry.Content.ActionPopulateLookup); err != nil {
@@ -1640,6 +1746,8 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionEmailUseSSL:                            d.Get("action_email_use_ssl").(bool),
 		ActionEmailUseTLS:                            d.Get("action_email_use_tls").(bool),
 		ActionEmailWidthSortColumns:                  d.Get("action_email_width_sort_columns").(bool),
+		ActionPagerdutyIntegrationURL:                d.Get("action_pagerduty_integration_url").(string),
+		ActionPagerdutyIntegrationURLOverride:        d.Get("action_pagerduty_integration_url_override").(string),
 		ActionPopulateLookupCommand:                  d.Get("action_populate_lookup_command").(string),
 		ActionPopulateLookupDest:                     d.Get("action_populate_lookup_dest").(string),
 		ActionPopulateLookupHostname:                 d.Get("action_populate_lookup_hostname").(string),
@@ -1660,6 +1768,15 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionScriptMaxTime:                          d.Get("action_script_max_time").(int),
 		ActionScriptTrackAlert:                       d.Get("action_script_track_alert").(bool),
 		ActionScriptTTL:                              d.Get("action_script_ttl").(string),
+		ActionSnowEventParamAccount:                  d.Get("action_snow_event_param_account").(string),
+		ActionSnowEventParamNode:                     d.Get("action_snow_event_param_node").(string),
+		ActionSnowEventParamType:                     d.Get("action_snow_event_param_type").(string),
+		ActionSnowEventParamResource:                 d.Get("action_snow_event_param_resource").(string),
+		ActionSnowEventParamSeverity:                 d.Get("action_snow_event_param_severity").(int),
+		ActionSnowEventParamDescription:              d.Get("action_snow_event_param_description").(string),
+		ActionSnowEventParamCiIdentifier:             d.Get("action_snow_event_param_ci_identifier").(string),
+		ActionSnowEventParamCustomFields:             d.Get("action_snow_event_param_custom_fields").(string),
+		ActionSnowEventParamAdditionalInfo:           d.Get("action_snow_event_param_additional_info").(string),
 		ActionSummaryIndex:                           d.Get("action_summary_index").(bool),
 		ActionSummaryIndexCommand:                    d.Get("action_summary_index_command").(string),
 		ActionSummaryIndexHostname:                   d.Get("action_summary_index_hostname").(string),

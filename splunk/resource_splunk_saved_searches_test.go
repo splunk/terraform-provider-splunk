@@ -174,6 +174,26 @@ resource "splunk_saved_searches" "test" {
 }
 `
 
+const newSavedSearchesPagerduty = `
+resource "splunk_saved_searches" "test" {
+	name = "Test Pagerduty Alert"
+	actions = "pagerduty"
+	action_pagerduty_integration_url = "abcd"
+	action_pagerduty_integration_url_override = "efgh"
+	alert_comparator    = "greater than"
+	alert_digest_mode   = true
+	alert_expires       = "30d"
+	alert_threshold     = "0"
+	alert_type          = "number of events"
+	cron_schedule       = "*/1 * * * *"
+	disabled            = false
+	is_scheduled        = true
+	is_visible          = true
+	realtime_schedule   = true
+	search              = "index=main level=error"
+}
+`
+
 const newSavedSearchesJiraServiceDesk = `
 resource "splunk_saved_searches" "test" {
 	name = "Test Jira Alert Ticket"
@@ -230,6 +250,34 @@ resource "splunk_saved_searches" "test" {
     action_email_message_report = "a non-default message"
     cron_schedule = "*/5 * * * *"
 }
+`
+
+const newSavedSearchesServiceNowEvent = `
+resource "splunk_saved_searches" "test" {
+	name                                    = "Test ServiceNow Event"
+	actions                                 = "snow_event"
+	search                                  = "index=main"
+	action_snow_event_param_account         = "account-test"
+	action_snow_event_param_node            = "node-test"
+	action_snow_event_param_type            = "type-test"
+	action_snow_event_param_resource        = "resource-test"
+	action_snow_event_param_severity        = 3
+	action_snow_event_param_description     = "description-test"
+	action_snow_event_param_ci_identifier   = "ci_identifier-test"
+	action_snow_event_param_custom_fields   = "custom_fields-test"
+	action_snow_event_param_additional_info = "additional_info-test"
+	alert_digest_mode                       = true
+	alert_expires                           = "24h"
+	alert_severity                          = 4
+	alert_comparator                        = "greater than"
+	alert_threshold                         = "10"
+	alert_type                              = "number of events"
+	is_scheduled                            = true
+	is_visible                              = true
+	dispatch_earliest_time                  = "rt-15m"
+	dispatch_latest_time                    = "rt-0m"
+	cron_schedule                           = "*/15 * * * *"
+  }
 `
 
 func TestAccSplunkSavedSearches(t *testing.T) {
@@ -393,6 +441,15 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 				),
 			},
 			{
+				Config: newSavedSearchesPagerduty,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Pagerduty Alert"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "pagerduty"),
+					resource.TestCheckResourceAttr(resourceName, "action_pagerduty_integration_url", "abcd"),
+					resource.TestCheckResourceAttr(resourceName, "action_pagerduty_integration_url_override", "efgh"),
+				),
+			},
+			{
 				Config: newSavedSearchesJiraServiceDesk,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", "Test Jira Alert Ticket"),
@@ -448,6 +505,33 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "action_email_format", "table"),
 					resource.TestCheckResourceAttr(resourceName, "action_email_to", "splunk@splunk.com"),
 					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/5 * * * *"),
+				),
+			},
+			{
+				Config: newSavedSearchesServiceNowEvent,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test ServiceNow Event"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "snow_event"),
+					resource.TestCheckResourceAttr(resourceName, "action_snow_event_param_account", "account-test"),
+					resource.TestCheckResourceAttr(resourceName, "action_snow_event_param_node", "node-test"),
+					resource.TestCheckResourceAttr(resourceName, "action_snow_event_param_type", "type-test"),
+					resource.TestCheckResourceAttr(resourceName, "action_snow_event_param_resource", "resource-test"),
+					resource.TestCheckResourceAttr(resourceName, "action_snow_event_param_severity", "3"),
+					resource.TestCheckResourceAttr(resourceName, "action_snow_event_param_description", "description-test"),
+					resource.TestCheckResourceAttr(resourceName, "action_snow_event_param_ci_identifier", "ci_identifier-test"),
+					resource.TestCheckResourceAttr(resourceName, "action_snow_event_param_custom_fields", "custom_fields-test"),
+					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
+					resource.TestCheckResourceAttr(resourceName, "alert_expires", "24h"),
+					resource.TestCheckResourceAttr(resourceName, "alert_severity", "4"),
+					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
+					resource.TestCheckResourceAttr(resourceName, "alert_threshold", "10"),
+					resource.TestCheckResourceAttr(resourceName, "alert_type", "number of events"),
+					resource.TestCheckResourceAttr(resourceName, "is_scheduled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
+					resource.TestCheckResourceAttr(resourceName, "dispatch_earliest_time", "rt-15m"),
+					resource.TestCheckResourceAttr(resourceName, "dispatch_latest_time", "rt-0m"),
+					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/15 * * * *"),
 				),
 			},
 			{
