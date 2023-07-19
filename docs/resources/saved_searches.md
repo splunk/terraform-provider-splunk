@@ -69,6 +69,9 @@ This resource block supports the following arguments:
 * `action_email_use_ssl` - (Optional) Indicates whether to use SSL when communicating with the SMTP server. Defaults to false.
 * `action_email_use_tls` - (Optional) Indicates whether to use TLS (transport layer security) when communicating with the SMTP server (starttls).Defaults to false.
 * `action_email_width_sort_columns` - (Optional) Indicates whether columns should be sorted from least wide to most wide, left to right.Only valid if format=text.
+* `action_pagerduty_custom_details` - (Optional) The PagerDuty custom details information.
+* `action_pagerduty_integration_key` - (Optional) The PagerDuty integration Key.
+* `action_pagerduty_integration_key_override` - (Optional) The PagerDuty integration Key override.
 * `action_pagerduty_integration_url` - (Optional) The pagerduty integration URL. This integration uses Splunk's native webhooks to send events to PagerDuty.
 * `action_pagerduty_integration_url_override` - (Optional) The pagerduty integration URL override. This integration uses Splunk's native webhooks to send events to PagerDuty.
 * `action_populate_lookup` - (Optional) The state of the populate lookup action. Read-only attribute. Value ignored on POST. Use actions to specify a list of enabled actions. Defaults to 0.
