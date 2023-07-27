@@ -3,6 +3,7 @@ package client
 import (
 	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
+	"net/url"
 
 	"github.com/google/go-querystring/query"
 )
@@ -23,7 +24,7 @@ func (client *Client) CreateAdminSAMLGroups(name string, adminSAMLGroupsObject *
 }
 
 func (client *Client) ReadAdminSAMLGroups(name string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "admin", "SAML-groups", name)
+	endpoint := client.BuildSplunkURL(nil, "services", "admin", "SAML-groups", url.PathEscape(name))
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
@@ -39,7 +40,7 @@ func (client *Client) UpdateAdminSAMLGroups(name string, adminSAMLGroupsObject *
 	}
 	// Not required for updates
 	values.Del("name")
-	endpoint := client.BuildSplunkURL(nil, "services", "admin", "SAML-groups", name)
+	endpoint := client.BuildSplunkURL(nil, "services", "admin", "SAML-groups", url.PathEscape(name))
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -49,7 +50,7 @@ func (client *Client) UpdateAdminSAMLGroups(name string, adminSAMLGroupsObject *
 }
 
 func (client *Client) DeleteAdminSAMLGroups(name string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "services", "admin", "SAML-groups", name)
+	endpoint := client.BuildSplunkURL(nil, "services", "admin", "SAML-groups", url.PathEscape(name))
 	resp, err := client.Delete(endpoint)
 	if err != nil {
 		return nil, err
