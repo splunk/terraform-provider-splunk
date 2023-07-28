@@ -1,3 +1,7 @@
+## 1.4.20
+* Support for defining pagerduty integration key, custom details.
+* Fix: Better error handling for non 20X error codes.
+
 ## 1.4.19
 * Support for Pager Duty fields in saved_searches
 
