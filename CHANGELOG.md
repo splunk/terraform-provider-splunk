@@ -1,3 +1,6 @@
+## 1.4.21
+* Fix: pagerduty integration key, custom details.
+
 ## 1.4.20
 * Support for defining pagerduty integration key, custom details.
 * Fix: Better error handling for non 20X error codes.
