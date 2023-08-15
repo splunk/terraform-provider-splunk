@@ -58,9 +58,9 @@ func savedSearches() *schema.Resource {
 					"4 - Warning",
 			},
 			"action_snow_event_param_description": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 				Description: "	A brief description of the event.",
 			},
 			"action_snow_event_param_ci_identifier": {
@@ -342,9 +342,9 @@ func savedSearches() *schema.Resource {
 					"Only valid if format=text.",
 			},
 			"action_pagerduty_custom_details": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 				Description: "The PagerDuty custom details information.",
 			},
 			"action_pagerduty_integration_key": {
@@ -355,9 +355,9 @@ func savedSearches() *schema.Resource {
 					"NOTE: None.",
 			},
 			"action_pagerduty_integration_key_override": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
 				Description: "The PagerDuty integration Key override.",
 			},
 			"action_pagerduty_integration_url": {
@@ -1767,6 +1767,9 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionEmailWidthSortColumns:                  d.Get("action_email_width_sort_columns").(bool),
 		ActionPagerdutyIntegrationURL:                d.Get("action_pagerduty_integration_url").(string),
 		ActionPagerdutyIntegrationURLOverride:        d.Get("action_pagerduty_integration_url_override").(string),
+		ActionPagerdutyParamCustDetails:              d.Get("action_pagerduty_custom_details").(string),
+		ActionPagerdutyParamIntKey:                   d.Get("action_pagerduty_integration_key").(string),
+		ActionPagerdutyParamIntKeyOverride:           d.Get("action_pagerduty_integration_key_override").(string),
 		ActionPopulateLookupCommand:                  d.Get("action_populate_lookup_command").(string),
 		ActionPopulateLookupDest:                     d.Get("action_populate_lookup_dest").(string),
 		ActionPopulateLookupHostname:                 d.Get("action_populate_lookup_hostname").(string),
