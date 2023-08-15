@@ -180,6 +180,9 @@ resource "splunk_saved_searches" "test" {
 	actions = "pagerduty"
 	action_pagerduty_integration_url = "abcd"
 	action_pagerduty_integration_url_override = "efgh"
+	action_pagerduty_custom_details = "ijkl"
+	action_pagerduty_integration_key = "mnop"
+	action_pagerduty_integration_key_override = "qrst"
 	alert_comparator    = "greater than"
 	alert_digest_mode   = true
 	alert_expires       = "30d"
@@ -447,6 +450,9 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "actions", "pagerduty"),
 					resource.TestCheckResourceAttr(resourceName, "action_pagerduty_integration_url", "abcd"),
 					resource.TestCheckResourceAttr(resourceName, "action_pagerduty_integration_url_override", "efgh"),
+					resource.TestCheckResourceAttr(resourceName, "action_pagerduty_custom_details", "ijkl"),
+					resource.TestCheckResourceAttr(resourceName, "action_pagerduty_integration_key", "mnop"),
+					resource.TestCheckResourceAttr(resourceName, "action_pagerduty_integration_key_override", "qrst"),
 				),
 			},
 			{
