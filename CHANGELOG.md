@@ -1,3 +1,6 @@
+## 1.4.22
+* Fix: Encode name parameter of URI for Admin SAML Groups.
+
 ## 1.4.21
 * Fix: pagerduty integration key, custom details.
 
