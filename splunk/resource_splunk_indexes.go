@@ -403,6 +403,13 @@ func indexRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
+		if !d.IsNewResource() {
+			// This probably means someone has deleted the index from Splunk directly. Setting empty id here to
+			// force Terraform to delete resource from state and thereby recreating it
+			d.SetId("")
+
+			return nil
+		}
 		return fmt.Errorf("Unable to find resource: %s", name)
 	}
 
