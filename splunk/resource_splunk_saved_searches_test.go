@@ -97,6 +97,29 @@ resource "splunk_saved_searches" "test" {
     }
 }
 `
+const newSavedSearchesLogEvent = `
+resource "splunk_saved_searches" "test" {
+	name = "Test Log Event Alert"
+	actions = "logevent"
+	action_log_event = 1
+	action_log_event_param_event = "$result.js$"
+	action_log_event_param_host = "splunk"
+	action_log_event_param_index = "main"
+	action_log_event_param_sourcetype = "stash"
+	action_log_event_param_source = "alert:$name$"
+	alert_comparator    = "greater than"
+	alert_digest_mode   = true
+	alert_expires       = "30d"
+	alert_threshold     = "0"
+	alert_type          = "number of events"
+	cron_schedule       = "*/1 * * * *"
+	disabled            = false
+	is_scheduled        = true
+	is_visible          = true
+	realtime_schedule   = true
+	search              = "index=main level=error | eval js = json_object("source_ip", src_ip, "destination_ip", dest_ip)"
+}
+`
 
 const newSavedSearchesXsoar = `
 resource "splunk_saved_searches" "test" {
@@ -393,6 +416,30 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "dispatch_index_latest", "-5m"),
 					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/15 * * * *"),
 					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
+				),
+			},
+			{
+				Config: newSavedSearchesLogEvent,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Log Event Alert"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "logevent"),
+					resource.TestCheckResourceAttr(resourceName, "action_log_event", "1"),
+					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_event", "$result.js$"),
+					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_host", "splunk"),
+					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_index", "main"),
+					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_sourcetype", "stash"),
+					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_source", "alert:$name$"),
+					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
+					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
+					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),
+					resource.TestCheckResourceAttr(resourceName, "alert_threshold", "0"),
+					resource.TestCheckResourceAttr(resourceName, "alert_type", "number of events"),
+					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/1 * * * *"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "is_scheduled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
+					resource.TestCheckResourceAttr(resourceName, "realtime_schedule", "true"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main level=error | eval js = json_object(\"source_ip\", src_ip, \"destination_ip\", dest_ip)"),
 				),
 			},
 			{

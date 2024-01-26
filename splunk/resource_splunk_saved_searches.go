@@ -582,6 +582,36 @@ func savedSearches() *schema.Resource {
 				Description: "Valid values are: Integer[p] Specifies the minimum time-to-live in seconds of the search artifacts if this action is triggered. " +
 					"If p follows Integer, specifies the number of scheduled periods. Defaults to 86400 (24 hours).",
 			},
+			"action_log_event": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enabled event logging.",
+			},
+			"action_log_event_param_event": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Event text for the logged event entry.",
+			},
+			"action_log_event_param_host": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Value of the host field for the logged event entry.",
+			},
+			"action_log_event_param_index": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Destination index for the logged event.",
+			},
+			"action_log_event_param_sourcetype": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Destination sourcetype for the logged event.",
+			},
+			"action_log_event_param_source": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Value of the source field for the logged event entry.",
+			},
 			"action_create_xsoar_incident": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -1427,6 +1457,24 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_summary_index_ttl", entry.Content.ActionSummaryIndexTTL); err != nil {
 		return err
 	}
+	if err = d.Set("action_log_event", entry.Content.ActionLogEvent); err != nil {
+		return err
+	}
+	if err = d.Set("action_log_event_param_event", entry.Content.ActionLogEventParamEvent); err != nil {
+		return err
+	}
+	if err = d.Set("action_log_event_param_host", entry.Content.ActionLogEventParamHost); err != nil {
+		return err
+	}
+	if err = d.Set("action_log_event_param_index", entry.Content.ActionLogEventParamIndex); err != nil {
+		return err
+	}
+	if err = d.Set("action_log_event_param_sourcetype", entry.Content.ActionLogEventParamSourceType); err != nil {
+		return err
+	}
+	if err = d.Set("action_log_event_param_source", entry.Content.ActionLogEventParamSource); err != nil {
+		return err
+	}
 	if err = d.Set("action_create_xsoar_incident", entry.Content.ActionCreateXsoarIncident); err != nil {
 		return err
 	}
@@ -1808,6 +1856,12 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionSummaryIndexName:                       d.Get("action_summary_index_name").(string),
 		ActionSummaryIndexTrackAlert:                 d.Get("action_summary_index_track_alert").(bool),
 		ActionSummaryIndexTTL:                        d.Get("action_summary_index_ttl").(string),
+		ActionLogEvent:                               d.Get("action_log_event").(string),
+		ActionLogEventParamEvent:                     d.Get("action_log_event_param_event").(string),
+		ActionLogEventParamHost:                      d.Get("action_log_event_param_host").(string),
+		ActionLogEventParamIndex:                     d.Get("action_log_event_param_index").(string),
+		ActionLogEventParamSourceType:                d.Get("action_log_event_param_sourcetype").(string),
+		ActionLogEventParamSource:                    d.Get("action_log_event_param_source").(string),
 		ActionCreateXsoarIncident:                    d.Get("action_create_xsoar_incident").(string),
 		ActionCreateXsoarIncidentParamSendAllServers: d.Get("action_create_xsoar_incident_param_send_all_servers").(string),
 		ActionCreateXsoarIncidentParamServerUrl:      d.Get("action_create_xsoar_incident_param_server_url").(string),
