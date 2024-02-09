@@ -1081,6 +1081,7 @@ func savedSearches() *schema.Resource {
 			},
 			"schedule_priority": {
 				Type:        schema.TypeString,
+				ForceNew:    true,
 				Optional:    true,
 				Computed:    true,
 				Description: "Raises the scheduling priority of the named search. Defaults to Default",
