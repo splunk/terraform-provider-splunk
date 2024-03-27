@@ -20,5 +20,5 @@ type InputsScriptObject struct {
 	RenameSource string `json:"rename-source,omitempty" url:"rename-source,omitempty"`
 	PassAuth     string `json:"passAuth,omitempty" url:"passAuth,omitempty"`
 	Disabled     bool   `json:"disabled,omitempty" url:"disabled"`
-	Interval     int    `json:"interval,omitempty" url:"interval,omitempty"`
+	Interval     int    `json:"interval,string,omitempty" url:"interval,omitempty"`
 }
