@@ -64,7 +64,14 @@ func splunkDashboardsRead(d *schema.ResourceData, meta interface{}) error {
 
 	aclObject := getResourceDataViewACL(d)
 
-	resp, err := (*provider.Client).ReadDashboardObject(name, aclObject.Owner, aclObject.App)
+	readUser := "nobody"
+
+	if aclObject.Sharing == "user" {
+		// If we have a private dashboard we can only query it using the owner
+		readUser = aclObject.Owner
+	}
+
+	resp, err := (*provider.Client).ReadDashboardObject(name, readUser, aclObject.App)
 	if err != nil {
 		return err
 	}
@@ -101,11 +108,18 @@ func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 	splunkDashboardsObj := getSplunkDashboardsConfig(d)
 	aclObject := getResourceDataViewACL(d)
 
-	if err := (*provider.Client).UpdateDashboardObject(aclObject.Owner, aclObject.App, name, splunkDashboardsObj); err != nil {
+	updateUser := "nobody"
+
+	if aclObject.Sharing == "user" {
+		// If we have a private dashboard we can only update it using the owner
+		updateUser = aclObject.Owner
+	}
+
+	if err := (*provider.Client).UpdateDashboardObject(updateUser, aclObject.App, name, splunkDashboardsObj); err != nil {
 		return err
 	}
 
-	if err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views"); err != nil {
+	if err := (*provider.Client).UpdateAcl(updateUser, aclObject.App, name, aclObject, "data", "ui", "views"); err != nil {
 		return err
 	}
 
