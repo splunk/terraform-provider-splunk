@@ -2,25 +2,26 @@ package splunk
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 const inputsScriptConfig = `
 resource "splunk_inputs_script" "script" {
   name     = "%v"
-  interval = 60
+  interval = "60"
 }
 `
 
 const inputsScriptUpdateConfig = `
 resource "splunk_inputs_script" "script" {
   name     = "%v"
-  interval = 120
+  interval = "120"
 }
 `
 
