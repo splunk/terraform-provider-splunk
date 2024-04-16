@@ -107,7 +107,7 @@ resource "splunk_saved_searches" "test" {
 	action_log_event_param_host = "splunk"
 	action_log_event_param_index = "main"
 	action_log_event_param_sourcetype = "stash"
-	action_log_event_param_source = "alert:$name$"
+	action_log_event_param_source = "alert"
 	alert_comparator    = "greater than"
 	alert_digest_mode   = true
 	alert_expires       = "30d"
@@ -429,7 +429,7 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_host", "splunk"),
 					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_index", "main"),
 					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_sourcetype", "stash"),
-					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_source", "alert:$name$"),
+					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_source", "alert"),
 					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
 					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),
