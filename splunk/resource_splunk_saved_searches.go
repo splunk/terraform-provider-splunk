@@ -582,6 +582,36 @@ func savedSearches() *schema.Resource {
 				Description: "Valid values are: Integer[p] Specifies the minimum time-to-live in seconds of the search artifacts if this action is triggered. " +
 					"If p follows Integer, specifies the number of scheduled periods. Defaults to 86400 (24 hours).",
 			},
+			"action_log_event": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enabled event logging.",
+			},
+			"action_log_event_param_event": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Event text for the logged event entry.",
+			},
+			"action_log_event_param_host": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Value of the host field for the logged event entry.",
+			},
+			"action_log_event_param_index": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Destination index for the logged event.",
+			},
+			"action_log_event_param_sourcetype": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Destination sourcetype for the logged event.",
+			},
+			"action_log_event_param_source": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Value of the source field for the logged event entry.",
+			},
 			"action_create_xsoar_incident": {
 				Type:        schema.TypeString,
 				Optional:    true,
