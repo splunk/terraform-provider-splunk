@@ -1,10 +1,11 @@
 package client
 
 import (
-	"github.com/splunk/terraform-provider-splunk/client/models"
-	"net/http"
-
 	"github.com/google/go-querystring/query"
+	"github.com/splunk/terraform-provider-splunk/client/models"
+	"log"
+	"net/http"
+	"net/http/httputil"
 )
 
 func (client *Client) CreateSavedSearches(name, owner, app string, savedSearchObject *models.SavedSearchObject) error {
@@ -19,6 +20,14 @@ func (client *Client) CreateSavedSearches(name, owner, app string, savedSearchOb
 	if err != nil {
 		return err
 	}
+
+	respBody, error := httputil.DumpResponse(resp, true)
+	if error != nil {
+		log.Printf("[ERROR] Error occured during CreateSavedSearches %s", error)
+	}
+
+	log.Printf("[DEBUG] Response object returned from CreateSavedSearches is: %s", string(respBody))
+
 	defer resp.Body.Close()
 	return nil
 }
@@ -53,6 +62,13 @@ func (client *Client) DeleteSavedSearches(name, owner, app string) (*http.Respon
 	if err != nil {
 		return nil, err
 	}
+
+	respBody, error := httputil.DumpResponse(resp, true)
+	if error != nil {
+		log.Printf("[ERROR] Error occured during DeleteSavedSearches %s", error)
+	}
+
+	log.Printf("[DEBUG] Response object returned from DeleteSavedSearches is: %s", string(respBody))
 
 	return resp, nil
 }
