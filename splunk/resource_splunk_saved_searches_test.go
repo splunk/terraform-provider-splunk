@@ -440,7 +440,7 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "is_scheduled", "true"),
 					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
 					resource.TestCheckResourceAttr(resourceName, "realtime_schedule", "true"),
-					resource.TestCheckResourceAttr(resourceName, "search", "index=main level=error | eval js = json_object(\"source_ip\", src_ip, \"destination_ip\", dest_ip)"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main level=error"),
 				),
 			},
 			{
