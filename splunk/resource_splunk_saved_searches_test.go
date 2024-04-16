@@ -102,7 +102,7 @@ const newSavedSearchesLogEvent = `
 resource "splunk_saved_searches" "test" {
 	name = "Test Log Event Alert"
 	actions = "logevent"
-	action_log_event = 1
+	action_log_event = "1"
 	action_log_event_param_event = "$result.js$"
 	action_log_event_param_host = "splunk"
 	action_log_event_param_index = "main"
@@ -425,7 +425,7 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", "Test Log Event Alert"),
 					resource.TestCheckResourceAttr(resourceName, "actions", "logevent"),
 					resource.TestCheckResourceAttr(resourceName, "action_log_event", "1"),
-					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_event", "$result.js$"),
+					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_event", "test data"),
 					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_host", "splunk"),
 					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_index", "main"),
 					resource.TestCheckResourceAttr(resourceName, "action_log_event_param_sourcetype", "stash"),
