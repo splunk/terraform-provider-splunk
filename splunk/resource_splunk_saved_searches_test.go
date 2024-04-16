@@ -103,7 +103,7 @@ resource "splunk_saved_searches" "test" {
 	name = "Test Log Event Alert"
 	actions = "logevent"
 	action_log_event = "1"
-	action_log_event_param_event = "$result.js$"
+	action_log_event_param_event = "test data"
 	action_log_event_param_host = "splunk"
 	action_log_event_param_index = "main"
 	action_log_event_param_sourcetype = "stash"
@@ -118,7 +118,7 @@ resource "splunk_saved_searches" "test" {
 	is_scheduled        = true
 	is_visible          = true
 	realtime_schedule   = true
-	search              = "index=main level=error | eval js = json_object("source_ip", src_ip, "destination_ip", dest_ip)"
+	search              = "index=main level=error"
 }
 `
 

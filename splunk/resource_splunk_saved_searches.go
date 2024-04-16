@@ -601,19 +601,16 @@ func savedSearches() *schema.Resource {
 			"action_log_event_param_index": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
 				Description: "Destination index for the logged event.",
 			},
 			"action_log_event_param_sourcetype": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
 				Description: "Destination sourcetype for the logged event.",
 			},
 			"action_log_event_param_source": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
 				Description: "Value of the source field for the logged event entry.",
 			},
 			"action_create_xsoar_incident": {
