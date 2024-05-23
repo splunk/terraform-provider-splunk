@@ -72,6 +72,7 @@ func providerSchema() map[string]*schema.Schema {
 func providerResources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
 		"splunk_admin_saml_groups":           adminSAMLGroups(),
+		"splunk_admin_proxysso_groups": 	  adminProxyssoGroups(),
 		"splunk_apps_local":                  appsLocal(),
 		"splunk_authentication_users":        authenticationUsers(),
 		"splunk_authorization_roles":         authorizationRoles(),
