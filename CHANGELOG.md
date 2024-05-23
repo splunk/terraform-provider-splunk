@@ -1,3 +1,6 @@
+## 1.4.23
+* Support for admin/ProxySSO-groups API endpoint
+
 ## 1.4.22
 * Fix: Encode name parameter of URI for Admin SAML Groups.
 
