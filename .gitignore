@@ -8,3 +8,5 @@ terraform.tfstate.*
 *.log
 .DS_Store
 .vscode
+
+dist/
