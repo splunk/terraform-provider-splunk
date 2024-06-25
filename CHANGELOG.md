@@ -1,3 +1,6 @@
+## 1.4.23
+* Upgrade: golang.org/x/crypto to remediate CVE-2020-928
+
 ## 1.4.22
 * Fix: Encode name parameter of URI for Admin SAML Groups.
 
