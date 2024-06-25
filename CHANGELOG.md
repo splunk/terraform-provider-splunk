@@ -1,3 +1,6 @@
+## 1.4.24
+* Fix goreleaser configuration
+
 ## 1.4.23
 * Upgrade: golang.org/x/crypto to remediate CVE-2020-928
 
