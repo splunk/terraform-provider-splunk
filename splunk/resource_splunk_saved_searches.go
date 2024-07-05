@@ -690,6 +690,151 @@ func savedSearches() *schema.Resource {
 				Description:  "URL to send the HTTP POST request to. Must be accessible from the Splunk server.",
 				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https?://[^\s]+$`), "Webhook URL is invalid"),
 			},
+			"action_ms_teams_publish_to_channel": {
+				Type:     schema.TypeBool,
+				Computed: true,
+				Description: "The state of the msteams action. Read-only attribute. " +
+					"Value ignored on POST. Use actions to specify a list of enabled actions. Defaults to 0.",
+			},
+			"action_ms_teams_publish_to_channel_command": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "The search command (or pipeline) which is responsible for executing the action." +
+					"Generally the command is a template search pipeline which is realized with values from the saved search." +
+					"To reference saved search field values wrap them in $, for example to reference the savedsearch name use $name$, to reference the search use $search$.",
+			},
+			"action_ms_teams_publish_to_channel_description": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "A brief description of the event.",
+			},
+			"action_ms_teams_publish_to_channel_hostname": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "Sets the hostname used in the web link (url) sent in msteams actions." +
+					"This value accepts two forms:hostname (for example, splunkserver, splunkserver.example.com)",
+			},
+			"action_ms_teams_publish_to_channel_icon_path": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "URL of the picture to be used for messages publication for this alert.",
+			},
+			"action_ms_teams_publish_to_channel_maxresults": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+				Description: "Sets the global maximum number of search results to send when action_ms_teams_publish_to_channel.action is enabled." +
+					"Defaults to 100.",
+			},
+			"action_ms_teams_publish_to_channel_maxtime": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "Valid values are Integer[m|s|h|d]." +
+					"Specifies the maximum amount of time the execution of an ms_teams action takes before the action is aborted. Defaults to 5m.",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_activity_title": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Activity Title of the message, can include dynamic results. ($result.field$) This field is required.",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_fields_list": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Comma separated list of fields to include in the message. Each field has to be a field resulting from the search.",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_fields_order": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Order fields in the message publication",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_image_link": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "URL of the picture to be used for messages publication for this alert.",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_action_name": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Label of the open URL potential action. (optional unless value is defined)",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_action_name2": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: " Label of the second open URL potential action. (optional unless value is defined)",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_url": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: " URl value for the open URL potential action URL. (optional unless label is defined)",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_url2": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "URl value for the second open URL potential action URL. (optional unless label is defined)",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_postaction_body": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: " The body of the POST request. (optional)",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_postaction_bodycontenttype": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: " The body of the POST request. (optional)",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_postaction_name": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Label of the HttpPOST potential action. (optional unless target is defined)",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_postaction_target": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Target value for the HttpPOST potential action. (optional unless label is defined)",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_theme_color": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Specifies a custom brand color for the card in hexadecimal code format. (optional, defaults to 0076D7)",
+			},
+			"action_ms_teams_publish_to_channel_param_alert_ms_teams_url": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Webhook URL, overrides default URL in global setting if defined. (https is enforced and added if not present)",
+			},
+			"action_ms_teams_publish_to_channel_track_alert": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Computed:    true,
+				Description: "Indicates whether the execution of this action signifies a trackable alert.",
+			},
+			"action_ms_teams_publish_to_channel_ttl": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "Valid values are Integer[p].Specifies the minimum time-to-live in seconds of the search artifacts if this action is triggered. " +
+					"If p follows <Integer>, int is the number of scheduled periods. Defaults to 86400 (24 hours)." +
+					"If no actions are triggered, the artifacts have their ttl determined by dispatch.ttl in savedsearches.conf.",
+			},
 			"alert_digest_mode": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -1488,6 +1633,76 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if err = d.Set("action_webhook_param_url", entry.Content.ActionWebhookParamUrl); err != nil {
+		return err
+	}
+
+	if err = d.Set("action_ms_teams_publish_to_channel", entry.Content.ActionMsTeamsPublishToChannel); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_command", entry.Content.ActionMsTeamsPublishToChannelCommand); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_description", entry.Content.ActionMsTeamsPublishToChannelDescription); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_hostname", entry.Content.ActionMsTeamsPublishToChannelHostname); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_icon_path", entry.Content.ActionMsTeamsPublishToChannelIconPath); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_maxresults", entry.Content.ActionMsTeamsPublishToChannelMaxresults); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_maxtime", entry.Content.ActionMsTeamsPublishToChannelMaxtime); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_activity_title", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsActivityTitle); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_fields_list", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsFieldsList); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_fields_order", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsFieldsOrder); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_image_link", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsImageLink); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_action_name", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsPotentialActionName); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_action_name2", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsPotentialActionName2); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_url", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsPotentialUrl); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_url2", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsPotentialUrl2); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_postaction_body", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsPotentialPostactionBody); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_postaction_bodycontenttype", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsPotentialPostactionBodycontenttype); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_postaction_name", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsPotentialPostactionName); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_potential_postaction_target", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsPotentialPostactionTarget); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_theme_color", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsThemeColor); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_param_alert_ms_teams_url", entry.Content.ActionMsTeamsPublishToChannelParamAlertMsTeamsUrl); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_track_alert", entry.Content.ActionMsTeamsPublishToChannelTrackAlert); err != nil {
+		return err
+	}
+	if err = d.Set("action_ms_teams_publish_to_channel_ttl", entry.Content.ActionMsTeamsPublishToChannelTtl); err != nil {
 		return err
 	}
 	if err = d.Set("alert_digest_mode", entry.Content.AlertDigestMode); err != nil {
