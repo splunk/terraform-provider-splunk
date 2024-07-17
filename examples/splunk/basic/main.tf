@@ -17,11 +17,14 @@ provider "splunk" {
   username             = "admin"
   password             = "changeme"
   insecure_skip_verify = true
+  ignore_schedule_priority = false
+
   // Or use environment variables used:
   // SPLUNK_USERNAME
   // SPLUNK_PASSWORD
   // SPLUNK_URL
   // SPLUNK_INSECURE_SKIP_VERIFY (Defaults to true)
+  // SPLUNK_IGNORE_SCHEDULE_PRIORITY (Defaults to false)
 }
 
 resource "splunk_admin_saml_groups" "saml-group01" {

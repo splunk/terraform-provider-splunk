@@ -1680,6 +1680,9 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 func savedSearchesUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	savedSearchesConfig := getSavedSearchesConfig(d)
+	if provider.Client.GetIgnoreSchedulePriority() {
+		savedSearchesConfig.SchedulePriority = ""
+	}
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
 
 	// Update will create a new resource with private `user` permissions if resource had shared permissions set
