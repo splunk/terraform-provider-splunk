@@ -1,8 +1,9 @@
 package client
 
 import (
-	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
+
+	"github.com/splunk/terraform-provider-splunk/client/models"
 
 	"github.com/google/go-querystring/query"
 )
@@ -60,7 +61,7 @@ func (client *Client) DeleteHttpEventCollectorObject(name, owner, app string) (*
 
 // services/data/inputs/http
 func (client *Client) ReadAllHttpEventCollectorObject() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "inputs", "http")
+	endpoint := client.BuildSplunkURL(nil, "servicesNS", "nobody", "search", "data", "inputs", "http")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
