@@ -684,6 +684,11 @@ func savedSearches() *schema.Resource {
 				Optional:    true,
 				Description: "Enter the description of issue created",
 			},
+			"action_jira_service_desk_param_jira_customfields": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enter custom fields data for the issue created",
+			},
 			"action_webhook_param_url": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -1487,6 +1492,9 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_jira_service_desk_param_jira_description", entry.Content.ActionJiraServiceDeskParamJiraDescription); err != nil {
 		return err
 	}
+	if err = d.Set("action_jira_service_desk_param_jira_customfields", entry.Content.ActionJiraServiceDeskParamJiraCustomfields); err != nil {
+		return err
+	}
 	if err = d.Set("action_webhook_param_url", entry.Content.ActionWebhookParamUrl); err != nil {
 		return err
 	}
@@ -1828,6 +1836,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionJiraServiceDeskParamJiraSummary:        d.Get("action_jira_service_desk_param_jira_summary").(string),
 		ActionJiraServiceDeskParamJiraPriority:       d.Get("action_jira_service_desk_param_jira_priority").(string),
 		ActionJiraServiceDeskParamJiraDescription:    d.Get("action_jira_service_desk_param_jira_description").(string),
+		ActionJiraServiceDeskParamJiraCustomfields:   d.Get("action_jira_service_desk_param_jira_customfields").(string),
 		ActionWebhookParamUrl:                        d.Get("action_webhook_param_url").(string),
 		AlertComparator:                              d.Get("alert_comparator").(string),
 		AlertCondition:                               d.Get("alert_condition").(string),
