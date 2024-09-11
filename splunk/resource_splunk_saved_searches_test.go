@@ -207,7 +207,7 @@ resource "splunk_saved_searches" "test" {
 	action_jira_service_desk_param_jira_summary = "error message"
 	action_jira_service_desk_param_jira_priority = "Normal"
 	action_jira_service_desk_param_jira_description = "test ticket creation"
-	action_jira_service_desk_param_jira_customfields = "customfield_10058":{"value":"custom_field_value_1"},"customfield_10046":{"value":"custom_field_value_2"}
+	action_jira_service_desk_param_jira_customfields = "\"customfield_10058\":{\"value\":\"custom_field_value_1\"},\"customfield_10046\":{\"value\":\"custom_field_value_2\"}"
 	alert_comparator    = "greater than"
 	alert_digest_mode   = true
 	alert_expires       = "30d"
