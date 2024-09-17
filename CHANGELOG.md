@@ -1,3 +1,6 @@
+## 1.4.25
+* Support for customfields in Jira service desk params
+
 ## 1.4.24
 * Fix goreleaser configuration
 
