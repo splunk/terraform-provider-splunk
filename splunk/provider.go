@@ -65,6 +65,12 @@ func providerSchema() map[string]*schema.Schema {
 			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_TIMEOUT", 60),
 			Description: "Timeout when making calls to Splunk server. Defaults to 60 seconds",
 		},
+		"ignore_schedule_priority": {
+			Type:        schema.TypeBool,
+			Optional:    true,
+			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_IGNORE_SCHEDULE_PRIORITY", false),
+			Description: "Ignore schedule_priority field in saved search",
+		},
 	}
 }
 
@@ -115,6 +121,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		splunkdClient, err = client.NewSplunkdClientWithAuthToken(token.(string),
 			[2]string{d.Get("username").(string), d.Get("password").(string)},
 			d.Get("url").(string),
+			d.Get("insecure_skip_verify").(bool),
 			httpClient)
 		if err != nil {
 			return splunkdClient, err
@@ -123,6 +130,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		splunkdClient, err = client.NewSplunkdClient("",
 			[2]string{d.Get("username").(string), d.Get("password").(string)},
 			d.Get("url").(string),
+			d.Get("insecure_skip_verify").(bool),
 			httpClient)
 		if err != nil {
 			return splunkdClient, err
