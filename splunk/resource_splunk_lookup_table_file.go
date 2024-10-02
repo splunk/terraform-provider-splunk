@@ -5,8 +5,6 @@ import (
 	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/splunk/terraform-provider-splunk/client/models"
-	"net/url"
-	"strings"
 )
 
 func lookupTableFile() *schema.Resource {
@@ -103,16 +101,11 @@ func lookupTableFileDelete(d *schema.ResourceData, meta interface{}) error {
 }
 
 func getLookupTableFile(d *schema.ResourceData) (lookupTableFile *models.LookupTableFile) {
-	fileContents := d.Get("file_contents").(string)
-	fileContents = strings.Replace(fileContents, "\n", "", -1)
-	fileContents = strings.Replace(fileContents, " ", "", -1)
-	fileContents = url.QueryEscape(fileContents)
-
 	lookupTableFile = &models.LookupTableFile{
 		App:          d.Get("app").(string),
 		Owner:        d.Get("owner").(string),
 		FileName:     d.Get("file_name").(string),
-		FileContents: fileContents,
+		FileContents: d.Get("file_contents").(string),
 	}
 	return lookupTableFile
 }
