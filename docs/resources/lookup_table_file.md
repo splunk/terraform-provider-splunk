@@ -8,13 +8,13 @@ resource "splunk_lookup_table_file" "lookup_table_file" {
   owner         = "nobody"
   file_name     = "lookup.csv"
   file_contents = <<-EOT
-    [
-      ["status", "status_description", "status_type"],
-      ["100", "Continue", "Informational"],
-      ["101", "Switching Protocols", "Informational"],
-      ["200", "OK", "Successful"]
-    ]
-  EOT
+[
+  ["status", "status_description", "status_type"],
+  ["100", "Continue", "Informational"],
+  ["101", "Switching Protocols", "Informational"],
+  ["200", "OK", "Successful"]
+]
+EOT
 }
 ```
 

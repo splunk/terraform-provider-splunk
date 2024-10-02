@@ -5,6 +5,8 @@ import (
 	"errors"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/splunk/terraform-provider-splunk/client/models"
+	"io"
+	"strings"
 )
 
 func lookupTableFile() *schema.Resource {
@@ -18,6 +20,7 @@ func lookupTableFile() *schema.Resource {
 			},
 			"owner": {
 				Type:        schema.TypeString,
+				ForceNew:    true,
 				Required:    true,
 				Description: "The owner of the lookup.",
 			},
@@ -62,6 +65,20 @@ func lookupTableFileRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	file_contents := string(bodyBytes)
+	file_contents = strings.Replace(file_contents, "[[", "[\n  [", -1)
+	file_contents = strings.Replace(file_contents, "],", "],\n ", -1)
+	file_contents = strings.Replace(file_contents, "]]", "]\n]\n", -1)
+
+	if err = d.Set("file_contents", file_contents); err != nil {
+		return err
+	}
 
 	return nil
 }
