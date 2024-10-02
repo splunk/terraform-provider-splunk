@@ -24,10 +24,10 @@ For latest resource argument reference: https://docs.splunk.com/Documentation/Sp
 This resource block supports the following arguments:
 * `app` - (Required) The app context for the resource.
 * `owner` - (Required) User name of resource owner. Defaults to the resource creator. Required for updating any knowledge object ACL properties. nobody = All users may access the resource, but write access to the resource might be restricted.
-* `file_name` - (Required) A name for the search. Generally ends with ".csv"
+* `file_name` - (Required) A name for the lookup table file. Generally ends with ".csv"
 * `file_contents` - (Required) The column header and row value contents for the lookup table file.
 
 ## Attribute Reference
 In addition to all arguments above, This resource block exports the following arguments:
 
-* `id` - The ID of the saved search resource
+* `id` - The ID of the lookup table file resource
