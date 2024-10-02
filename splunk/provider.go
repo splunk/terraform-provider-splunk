@@ -85,6 +85,7 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_inputs_tcp_cooked":           inputsTCPCooked(),
 		"splunk_inputs_tcp_splunk_tcp_token": inputsTCPSplunkTCPToken(),
 		"splunk_inputs_tcp_ssl":              inputsTCPSSL(),
+		"splunk_lookup_table_file":           lookupTableFile(),
 		"splunk_outputs_tcp_default":         outputsTCPDefault(),
 		"splunk_outputs_tcp_server":          outputsTCPServer(),
 		"splunk_outputs_tcp_group":           outputsTCPGroup(),
