@@ -14,13 +14,11 @@ resource "splunk_lookup_table_file" "test" {
     app = "search"
 	owner = "nobody"
 	file_name = "lookup.csv"
-	file_contents = <<-EOT
-[
-  ["status", "status_description", "status_type"],
-  ["100", "Continue", "Informational"],
-  ["101", "Switching Protocols", "Informational"]
-]
-EOT
+	file_contents = [
+		["status", "status_description", "status_type"],
+		["100", "Continue", "Informational"],
+		["101", "Switching Protocols", "Informational"]
+	]
 }
 `
 
@@ -29,14 +27,12 @@ resource "splunk_lookup_table_file" "test" {
     app = "search"
 	owner = "nobody"
 	file_name = "lookup.csv"
-	file_contents = <<-EOT
-[
-  ["status", "status_description", "status_type"],
-  ["100", "Continue", "Informational"],
-  ["101", "Switching Protocols", "Informational"],
-  ["200", "OK", "Successful"]
-]
-EOT
+	file_contents = [
+		["status", "status_description", "status_type"],
+		["100", "Continue", "Informational"],
+		["101", "Switching Protocols", "Informational"],
+		["200", "OK", "Successful"]
+	]
 }
 `
 
@@ -55,7 +51,16 @@ func TestAccSplunkLookupTableFile(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "app", "search"),
 					resource.TestCheckResourceAttr(resourceName, "owner", "nobody"),
 					resource.TestCheckResourceAttr(resourceName, "file_name", "lookup.csv"),
-					resource.TestCheckResourceAttr(resourceName, "file_contents", "[\n  [\"status\", \"status_description\", \"status_type\"],\n  [\"100\", \"Continue\", \"Informational\"],\n  [\"101\", \"Switching Protocols\", \"Informational\"]\n]\n"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.#", "3"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.0.0", "status"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.0.1", "status_description"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.0.2", "status_type"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.1.0", "100"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.1.1", "Continue"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.1.2", "Informational"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.2.0", "101"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.2.1", "Switching Protocols"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.2.2", "Informational"),
 				),
 			},
 			{
@@ -64,7 +69,19 @@ func TestAccSplunkLookupTableFile(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "app", "search"),
 					resource.TestCheckResourceAttr(resourceName, "owner", "nobody"),
 					resource.TestCheckResourceAttr(resourceName, "file_name", "lookup.csv"),
-					resource.TestCheckResourceAttr(resourceName, "file_contents", "[\n  [\"status\", \"status_description\", \"status_type\"],\n  [\"100\", \"Continue\", \"Informational\"],\n  [\"101\", \"Switching Protocols\", \"Informational\"],\n  [\"200\", \"OK\", \"Successful\"]\n]\n"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.#", "4"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.0.0", "status"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.0.1", "status_description"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.0.2", "status_type"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.1.0", "100"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.1.1", "Continue"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.1.2", "Informational"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.2.0", "101"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.2.1", "Switching Protocols"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.2.2", "Informational"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.3.0", "200"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.3.1", "OK"),
+					resource.TestCheckResourceAttr(resourceName, "file_contents.3.2", "Successful"),
 				),
 			},
 		},

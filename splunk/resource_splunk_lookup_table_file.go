@@ -6,7 +6,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/splunk/terraform-provider-splunk/client/models"
 	"io"
-	"strings"
 )
 
 func lookupTableFile() *schema.Resource {
@@ -31,8 +30,14 @@ func lookupTableFile() *schema.Resource {
 				Description: "A file name for the lookup.",
 			},
 			"file_contents": {
-				Type:        schema.TypeString,
-				Required:    true,
+				Type:     schema.TypeList,
+				Required: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeList,
+					Elem: &schema.Schema{
+						Type: schema.TypeString,
+					},
+				},
 				Description: "The contents of the lookup.",
 			},
 		},
@@ -71,12 +76,12 @@ func lookupTableFileRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	file_contents := string(bodyBytes)
-	file_contents = strings.Replace(file_contents, "[[", "[\n  [", -1)
-	file_contents = strings.Replace(file_contents, "],", "],\n ", -1)
-	file_contents = strings.Replace(file_contents, "]]", "]\n]\n", -1)
+	var fileContents [][]string
+	if err := json.Unmarshal(bodyBytes, &fileContents); err != nil {
+		return err
+	}
 
-	if err = d.Set("file_contents", file_contents); err != nil {
+	if err = d.Set("file_contents", fileContents); err != nil {
 		return err
 	}
 
@@ -118,11 +123,12 @@ func lookupTableFileDelete(d *schema.ResourceData, meta interface{}) error {
 }
 
 func getLookupTableFile(d *schema.ResourceData) (lookupTableFile *models.LookupTableFile) {
+	fileContents, _ := json.Marshal(d.Get("file_contents"))
 	lookupTableFile = &models.LookupTableFile{
 		App:          d.Get("app").(string),
 		Owner:        d.Get("owner").(string),
 		FileName:     d.Get("file_name").(string),
-		FileContents: d.Get("file_contents").(string),
+		FileContents: string(fileContents),
 	}
 	return lookupTableFile
 }
