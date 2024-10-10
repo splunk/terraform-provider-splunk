@@ -22,6 +22,8 @@ jobs:
         ports:
           - 8000:8000
           - 8089:8089
+        volumes:
+          - ${{ github.workspace }}/terraform/apps:/apps
 
     steps:
     - name: Set up Go 1.x
