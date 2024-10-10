@@ -14,6 +14,6 @@ provider "splunk" {
 
 resource "splunk_apps_local" "lookup_file_editing" {
   filename         = true
-  name             = "/apps/splunk-app-for-lookup-file-editing_404.tgz"
+  name             = "/workspace/terraform/apps/splunk-app-for-lookup-file-editing_404.tgz"
   explicit_appname = "splunk-app-for-lookup-file-editing"
 }
