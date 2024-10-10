@@ -15,5 +15,5 @@ provider "splunk" {
 resource "splunk_apps_local" "lookup_file_editing" {
   filename         = true
   name             = "/apps/splunk-app-for-lookup-file-editing_404.tgz"
-  explicit_appname = "Splunk App for Lookup File Editing
+  explicit_appname = "Splunk App for Lookup File Editing"
 }
