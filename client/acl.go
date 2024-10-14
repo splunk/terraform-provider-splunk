@@ -2,9 +2,10 @@ package client
 
 import (
 	"fmt"
-	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
 	"strings"
+
+	"github.com/splunk/terraform-provider-splunk/client/models"
 
 	"github.com/google/go-querystring/query"
 )
@@ -64,6 +65,7 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 	if err != nil {
 		return fmt.Errorf("GET failed for endpoint %s: %s", endpoint.Path, err)
 	}
+
 	defer resp.Body.Close()
 	return nil
 }
