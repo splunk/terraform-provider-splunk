@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
 	"regexp"
+
+	"github.com/splunk/terraform-provider-splunk/client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
@@ -244,7 +245,7 @@ func getHttpEventCollectorConfig(d *schema.ResourceData) (httpInputConfigObject 
 
 func getHECConfigByName(name string, httpResponse *http.Response) (hecEntry *models.HECEntry, err error) {
 	response := &models.HECResponse{}
-	//body, err := ioutil.ReadAll(httpResponse.Body)
+	//body, err := io.ReadAll(httpResponse.Body)
 	//fmt.Println(body)
 	switch httpResponse.StatusCode {
 	case 200, 201:

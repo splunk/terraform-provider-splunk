@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/splunk/terraform-provider-splunk/client/models"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"regexp"
 	"strconv"
+
+	"github.com/splunk/terraform-provider-splunk/client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -109,7 +110,7 @@ func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 	defer contentResp.Body.Close()
 
 	var result map[string]interface{}
-	b, _ := ioutil.ReadAll(contentResp.Body)
+	b, _ := io.ReadAll(contentResp.Body)
 
 	err = json.Unmarshal(b, &result)
 	if err != nil {
