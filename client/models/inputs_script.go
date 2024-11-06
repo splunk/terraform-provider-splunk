@@ -7,9 +7,9 @@ type InputsScriptResponse struct {
 }
 
 type InputsScriptEntry struct {
-	Name    string             `json:"name"`
-	ACL     ACLObject          `json:"acl"`
-	Content InputsScriptObject `json:"content"`
+	Name    string                     `json:"name"`
+	ACL     ACLObject                  `json:"acl"`
+	Content InputsScriptObjectResponse `json:"content"`
 }
 
 type InputsScriptObject struct {
@@ -21,4 +21,15 @@ type InputsScriptObject struct {
 	PassAuth     string `json:"passAuth,omitempty" url:"passAuth,omitempty"`
 	Disabled     bool   `json:"disabled,omitempty" url:"disabled"`
 	Interval     int    `json:"interval,omitempty" url:"interval,omitempty"`
+}
+
+type InputsScriptObjectResponse struct {
+	Host         string      `json:"host,omitempty"`
+	Index        string      `json:"index,omitempty"`
+	Source       string      `json:"source,omitempty"`
+	SourceType   string      `json:"sourcetype,omitempty"`
+	RenameSource string      `json:"rename-source,omitempty"`
+	PassAuth     string      `json:"passAuth,omitempty"`
+	Disabled     bool        `json:"disabled,omitempty"`
+	Interval     interface{} `json:"interval,omitempty"` // Can be int or string
 }
