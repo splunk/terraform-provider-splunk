@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
+
+	"github.com/avast/retry-go/v4"
 
 	"github.com/splunk/terraform-provider-splunk/client/models"
 
@@ -50,7 +53,20 @@ func splunkDashboardsCreate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views"); err != nil {
+	// add retry as sometimes dashboard object is not yet propagated and acl endpoint return 404
+	err = retry.Do(
+		func() error {
+			err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views")
+			if err != nil {
+				return err
+			}
+			return nil
+		}, retry.Attempts(10), retry.OnRetry(func(n uint, err error) {
+			log.Printf("#%d: %s. Retrying...\n", n, err)
+		}), retry.DelayType(retry.BackOffDelay),
+	)
+
+	if err != nil {
 		return err
 	}
 

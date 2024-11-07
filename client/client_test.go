@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
 	"log"
 	"math"
 	"net/http"
@@ -185,7 +184,7 @@ func TestNewRequest(t *testing.T) {
 		if test.method == MethodGet || test.method == MethodDelete {
 			t.Skipf("Skip NewRequest body test for %v and %v method", MethodGet, MethodDelete)
 		} else {
-			gotBody, _ := ioutil.ReadAll(req.Body)
+			gotBody, _ := io.ReadAll(req.Body)
 			if bytes.Compare(gotBody, body) != -1 {
 				t.Errorf("NewRequest url is %v, want %v", gotBody, body)
 			}
