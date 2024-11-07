@@ -49,6 +49,10 @@ func splunkLookupDefinitionsCreate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
+
+	if err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "transforms", "lookups"); err != nil {
+		return err
+	}
 	d.SetId(name)
 	return splunkLookupDefinitionsRead(d, meta)
 }

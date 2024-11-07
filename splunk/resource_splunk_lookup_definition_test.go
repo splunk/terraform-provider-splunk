@@ -31,7 +31,6 @@ resource "splunk_lookup_definition" "example" {
   acl {
     owner = "admin"
     app = "search"
-    sharing = "global"
     read = ["*"]
     write = ["admin"]
   }
@@ -40,14 +39,14 @@ resource "splunk_lookup_definition" "example" {
 
 const splunkLookupDefinitionObject = `
 resource "splunk_lookup_definition" "example" {
-  name     = "example_lookup_defiinition"
+  name     = "example_lookup_definition"
   filename = "example_lookup_file.csv"
   }
 `
 
 const updateSplunkLookupDefinitionObject = `
 resource "splunk_lookup_definition" "example" {
-  name     = "example_lookup_defiinition"
+  name     = "example_lookup_definition"
   filename = "example_lookup_file2.csv"
   }
 `
@@ -64,7 +63,7 @@ func TestAccSplunkLookupDefinition(t *testing.T) {
 			{
 				Config: splunkLookupDefinitionObject,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "name", "example_lookup_defiinition"),
+					resource.TestCheckResourceAttr(resourceName, "name", "example_lookup_definition"),
 					resource.TestCheckResourceAttr(resourceName, "filename", "example_lookup_file.csv"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "admin"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "search"),
@@ -74,7 +73,7 @@ func TestAccSplunkLookupDefinition(t *testing.T) {
 			{
 				Config: updateSplunkLookupDefinitionObject,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "name", "example_lookup_defiinition"),
+					resource.TestCheckResourceAttr(resourceName, "name", "example_lookup_definition"),
 					resource.TestCheckResourceAttr(resourceName, "filename", "example_lookup_file2.csv"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "admin"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "search"),
@@ -102,11 +101,11 @@ func TestAccSplunkLookupDefinitionWithAcl(t *testing.T) {
 			{
 				Config: splunkLookupDefinitionObjectWithAcl,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "name", "example_lookup_defiinition"),
+					resource.TestCheckResourceAttr(resourceName, "name", "example_lookup_definition"),
 					resource.TestCheckResourceAttr(resourceName, "filename", "example_lookup_file.csv"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "admin"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "search"),
-					resource.TestCheckResourceAttr(resourceName, "acl.0.sharing", "global"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.sharing", "user"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.read.0", "*"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.write.0", "admin"),
 				),
@@ -114,11 +113,11 @@ func TestAccSplunkLookupDefinitionWithAcl(t *testing.T) {
 			{
 				Config: updateSplunkLookupDefinitionObjectWithAcl,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "name", "example_lookup_defiinition"),
+					resource.TestCheckResourceAttr(resourceName, "name", "example_lookup_definition"),
 					resource.TestCheckResourceAttr(resourceName, "filename", "example_lookup_file2.csv"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "admin"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "search"),
-					resource.TestCheckResourceAttr(resourceName, "acl.0.sharing", "global"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.sharing", "user"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.read.0", "*"),
 					resource.TestCheckResourceAttr(resourceName, "acl.0.write.0", "admin"),
 				),
