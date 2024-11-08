@@ -22,6 +22,8 @@ jobs:
         ports:
           - 8000:8000
           - 8089:8089
+        volumes:
+          - ${{ github.workspace }}:/workspace
 
     steps:
     - name: Set up Go 1.x
@@ -43,6 +45,17 @@ jobs:
 
     - name: Build
       run: go build -v .
+
+    - name: Set up Terraform 1.1.7
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: "1.1.7"
+
+    - name: Terraform init
+      run: terraform -chdir=terraform init
+
+    - name: Terraform apply
+      run: terraform -chdir=terraform apply --auto-approve
 
     - name: Test
       run: TF_ACC=1 SPLUNK_HOME=/opt/splunk SPLUNK_URL=localhost:8089 SPLUNK_USERNAME=admin SPLUNK_PASSWORD=password go test ./... -v

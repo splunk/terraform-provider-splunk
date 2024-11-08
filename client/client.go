@@ -43,6 +43,7 @@ type Client struct {
 	host       string
 	httpClient *http.Client
 	userAgent  string
+	urlEncoded bool
 }
 
 // NewRequest creates a new HTTP Request and set proper header
@@ -60,6 +61,9 @@ func (c *Client) NewRequest(httpMethod, url string, body io.Reader) (*http.Reque
 	}
 	request.Header.Set("Accept", "application/json")
 	request.Header.Set("User-Agent", c.userAgent)
+	if c.urlEncoded {
+		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
 	return request, nil
 }
 

@@ -1,3 +1,6 @@
+## 1.4.27
+* Support for lookup table files
+
 ## 1.4.26
 * Fix: Add retry mechanism to dashboard's acl endpoint
 

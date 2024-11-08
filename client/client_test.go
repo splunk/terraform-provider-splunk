@@ -222,6 +222,36 @@ func TestNewRequestUserAgentHeader(t *testing.T) {
 	}
 }
 
+func TestNewRequestWithoutContentTypeHeader(t *testing.T) {
+	client, err := NewDefaultSplunkdClient()
+	if err != nil {
+		t.Error(err)
+	}
+	req, err := client.NewRequest(MethodGet, testURL, nil)
+	if err != nil {
+		t.Errorf("NewRequest returns unexpected error %v", err)
+	}
+	if req.Header["Content-Type"] != nil {
+		t.Errorf("NewRequest Content-Type is %v, want nil", req.Header["Content-Type"])
+	}
+}
+
+func TestNewRequestWithContentTypeHeader(t *testing.T) {
+	client, err := NewDefaultSplunkdClient()
+	if err != nil {
+		t.Error(err)
+	}
+	client.urlEncoded = true
+	req, err := client.NewRequest(MethodGet, testURL, nil)
+	if err != nil {
+		t.Errorf("NewRequest returns unexpected error %v", err)
+	}
+	expectedContentType := []string{"application/x-www-form-urlencoded"}
+	if got, want := req.Header["Content-Type"], expectedContentType; !reflect.DeepEqual(got, want) {
+		t.Errorf("NewRequest Content-Type is %v, want %v", got, want)
+	}
+}
+
 func TestNewRequestSessionKey(t *testing.T) {
 	client, err := NewDefaultSplunkdClient()
 	if err != nil {
