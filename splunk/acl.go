@@ -1,7 +1,10 @@
 package splunk
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
@@ -29,31 +32,29 @@ func aclSchema() *schema.Schema {
 						"nobody = All users may access the resource, but write access to the resource might be restricted.",
 				},
 				"sharing": {
-					Type:     schema.TypeString,
-					Optional: true,
-					Computed: true,
+					Type:         schema.TypeString,
+					Optional:     true,
+					Computed:     true,
+					ValidateFunc: validation.StringInSlice([]string{"user", "app", "global"}, false),
+					ForceNew:     true,
 					Description: "Indicates how the resource is shared. Required for updating any knowledge object ACL properties." +
 						"app: Shared within a specific app" +
 						"global: (Default) Shared globally to all apps." +
 						"user: Private to a user",
 				},
 				"read": {
-					Type:     schema.TypeList,
-					Optional: true,
-					Computed: true,
-					Elem: &schema.Schema{
-						Type: schema.TypeString,
-					},
+					Type:        schema.TypeList,
+					Optional:    true,
+					Computed:    true,
+					Elem:        &schema.Schema{Type: schema.TypeString},
 					Description: "Properties that indicate resource read permissions.",
 				},
 				"write": {
-					Type:     schema.TypeList,
-					Optional: true,
-					Computed: true,
-					Elem: &schema.Schema{
-						Type: schema.TypeString,
-					},
-					Description: "Properties that indicate write permissions of the resource.",
+					Type:        schema.TypeList,
+					Optional:    true,
+					Computed:    true,
+					Elem:        &schema.Schema{Type: schema.TypeString},
+					Description: "Properties that indicate resource write permissions.",
 				},
 				"can_change_perms": {
 					Type:        schema.TypeBool,
@@ -94,6 +95,37 @@ func aclSchema() *schema.Schema {
 			},
 		},
 	}
+}
+
+func aclValidator(diff *schema.ResourceDiff, v interface{}) error {
+	acl := diff.Get("acl").([]interface{})
+	if len(acl) == 0 {
+		return nil
+	}
+	// Assert that each item is a map[string]interface{}
+	aclMap, ok := acl[0].(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("Value cannot be mapped to map!")
+	}
+
+	// Check if sharing has changed to "user"
+	if diff.HasChange("acl.0.sharing") {
+		_, new := diff.GetChange("acl.0.sharing")
+		if new == "user" {
+			// Check if `read` or `write` attributes are explicitly set in the configuration, ignoring persisted state
+			if diff.HasChange("acl.0.read") {
+				if aclMap["read"] != nil && len(aclMap["read"].([]interface{})) > 0 {
+					return fmt.Errorf("`acl.read` cannot be set when `acl.sharing` is `user`")
+				}
+			}
+			if diff.HasChange("acl.0.write") {
+				if aclMap["write"] != nil && len(aclMap["write"].([]interface{})) > 0 {
+					return fmt.Errorf("`acl.write` cannot be set when `acl.sharing` is `user`")
+				}
+			}
+		}
+	}
+	return nil
 }
 
 func getACLConfig(r []interface{}) (acl *models.ACLObject) {

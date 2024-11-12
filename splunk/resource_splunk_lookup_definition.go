@@ -14,6 +14,7 @@ import (
 
 func splunkLookupDefinitions() *schema.Resource {
 	return &schema.Resource{
+		CustomizeDiff: aclValidator,
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -49,7 +50,6 @@ func splunkLookupDefinitionsCreate(d *schema.ResourceData, meta interface{}) err
 	if err != nil {
 		return err
 	}
-
 	if err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "transforms", "lookups"); err != nil {
 		return err
 	}
@@ -103,11 +103,14 @@ func splunkLookupDefinitionsUpdate(d *schema.ResourceData, meta interface{}) err
 	updateUser := "nobody"
 
 	if aclObject.Sharing == "user" {
-		// If we have a private dashboard we can only update it using the owner
 		updateUser = aclObject.Owner
 	}
 
 	if err := (*provider.Client).UpdateLookupDefinitionObject(updateUser, aclObject.App, name, splunkLookupDefinitionObj); err != nil {
+		return err
+	}
+
+	if err := (*provider.Client).UpdateAcl(updateUser, aclObject.App, name, aclObject, "data", "transforms", "lookups"); err != nil {
 		return err
 	}
 

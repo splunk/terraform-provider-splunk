@@ -33,8 +33,7 @@ For latest resource argument reference: https://docs.splunk.com/Documentation/Sp
 This resource block supports the following arguments:
 * `app` - (Optional) The app context for the resource. Required for updating saved search ACL properties. Allowed values are: The name of an app and system.
 * `owner` - (Optional) User name of resource owner. Defaults to the resource creator. Required for updating any knowledge object ACL properties. nobody = All users may access the resource, but write access to the resource might be restricted.
-* `sharing
-* ` - (Optional) Indicates how the resource is shared. Required for updating any knowledge object ACL properties.
+* `sharing` - (Optional) Indicates how the resource is shared. Required for updating any knowledge object ACL properties.
 <br>app: Shared within a specific app<br>global: (Default) Shared globally to all apps<br>user: Private to a user
 * `read` - (Optional) Properties that indicate resource read permissions
 * `write` - (Optional) Properties that indicate write permissions of the resource

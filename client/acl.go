@@ -2,7 +2,9 @@ package client
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"net/http/httputil"
 	"strings"
 
 	"github.com/splunk/terraform-provider-splunk/client/models"
@@ -62,11 +64,21 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 	resourcePath = append(resourcePath, name, "acl")
 	endpoint := client.BuildSplunkURL(nil, resourcePath...)
 	resp, err := client.Post(endpoint, values)
+	requestBody, _ := httputil.DumpRequest(resp.Request, false)
 	if err != nil {
 		return fmt.Errorf("GET failed for endpoint %s: %s", endpoint.Path, err)
 	}
 
 	defer resp.Body.Close()
+
+	respBody, error := httputil.DumpResponse(resp, true)
+	if error != nil {
+		log.Printf("[ERROR] Error occured during acl creation %s", error)
+	}
+
+	log.Printf("[DEBUG] Request object coming acl is: %s and body: %s", string(requestBody), string(values.Encode()))
+	log.Printf("[DEBUG] Response object returned from acl creation: %s", string(respBody))
+
 	return nil
 }
 
