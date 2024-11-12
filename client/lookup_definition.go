@@ -5,9 +5,8 @@ import (
 	"net/http"
 	"net/http/httputil"
 
-	"github.com/splunk/terraform-provider-splunk/client/models"
-
 	"github.com/google/go-querystring/query"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
 func (client *Client) CreateLookupDefinitionObject(owner string, app string, splunkLookupDefObj *models.SplunkLookupDefinitionObject) error {

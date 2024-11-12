@@ -1,3 +1,6 @@
+## 1.4.28 
+* Support for lookup definition
+
 ## 1.4.27
 * Support for lookup table files
 
