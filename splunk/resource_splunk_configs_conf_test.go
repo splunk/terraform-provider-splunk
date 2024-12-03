@@ -10,7 +10,7 @@ import (
 
 const newConfigsConf = `
 resource "splunk_configs_conf" "tftest-stanza" {
-	name = "tf_test/tftest_stanza"
+	name = "tf_test/sqs://tftest_stanza"
 	variables = {
         "disabled": "false"
 		"key": "value"
@@ -20,7 +20,7 @@ resource "splunk_configs_conf" "tftest-stanza" {
 
 const updateConfigsConf = `
 resource "splunk_configs_conf" "tftest-stanza" {
-	name = "tf_test/tftest_stanza"
+	name = "tf_test/sqs://tftest_stanza"
 	variables = {
         "disabled": "false"
 		"key": "new-value"
