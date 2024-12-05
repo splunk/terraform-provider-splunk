@@ -80,7 +80,7 @@ resource "splunk_configs_conf" "tftest-stanza-special-chars" {
 }
 `
 
-func TestAccCreateSplunkConfigsConf(t *testing.T) {
+func TestAccCreateSplunkConfigsConfSpecialChars(t *testing.T) {
 	resourceName := "splunk_configs_conf.tftest-stanza-special-chars"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
