@@ -60,6 +60,59 @@ func TestAccCreateSplunkConfigsConf(t *testing.T) {
 	})
 }
 
+const newConfigsConfSpecialChars = `
+resource "splunk_configs_conf" "tftest-stanza-special-chars" {
+	name = "tf_test/sqs://tftest_stanza_special_chars"
+	variables = {
+        "disabled": "false"
+		"key": "value"
+	}
+}
+`
+
+const updateConfigsConfSpecialChars = `
+resource "splunk_configs_conf" "tftest-stanza-special-chars" {
+	name = "tf_test/sqs://tftest_stanza_special_chars"
+	variables = {
+        "disabled": "false"
+		"key": "new-value"
+	}
+}
+`
+
+func TestAccCreateSplunkConfigsConfSpecialChars(t *testing.T) {
+	resourceName := "splunk_configs_conf.tftest-stanza-special-chars"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testAccSplunkConfigsConfDestroyResources,
+		Steps: []resource.TestStep{
+			{
+				Config: newConfigsConfSpecialChars,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "variables.%", "2"),
+					resource.TestCheckResourceAttr(resourceName, "variables.key", "value"),
+				),
+			},
+			{
+				Config: updateConfigsConfSpecialChars,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "variables.%", "2"),
+					resource.TestCheckResourceAttr(resourceName, "variables.key", "new-value"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+
 func testAccSplunkConfigsConfDestroyResources(s *terraform.State) error {
 	client, err := newTestClient()
 	if err != nil {
