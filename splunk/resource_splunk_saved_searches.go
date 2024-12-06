@@ -695,6 +695,56 @@ func savedSearches() *schema.Resource {
 				Description:  "URL to send the HTTP POST request to. Must be accessible from the Splunk server.",
 				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https?://[^\s]+$`), "Webhook URL is invalid"),
 			},
+			"action_sendtophantom": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enable the send to phantom action (https://docs.splunk.com/Documentation/SOARExport/4.3.13/UserGuide/Adaptiveresponseactions#Send_to_SOAR_request).",
+			},
+			"action_sendtophantom_param_phantom_server": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The phantom server.",
+			},
+			"action_sendtophantom_param_server_playbook_name": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "server_playbook_name",
+			},
+			"action_sendtophantom_param_severity": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Alert severity.",
+			},
+			"action_sendtophantom_param_sensitivity": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Alert sensitivity.",
+			},
+			"action_sendtophantom_param_label": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Alert label.",
+			},
+			"action_sendtophantom_param_grouping": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Alert grouping.",
+			},
+			"action_sendtophantom_param_relay_account": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "relay_account (the Alert Action Account).",
+			},
+			"action_sendtophantom_param_container_name": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "search_name (default) or source.",
+			},
+			"action_sendtophantom_param_cam_workers": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Adaptive response relay worker, use [\"local\"] if running locally.",
+			},
 			"alert_digest_mode": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -1495,6 +1545,36 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_jira_service_desk_param_jira_customfields", entry.Content.ActionJiraServiceDeskParamJiraCustomfields); err != nil {
 		return err
 	}
+	if err = d.Set("action_sendtophantom", entry.Content.ActionSendToPhantom); err != nil {
+		return err
+	}
+	if err = d.Set("action_sendtophantom_param_phantom_server", entry.Content.ActionSendToPhantomParamPhantomServer); err != nil {
+		return err
+	}
+	if err = d.Set("action_sendtophantom_param_server_playbook_name", entry.Content.ActionSendToPhantomParamServerPlaybookName); err != nil {
+		return err
+	}
+	if err = d.Set("action_sendtophantom_param_severity", entry.Content.ActionSendToPhantomParamSeverity); err != nil {
+		return err
+	}
+	if err = d.Set("action_sendtophantom_param_sensitivity", entry.Content.ActionSendToPhantomParamSensitivity); err != nil {
+		return err
+	}
+	if err = d.Set("action_sendtophantom_param_label", entry.Content.ActionSendToPhantomParamLabel); err != nil {
+		return err
+	}
+	if err = d.Set("action_sendtophantom_param_grouping", entry.Content.ActionSendToPhantomParamGrouping); err != nil {
+		return err
+	}
+	if err = d.Set("action_sendtophantom_param_relay_account", entry.Content.ActionSendToPhantomParamRelayAccount); err != nil {
+		return err
+	}
+	if err = d.Set("action_sendtophantom_param_container_name", entry.Content.ActionSendToPhantomParamContainerName); err != nil {
+		return err
+	}
+	if err = d.Set("action_sendtophantom_param_cam_workers", entry.Content.ActionSendToPhantomParam_CamWorkers); err != nil {
+		return err
+	}
 	if err = d.Set("action_webhook_param_url", entry.Content.ActionWebhookParamUrl); err != nil {
 		return err
 	}
@@ -1837,6 +1917,16 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionJiraServiceDeskParamJiraPriority:       d.Get("action_jira_service_desk_param_jira_priority").(string),
 		ActionJiraServiceDeskParamJiraDescription:    d.Get("action_jira_service_desk_param_jira_description").(string),
 		ActionJiraServiceDeskParamJiraCustomfields:   d.Get("action_jira_service_desk_param_jira_customfields").(string),
+		ActionSendToPhantom:                          d.Get("action_sendtophantom").(string),
+		ActionSendToPhantomParamPhantomServer:        d.Get("action_sendtophantom_param_phantom_server").(string),
+		ActionSendToPhantomParamServerPlaybookName:   d.Get("action_sendtophantom_param_server_playbook_name").(string),
+		ActionSendToPhantomParamSeverity:             d.Get("action_sendtophantom_param_severity").(string),
+		ActionSendToPhantomParamSensitivity:          d.Get("action_sendtophantom_param_sensitivity").(string),
+		ActionSendToPhantomParamLabel:                d.Get("action_sendtophantom_param_label").(string),
+		ActionSendToPhantomParamGrouping:             d.Get("action_sendtophantom_param_grouping").(string),
+		ActionSendToPhantomParamRelayAccount:         d.Get("action_sendtophantom_param_relay_account").(string),
+		ActionSendToPhantomParamContainerName:        d.Get("action_sendtophantom_param_container_name").(string),
+		ActionSendToPhantomParam_CamWorkers:          d.Get("action_sendtophantom_param_cam_workers").(string),
 		ActionWebhookParamUrl:                        d.Get("action_webhook_param_url").(string),
 		AlertComparator:                              d.Get("alert_comparator").(string),
 		AlertCondition:                               d.Get("alert_condition").(string),
