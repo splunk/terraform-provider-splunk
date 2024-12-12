@@ -13,6 +13,12 @@ import (
 	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
+func suppressDefault(defaultValue string) schema.SchemaDiffSuppressFunc {
+    return func(k, old, new string, d *schema.ResourceData) bool {
+        return old == defaultValue && new == ""
+    }
+}
+
 func savedSearches() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
@@ -673,6 +679,7 @@ func savedSearches() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Jira Issue Summary or title",
+				DiffSuppressFunc: suppressDefault("Splunk Alert: $name$"),
 			},
 			"action_jira_service_desk_param_jira_priority": {
 				Type:        schema.TypeString,
@@ -683,6 +690,7 @@ func savedSearches() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "Enter the description of issue created",
+				DiffSuppressFunc: suppressDefault("The alert condition for '$name$' was triggered."),
 			},
 			"action_jira_service_desk_param_jira_customfields": {
 				Type:        schema.TypeString,
@@ -1483,14 +1491,18 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_jira_service_desk_param_jira_issue_type", entry.Content.ActionJiraServiceDeskParamJiraIssueType); err != nil {
 		return err
 	}
-	if err = d.Set("action_jira_service_desk_param_jira_summary", entry.Content.ActionJiraServiceDeskParamJiraSummary); err != nil {
-		return err
+	if entry.Content.ActionJiraServiceDeskParamJiraSummary != "Splunk Alert: $name$" {
+		if err = d.Set("action_jira_service_desk_param_jira_summary", entry.Content.ActionJiraServiceDeskParamJiraSummary); err != nil {
+			return err
+		}
 	}
 	if err = d.Set("action_jira_service_desk_param_jira_priority", entry.Content.ActionJiraServiceDeskParamJiraPriority); err != nil {
 		return err
 	}
-	if err = d.Set("action_jira_service_desk_param_jira_description", entry.Content.ActionJiraServiceDeskParamJiraDescription); err != nil {
-		return err
+	if entry.Content.ActionJiraServiceDeskParamJiraDescription != "The alert condition for '$name$' was triggered." {
+		if err = d.Set("action_jira_service_desk_param_jira_description", entry.Content.ActionJiraServiceDeskParamJiraDescription); err != nil {
+			return err
+		}
 	}
 	if err = d.Set("action_jira_service_desk_param_jira_customfields", entry.Content.ActionJiraServiceDeskParamJiraCustomfields); err != nil {
 		return err
