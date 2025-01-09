@@ -4,15 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
-// resourceSplunkServerClass defines the schema and CRUD operations for the Splunk server class resource
 func serverClass() *schema.Resource {
 	return &schema.Resource{
+		Create: resourceSplunkServerClassCreate,
+		Read:   resourceSplunkServerClassRead,
+		Update: resourceSplunkServerClassUpdate,
+		Delete: resourceSplunkServerClassDelete,
+
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:        schema.TypeString,
@@ -53,72 +56,51 @@ func serverClass() *schema.Resource {
 				Description: "Description of the server class.",
 			},
 		},
-		Create: serverClassCreate,
-		Read:   serverClassRead,
-		Update: serverClassUpdate,
-		Delete: serverClassDelete,
 		Importer: &schema.ResourceImporter{
 			State: schema.ImportStatePassthrough,
 		},
 	}
 }
 
-// resourceSplunkServerClassCreate handles the creation of a Splunk server class
-func serverClassCreate(d *schema.ResourceData, m interface{}) error {
-	provider := m.(*SplunkProvider)
+func resourceSplunkServerClassCreate(d *schema.ResourceData, meta interface{}) error {
+	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
 
-	serverClass := getServerClassConfig(d)
-
-	body, err := json.Marshal(serverClass)
+	serverClassConfigObj := getServerClassConfig(d)
+	err := provider.Client.CreateServerClassObject(name, serverClassConfigObj)
 	if err != nil {
-		return fmt.Errorf("error marshaling server class: %s", err)
-	}
-
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/services/deployment/server/serverclasses/%s", provider.Client.BaseURL, name), strings.NewReader(string(body)))
-	if err != nil {
-		return fmt.Errorf("error creating request: %s", err)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := provider.Client.Do(req)
-	if err != nil {
-		return fmt.Errorf("error making request: %s", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusCreated {
-		return fmt.Errorf("error creating server class: %s", resp.Status)
+		return fmt.Errorf("error creating Splunk server class: %s", err)
 	}
 
 	d.SetId(name)
-	return serverClassRead(d, m)
+	return resourceSplunkServerClassRead(d, meta)
 }
 
-// resourceSplunkServerClassRead handles reading a Splunk server class
-func serverClassRead(d *schema.ResourceData, m interface{}) error {
-	provider := m.(*SplunkProvider)
+func resourceSplunkServerClassRead(d *schema.ResourceData, meta interface{}) error {
+	provider := meta.(*SplunkProvider)
 	name := d.Id()
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/services/deployment/server/serverclasses/%s", provider.Client.BaseURL, name), nil)
+	resp, err := provider.Client.ReadServerClassObject(name)
 	if err != nil {
-		return fmt.Errorf("error creating request: %s", err)
-	}
-
-	resp, err := provider.Client.Do(req)
-	if err != nil {
-		return fmt.Errorf("error making request: %s", err)
+		if resp != nil && resp.StatusCode == http.StatusNotFound {
+			d.SetId("")
+			return nil
+		}
+		return fmt.Errorf("error reading Splunk server class: %s", err)
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("error reading server class: %s", resp.Status)
-	}
-
-	var serverClass models.ServerClassObject
-	if err := json.NewDecoder(resp.Body).Decode(&serverClass); err != nil {
+	var serverClassResponse models.ServerClassResponse
+	if err := json.NewDecoder(resp.Body).Decode(&serverClassResponse); err != nil {
 		return fmt.Errorf("error decoding response: %s", err)
 	}
+
+	if len(serverClassResponse.Entry) == 0 {
+		d.SetId("")
+		return nil
+	}
+
+	serverClass := serverClassResponse.Entry[0].Content
 
 	d.Set("name", serverClass.Name)
 	d.Set("description", serverClass.Description)
@@ -131,62 +113,32 @@ func serverClassRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-// resourceSplunkServerClassUpdate handles updating a Splunk server class
-func serverClassUpdate(d *schema.ResourceData, m interface{}) error {
-	provider := m.(*SplunkProvider)
+func resourceSplunkServerClassUpdate(d *schema.ResourceData, meta interface{}) error {
+	provider := meta.(*SplunkProvider)
 	name := d.Id()
 
-	serverClass := getServerClassConfig(d)
-
-	body, err := json.Marshal(serverClass)
+	serverClassConfigObj := getServerClassConfig(d)
+	err := provider.Client.UpdateServerClassObject(name, serverClassConfigObj)
 	if err != nil {
-		return fmt.Errorf("error marshaling server class: %s", err)
+		return fmt.Errorf("error updating Splunk server class: %s", err)
 	}
 
-	req, err := http.NewRequest("PUT", fmt.Sprintf("%s/services/deployment/server/serverclasses/%s", provider.Client.BaseURL, name), strings.NewReader(string(body)))
-	if err != nil {
-		return fmt.Errorf("error creating request: %s", err)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-	resp, err := provider.Client.Do(req)
-	if err != nil {
-		return fmt.Errorf("error making request: %s", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("error updating server class: %s", resp.Status)
-	}
-
-	return serverClassRead(d, m)
+	return resourceSplunkServerClassRead(d, meta)
 }
 
-// resourceSplunkServerClassDelete handles deleting a Splunk server class
-func serverClassDelete(d *schema.ResourceData, m interface{}) error {
-	provider := m.(*SplunkProvider)
+func resourceSplunkServerClassDelete(d *schema.ResourceData, meta interface{}) error {
+	provider := meta.(*SplunkProvider)
 	name := d.Id()
 
-	req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/services/deployment/server/serverclasses/%s", provider.Client.BaseURL, name), nil)
+	err := provider.Client.DeleteServerClassObject(name)
 	if err != nil {
-		return fmt.Errorf("error creating request: %s", err)
-	}
-
-	resp, err := provider.Client.Do(req)
-	if err != nil {
-		return fmt.Errorf("error making request: %s", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("error deleting server class: %s", resp.Status)
+		return fmt.Errorf("error deleting Splunk server class: %s", err)
 	}
 
 	d.SetId("")
 	return nil
 }
 
-// getServerClassConfig extracts the server class configuration from the resource data
 func getServerClassConfig(d *schema.ResourceData) *models.ServerClassObject {
 	return &models.ServerClassObject{
 		Name:             d.Get("name").(string),
@@ -199,7 +151,6 @@ func getServerClassConfig(d *schema.ResourceData) *models.ServerClassObject {
 	}
 }
 
-// convertInterfaceToStringList converts a list of interfaces to a list of strings
 func convertInterfaceToStringList(input []interface{}) []string {
 	output := make([]string, len(input))
 	for i, v := range input {
