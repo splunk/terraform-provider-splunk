@@ -91,6 +91,7 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_outputs_tcp_group":           outputsTCPGroup(),
 		"splunk_outputs_tcp_syslog":          outputsTCPSyslog(),
 		"splunk_saved_searches":              savedSearches(),
+		"splunk_server_class":                splunkServerClass(),
 		"splunk_lookup_definition":           splunkLookupDefinitions(),
 		"splunk_sh_indexes_manager":          shIndexesManager(),
 		"splunk_indexes":                     index(),
