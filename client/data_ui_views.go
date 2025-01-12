@@ -3,7 +3,7 @@ package client
 import (
 	"net/http"
 
-	"github.com/splunk/terraform-provider-splunk/client/models"
+	"github.com/nealbrown/terraform-provider-splunk/client/models"
 
 	"github.com/google/go-querystring/query"
 )

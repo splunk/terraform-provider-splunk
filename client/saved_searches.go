@@ -1,11 +1,12 @@
 package client
 
 import (
-	"github.com/google/go-querystring/query"
-	"github.com/splunk/terraform-provider-splunk/client/models"
 	"log"
 	"net/http"
 	"net/http/httputil"
+
+	"github.com/google/go-querystring/query"
+	"github.com/nealbrown/terraform-provider-splunk/client/models"
 )
 
 func (client *Client) CreateSavedSearches(name, owner, app string, savedSearchObject *models.SavedSearchObject) error {

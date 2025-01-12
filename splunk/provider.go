@@ -3,7 +3,7 @@ package splunk
 import (
 	"time"
 
-	"github.com/splunk/terraform-provider-splunk/client"
+	"github.com/nealbrown/terraform-provider-splunk/client"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
