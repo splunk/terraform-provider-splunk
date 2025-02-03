@@ -1,3 +1,6 @@
+## 1.4.30
+* Suppress defaults when planning changes to Jira service desk params
+
 ## 1.4.29
 * Support ':' and '/' characters in configs_conf stanza name
 * Fix: Add retry mechanism to configs_conf acl endpoint
