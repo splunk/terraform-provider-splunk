@@ -591,7 +591,6 @@ func savedSearches() *schema.Resource {
 			"action_logevent": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Computed:    true,
 				Description: "Enabled event logging.",
 			},
 			"action_logevent_param_event": {
