@@ -101,9 +101,9 @@ const newSavedSearchesLogEvent = `
 resource "splunk_saved_searches" "test" {
 	name = "Test Log Event Alert"
 	actions = "logevent"
-	action_logevent = "1"
-	action_logevent_param_event = "test data"
-	action_logevent_param_host = "splunk"
+	action_logevent = 1
+	action_logevent_param_event = "test"
+	action_logevent_param_host = ""
 	action_logevent_param_index = "main"
 	action_logevent_param_sourcetype = "stash"
 	action_logevent_param_source = "alert"
