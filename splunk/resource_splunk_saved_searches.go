@@ -596,6 +596,7 @@ func savedSearches() *schema.Resource {
 			"action_logevent_param_event": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Event text for the logged event entry.",
 			},
 			"action_logevent_param_host": {
