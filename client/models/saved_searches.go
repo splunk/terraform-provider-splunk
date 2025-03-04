@@ -117,6 +117,7 @@ type SavedSearchObject struct {
 	ActionJiraServiceDeskParamJiraSummary        string  `json:"action.jira_service_desk.param.jira_summary,omitempty" url:"action.jira_service_desk.param.jira_summary"`
 	ActionJiraServiceDeskParamJiraPriority       string  `json:"action.jira_service_desk.param.jira_priority,omitempty" url:"action.jira_service_desk.param.jira_priority"`
 	ActionJiraServiceDeskParamJiraDescription    string  `json:"action.jira_service_desk.param.jira_description,omitempty" url:"action.jira_service_desk.param.jira_description"`
+	ActionJiraServiceDeskParamJiraDedup          string `json:"action.jira_service_desk.param.jira_dedup,omitempty" url:"action.jira_service_desk.param.jira_description"`
 	ActionJiraServiceDeskParamJiraCustomfields   string  `json:"action.jira_service_desk.param.jira_customfields,omitempty" url:"action.jira_service_desk.param.jira_customfields"`
 	ActionWebhookParamUrl                        string  `json:"action.webhook.param.url,omitempty" url:"action.webhook.param.url"`
 	AlertDigestMode                              bool    `json:"alert.digest_mode" url:"alert.digest_mode"`
