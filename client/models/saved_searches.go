@@ -97,6 +97,12 @@ type SavedSearchObject struct {
 	ActionSummaryIndexMaxTime                    int     `json:"action.summary_index.maxtime,omitempty" url:"action.summary_index.maxtime,omitempty"`
 	ActionSummaryIndexTrackAlert                 bool    `json:"action.summary_index.track_alert" url:"action.summary_index.track_alert"`
 	ActionSummaryIndexTTL                        string  `json:"action.summary_index.ttl,omitempty" url:"action.summary_index.ttl,omitempty"`
+	ActionLogEvent                               string  `json:"action.logevent,omitempty" url:"action.logevent"`
+	ActionLogEventParamEvent                     string  `json:"action.logevent.param.event" url:"action.logevent.param.event"`
+	ActionLogEventParamHost                      string  `json:"action.logevent.param.host,omitempty" url:"action.logevent.param.host"`
+	ActionLogEventParamIndex                     string  `json:"action.logevent.param.index,omitempty" url:"action.logevent.param.index"`
+	ActionLogEventParamSourceType                string  `json:"action.logevent.param.sourcetype,omitempty" url:"action.logevent.param.sourcetype"`
+	ActionLogEventParamSource                    string  `json:"action.logevent.param.source,omitempty" url:"action.logevent.param.source"`
 	ActionCreateXsoarIncident                    string  `json:"action.create_xsoar_incident,omitempty" url:"action.create_xsoar_incident"`
 	ActionCreateXsoarIncidentParamSendAllServers string  `json:"action.create_xsoar_incident.param.send_all_servers,omitempty" url:"action.create_xsoar_incident.param.send_all_servers"`
 	ActionCreateXsoarIncidentParamServerUrl      string  `json:"action.create_xsoar_incident.param.server_url,omitempty" url:"action.create_xsoar_incident.param.server_url"`
