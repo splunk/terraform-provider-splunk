@@ -41,6 +41,7 @@ type Client struct {
 	sessionKey string
 	auth       [2]string
 	host       string
+	path       string
 	httpClient *http.Client
 	userAgent  string
 	urlEncoded bool
@@ -77,7 +78,7 @@ func getEnv(key, defaultValue string) string {
 }
 
 func (c *Client) BuildSplunkURL(queryValues url.Values, urlPathParts ...string) url.URL {
-	buildPath := ""
+	buildPath := c.path
 	for _, pathPart := range urlPathParts {
 		pathPart = strings.ReplaceAll(pathPart, " ", "+") // url parameters cannot have spaces
 		buildPath = path.Join(buildPath, pathPart)
@@ -277,13 +278,14 @@ func NewDefaultSplunkdClient() (*Client, error) {
 }
 
 // NewSplunkdClient creates a Client with custom values passed in
-func NewSplunkdClient(sessionKey string, auth [2]string, host string, httpClient *http.Client) (*Client, error) {
+func NewSplunkdClient(sessionKey string, auth [2]string, host string, path string, httpClient *http.Client) (*Client, error) {
 	c, err := NewDefaultSplunkdClient()
 	if err != nil {
 		return nil, err
 	}
 	c.auth = auth
 	c.host = host
+	c.path = path
 	c.sessionKey = sessionKey
 	if httpClient != nil {
 		c.httpClient = httpClient
@@ -292,13 +294,14 @@ func NewSplunkdClient(sessionKey string, auth [2]string, host string, httpClient
 }
 
 // NewSplunkdClient creates a Client with custom values passed in
-func NewSplunkdClientWithAuthToken(authToken string, auth [2]string, host string, httpClient *http.Client) (*Client, error) {
+func NewSplunkdClientWithAuthToken(authToken string, auth [2]string, host string, path string, httpClient *http.Client) (*Client, error) {
 	c, err := NewDefaultSplunkdClient()
 	if err != nil {
 		return nil, err
 	}
 	c.auth = auth
 	c.host = host
+	c.path = path
 	c.authToken = authToken
 	if httpClient != nil {
 		c.httpClient = httpClient

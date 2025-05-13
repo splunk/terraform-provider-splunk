@@ -1,6 +1,7 @@
 package splunk
 
 import (
+	"net/url"
 	"time"
 
 	"github.com/splunk/terraform-provider-splunk/client"
@@ -113,10 +114,16 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		return nil, err
 	}
 
+	u, err := url.Parse(d.Get("url").(string))
+	if err != nil {
+		return nil, err
+	}
+
 	if token, ok := d.GetOk("auth_token"); ok {
 		splunkdClient, err = client.NewSplunkdClientWithAuthToken(token.(string),
 			[2]string{d.Get("username").(string), d.Get("password").(string)},
-			d.Get("url").(string),
+			u.Host,
+			u.Path,
 			httpClient)
 		if err != nil {
 			return splunkdClient, err
@@ -124,7 +131,8 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	} else {
 		splunkdClient, err = client.NewSplunkdClient("",
 			[2]string{d.Get("username").(string), d.Get("password").(string)},
-			d.Get("url").(string),
+			u.Host,
+			u.Path,
 			httpClient)
 		if err != nil {
 			return splunkdClient, err
