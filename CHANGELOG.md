@@ -1,3 +1,6 @@
+## 1.4.31
+* Fix: URL parsing of Splunk client path
+
 ## 1.4.30
 * Suppress defaults when planning changes to Jira service desk params
 

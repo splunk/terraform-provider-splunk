@@ -1,6 +1,7 @@
 package splunk
 
 import (
+	"net/url"
 	"os"
 	"testing"
 	"time"
@@ -31,11 +32,22 @@ func newTestClient() (*client.Client, error) {
 	if err != nil {
 		return nil, err
 	}
+	// Parse splunk url host
+	SPLUNK_URL := (os.Getenv("SPLUNK_URL"))
+	if !hasHTTPScheme(SPLUNK_URL) {
+		SPLUNK_URL = "http://" + SPLUNK_URL // add http scheme so url.Parse works
+	}
+	u, err := url.Parse(SPLUNK_URL)
+	if err != nil {
+		return nil, err
+	}
+	host := u.Host
+
 	return client.NewSplunkdClient(
 		"",
 		[2]string{os.Getenv("SPLUNK_USERNAME"),
 			os.Getenv("SPLUNK_PASSWORD")},
-		os.Getenv("SPLUNK_URL"),
+		host,
 		"",
 		http)
 }

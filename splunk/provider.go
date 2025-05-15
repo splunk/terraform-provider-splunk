@@ -113,12 +113,15 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	u, err := url.Parse(d.Get("url").(string))
+	// Ensure scheme to parse host and path
+	providerUrl := d.Get("url").(string)
+	if !hasHTTPScheme(providerUrl) {
+		providerUrl = "http://" + providerUrl // add http scheme so url.Parse works
+	}
+	u, err := url.Parse(providerUrl)
 	if err != nil {
 		return nil, err
 	}
-
 	if token, ok := d.GetOk("auth_token"); ok {
 		splunkdClient, err = client.NewSplunkdClientWithAuthToken(token.(string),
 			[2]string{d.Get("username").(string), d.Get("password").(string)},
@@ -146,4 +149,13 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
 	provider.Client = splunkdClient
 	return provider, nil
+}
+
+// hasHTTPScheme checks if a string has an "http" or "https" scheme using url.Parse.
+func hasHTTPScheme(s string) bool {
+	u, err := url.Parse(s)
+	if err != nil {
+		return false // Invalid URL
+	}
+	return u.Scheme == "http" || u.Scheme == "https"
 }
