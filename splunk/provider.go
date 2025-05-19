@@ -2,6 +2,7 @@ package splunk
 
 import (
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/splunk/terraform-provider-splunk/client"
@@ -115,7 +116,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	}
 	// Ensure scheme to parse host and path
 	providerUrl := d.Get("url").(string)
-	if !hasHTTPScheme(providerUrl) {
+	if !hasScheme(providerUrl) {
 		providerUrl = "http://" + providerUrl // add http scheme so url.Parse works
 	}
 	u, err := url.Parse(providerUrl)
@@ -151,11 +152,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	return provider, nil
 }
 
-// hasHTTPScheme checks if a string has an "http" or "https" scheme using url.Parse.
-func hasHTTPScheme(s string) bool {
-	u, err := url.Parse(s)
-	if err != nil {
-		return false // Invalid URL
-	}
-	return u.Scheme == "http" || u.Scheme == "https"
+// hasScheme checks if a string has an "://"
+func hasScheme(s string) bool {
+	return strings.Contains(s, "://") // require URL scheme
 }

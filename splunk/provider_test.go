@@ -34,7 +34,7 @@ func newTestClient() (*client.Client, error) {
 	}
 	// Parse splunk url host
 	SPLUNK_URL := (os.Getenv("SPLUNK_URL"))
-	if !hasHTTPScheme(SPLUNK_URL) {
+	if !hasScheme(SPLUNK_URL) {
 		SPLUNK_URL = "http://" + SPLUNK_URL // add http scheme so url.Parse works
 	}
 	u, err := url.Parse(SPLUNK_URL)
