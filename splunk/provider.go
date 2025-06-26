@@ -2,7 +2,6 @@ package splunk
 
 import (
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/splunk/terraform-provider-splunk/client"
@@ -153,6 +152,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 }
 
 // hasScheme checks if a string has an "://"
-func hasScheme(s string) bool {
-	return strings.Contains(s, "://") // require URL scheme
+func hasScheme(providerUrl string) bool {
+	parsed, err := url.Parse(providerUrl)
+	return err == nil && parsed.Scheme != "" && parsed.Host != ""
 }
