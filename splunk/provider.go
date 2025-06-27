@@ -151,7 +151,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	return provider, nil
 }
 
-// hasScheme checks if a string has an "://"
+// hasScheme checks if a URL has scheme and host
 func hasScheme(providerUrl string) bool {
 	parsed, err := url.Parse(providerUrl)
 	return err == nil && parsed.Scheme != "" && parsed.Host != ""
