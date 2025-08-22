@@ -1732,17 +1732,7 @@ func savedSearchesDelete(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	defer resp.Body.Close()
-
-	switch resp.StatusCode {
-	case 200, 201:
-		return nil
-
-	default:
-		errorResponse := &models.InputsUDPResponse{}
-		_ = json.NewDecoder(resp.Body).Decode(errorResponse)
-		err := errors.New(errorResponse.Messages[0].Text)
-		return err
-	}
+	return nil
 }
 
 func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.SavedSearchObject) {
