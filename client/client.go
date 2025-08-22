@@ -88,7 +88,11 @@ func (c *Client) BuildSplunkURL(queryValues url.Values, urlPathParts ...string) 
 	}
 
 	queryValues.Set("output_mode", "json")
-	queryValues.Set("count", "-1") // To avoid http response truncation
+	
+	if !queryValues.Has("count") {
+		queryValues.Set("count", "-1") // To avoid http response truncation
+	}
+	
 	httpScheme := getEnv(envVarHTTPScheme, defaultScheme)
 
 	return url.URL{
