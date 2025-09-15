@@ -1,3 +1,6 @@
+## 1.4.32
+* Support for Log Event action fields in saved_searches
+
 ## 1.4.31
 * Fix: URL parsing of Splunk client path
 
