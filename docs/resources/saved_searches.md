@@ -106,6 +106,12 @@ This resource block supports the following arguments:
 * `action_summary_index_name` - (Optional) Specifies the name of the summary index where the results of the scheduled search are saved.Defaults to summary.
 * `action_summary_index_track_alert` - (Optional) Indicates whether the execution of this action signifies a trackable alert.
 * `action_summary_index_ttl` - (Optional) Valid values are: Integer[p] Specifies the minimum time-to-live in seconds of the search artifacts if this action is triggered. If p follows Integer, specifies the number of scheduled periods. Defaults to 86400 (24 hours).
+* `action_logevent` - (Optional) Enable log event action (Should be 1 (Enabled) or 0 (Disabled))
+* `action_logevent_param_event` - (Optional) Specific event text for the logged event.
+* `action_logevent_param_host` - (Optional) Value for the host field of the logged event.
+* `action_logevent_param_index` - (Optional) Destination index where to store the logged event.
+* `action_logevent_param_sourcetype` - (Optional) Destination sourcetype where to store the logged event.
+* `action_logevent_param_source` - (Optional) Value for the source field of the logged event.
 * `action_create_xsoar_incident` - (Optional) Enable XSOAR alerting (Should by 1 (Enabled) or 0 (Disabled))
 * `action_create_xsoar_incident_param_send_all_servers` - (Optional) Enable XSOAR alerting sending to all servers (Should by 1 (Enabled) or 0 (Disabled)
 * `action_create_xsoar_incident_param_server_url` - (Optional) XSOAR Server instance URL (Should start with https:// || http://)
