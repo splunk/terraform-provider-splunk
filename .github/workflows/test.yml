@@ -18,6 +18,7 @@ jobs:
         image: splunk/splunk:latest
         env:
           SPLUNK_START_ARGS: --accept-license
+          SPLUNK_GENERAL_TERMS: --accept-sgt-current-at-splunk-com
           SPLUNK_PASSWORD: password
         ports:
           - 8000:8000
