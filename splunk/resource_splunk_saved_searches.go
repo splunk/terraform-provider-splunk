@@ -14,9 +14,9 @@ import (
 )
 
 func suppressDefault(defaultValue string) schema.SchemaDiffSuppressFunc {
-    return func(k, old, new string, d *schema.ResourceData) bool {
-        return old == defaultValue && new == ""
-    }
+	return func(k, old, new string, d *schema.ResourceData) bool {
+		return old == defaultValue && new == ""
+	}
 }
 
 func savedSearches() *schema.Resource {
@@ -712,9 +712,9 @@ func savedSearches() *schema.Resource {
 				Description: "Jira Issue Type you would like to create",
 			},
 			"action_jira_service_desk_param_jira_summary": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Jira Issue Summary or title",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Description:      "Jira Issue Summary or title",
 				DiffSuppressFunc: suppressDefault("Splunk Alert: $name$"),
 			},
 			"action_jira_service_desk_param_jira_priority": {
@@ -723,10 +723,15 @@ func savedSearches() *schema.Resource {
 				Description: "Priority of issue created",
 			},
 			"action_jira_service_desk_param_jira_description": {
+				Type:             schema.TypeString,
+				Optional:         true,
+				Description:      "Enter the description of issue created",
+				DiffSuppressFunc: suppressDefault("The alert condition for '$name$' was triggered."),
+			},
+			"action_jira_service_desk_param_jira_dedup": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				Description: "Enter the description of issue created",
-				DiffSuppressFunc: suppressDefault("The alert condition for '$name$' was triggered."),
+				Description: "Enables Jira ticket deduplication",
 			},
 			"action_jira_service_desk_param_jira_customfields": {
 				Type:        schema.TypeString,

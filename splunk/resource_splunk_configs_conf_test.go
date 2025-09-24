@@ -112,7 +112,6 @@ func TestAccCreateSplunkConfigsConfSpecialChars(t *testing.T) {
 	})
 }
 
-
 func testAccSplunkConfigsConfDestroyResources(s *terraform.State) error {
 	client, err := newTestClient()
 	if err != nil {
