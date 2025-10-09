@@ -307,6 +307,34 @@ resource "splunk_saved_searches" "test" {
   }
 `
 
+const newSavedSearchesSendToPhantom = `
+resource "splunk_saved_searches" "test" {
+	name = "Test Phantom Alert"
+	actions = "sendtophantom"
+	action_sendtophantom = "1"
+	action_sendtophantom_param_phantom_server = "test_phantom_server"
+	action_sendtophantom_param_server_playbook_name = "test_playbook"
+	action_sendtophantom_param_severity = "high"
+	action_sendtophantom_param_sensitivity = "amber"
+	action_sendtophantom_param_label = "test"
+	action_sendtophantom_param_grouping = "1"
+	action_sendtophantom_param_relay_account = "test_relay_account"
+	action_sendtophantom_param_container_name = "default"
+	action_sendtophantom_param_cam_workers = "[\"local\"]"
+	alert_comparator    = "greater than"
+	alert_digest_mode   = true
+	alert_expires       = "30d"
+	alert_threshold     = "0"
+	alert_type          = "number of events"
+	cron_schedule       = "*/1 * * * *"
+	disabled            = false
+	is_scheduled        = true
+	is_visible          = true
+	realtime_schedule   = true
+	search              = "index=main level=error"
+}
+`
+
 func TestAccSplunkSavedSearches(t *testing.T) {
 	resourceName := "splunk_saved_searches.test"
 	resource.Test(t, resource.TestCase{
@@ -457,6 +485,34 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "action_create_xsoar_incident_param_severity", "1"),
 					resource.TestCheckResourceAttr(resourceName, "action_create_xsoar_incident_param_occurred", "$trigger_time$"),
 					resource.TestCheckResourceAttr(resourceName, "action_create_xsoar_incident_param_type", "Unclassified"),
+					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
+					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
+					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),
+					resource.TestCheckResourceAttr(resourceName, "alert_threshold", "0"),
+					resource.TestCheckResourceAttr(resourceName, "alert_type", "number of events"),
+					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/1 * * * *"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "is_scheduled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
+					resource.TestCheckResourceAttr(resourceName, "realtime_schedule", "true"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main level=error"),
+				),
+			},
+			{
+				Config: newSavedSearchesSendToPhantom,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Phantom Alert"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "sendtophantom"),
+					resource.TestCheckResourceAttr(resourceName, "action_sendtophantom", "1"),
+					resource.TestCheckResourceAttr(resourceName, "action_sendtophantom_param_phantom_server", "test_phantom_server"),
+					resource.TestCheckResourceAttr(resourceName, "action_sendtophantom_param_server_playbook_name", "test_playbook"),
+					resource.TestCheckResourceAttr(resourceName, "action_sendtophantom_param_severity", "high"),
+					resource.TestCheckResourceAttr(resourceName, "action_sendtophantom_param_sensitivity", "amber"),
+					resource.TestCheckResourceAttr(resourceName, "action_sendtophantom_param_label", "test"),
+					resource.TestCheckResourceAttr(resourceName, "action_sendtophantom_param_grouping", "1"),
+					resource.TestCheckResourceAttr(resourceName, "action_sendtophantom_param_relay_account", "test_relay_account"),
+					resource.TestCheckResourceAttr(resourceName, "action_sendtophantom_param_container_name", "default"),
+					resource.TestCheckResourceAttr(resourceName, "action_sendtophantom_param_cam_workers", "[\"local\"]"),
 					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
 					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),

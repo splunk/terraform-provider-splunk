@@ -124,6 +124,16 @@ type SavedSearchObject struct {
 	ActionJiraServiceDeskParamJiraPriority       string  `json:"action.jira_service_desk.param.jira_priority,omitempty" url:"action.jira_service_desk.param.jira_priority"`
 	ActionJiraServiceDeskParamJiraDescription    string  `json:"action.jira_service_desk.param.jira_description,omitempty" url:"action.jira_service_desk.param.jira_description"`
 	ActionJiraServiceDeskParamJiraCustomfields   string  `json:"action.jira_service_desk.param.jira_customfields,omitempty" url:"action.jira_service_desk.param.jira_customfields"`
+	ActionSendToPhantom                          string  `json:"action.sendtophantom,omitempty" url:"action.sendtophantom"`
+	ActionSendToPhantomParamPhantomServer        string  `json:"action.sendtophantom.param.phantom_server,omitempty" url:"action.sendtophantom.param.phantom_server"`
+	ActionSendToPhantomParamServerPlaybookName   string  `json:"action.sendtophantom.param.server_playbook_name,omitempty" url:"action.sendtophantom.param.server_playbook_name"`
+	ActionSendToPhantomParamSeverity             string  `json:"action.sendtophantom.param.severity,omitempty" url:"action.sendtophantom.param.severity"`
+	ActionSendToPhantomParamSensitivity          string  `json:"action.sendtophantom.param.sensitivity,omitempty" url:"action.sendtophantom.param.sensitivity"`
+	ActionSendToPhantomParamLabel                string  `json:"action.sendtophantom.param.label,omitempty" url:"action.sendtophantom.param.label"`
+	ActionSendToPhantomParamGrouping             string  `json:"action.sendtophantom.param.grouping,omitempty" url:"action.sendtophantom.param.grouping"`
+	ActionSendToPhantomParamRelayAccount         string  `json:"action.sendtophantom.param.relay_account,omitempty" url:"action.sendtophantom.param.relay_account"`
+	ActionSendToPhantomParamContainerName        string  `json:"action.sendtophantom.param.container_name,omitempty" url:"action.sendtophantom.param.container_name"`
+	ActionSendToPhantomParam_CamWorkers          string  `json:"action.sendtophantom.param._cam_workers,omitempty" url:"action.sendtophantom.param._cam_workers"`
 	ActionWebhookParamUrl                        string  `json:"action.webhook.param.url,omitempty" url:"action.webhook.param.url"`
 	AlertDigestMode                              bool    `json:"alert.digest_mode" url:"alert.digest_mode"`
 	AlertExpires                                 string  `json:"alert.expires,omitempty" url:"alert.expires,omitempty"`
