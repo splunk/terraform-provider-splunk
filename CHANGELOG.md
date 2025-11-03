@@ -1,3 +1,6 @@
+## 1.4.33
+* Support for better_webhook action fields in saved_searches
+
 ## 1.4.32
 * Support for Log Event action fields in saved_searches
 

@@ -14,9 +14,9 @@ import (
 )
 
 func suppressDefault(defaultValue string) schema.SchemaDiffSuppressFunc {
-    return func(k, old, new string, d *schema.ResourceData) bool {
-        return old == defaultValue && new == ""
-    }
+	return func(k, old, new string, d *schema.ResourceData) bool {
+		return old == defaultValue && new == ""
+	}
 }
 
 func savedSearches() *schema.Resource {
@@ -712,9 +712,9 @@ func savedSearches() *schema.Resource {
 				Description: "Jira Issue Type you would like to create",
 			},
 			"action_jira_service_desk_param_jira_summary": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Jira Issue Summary or title",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Description:      "Jira Issue Summary or title",
 				DiffSuppressFunc: suppressDefault("Splunk Alert: $name$"),
 			},
 			"action_jira_service_desk_param_jira_priority": {
@@ -723,9 +723,9 @@ func savedSearches() *schema.Resource {
 				Description: "Priority of issue created",
 			},
 			"action_jira_service_desk_param_jira_description": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Enter the description of issue created",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Description:      "Enter the description of issue created",
 				DiffSuppressFunc: suppressDefault("The alert condition for '$name$' was triggered."),
 			},
 			"action_jira_service_desk_param_jira_customfields": {
@@ -738,6 +738,16 @@ func savedSearches() *schema.Resource {
 				Optional:     true,
 				Description:  "URL to send the HTTP POST request to. Must be accessible from the Splunk server.",
 				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https?://[^\s]+$`), "Webhook URL is invalid"),
+			},
+			"action_better_webhook_param_credential": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Credential for the better_webhook action.",
+			},
+			"action_better_webhook_param_url": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "URL for the better_webhook action.",
 			},
 			"alert_digest_mode": {
 				Type:     schema.TypeBool,
@@ -1564,6 +1574,12 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_webhook_param_url", entry.Content.ActionWebhookParamUrl); err != nil {
 		return err
 	}
+	if err = d.Set("action_better_webhook_param_credential", entry.Content.ActionBetterWebhookParamCredential); err != nil {
+		return err
+	}
+	if err = d.Set("action_better_webhook_param_url", entry.Content.ActionBetterWebhookParamUrl); err != nil {
+		return err
+	}
 	if err = d.Set("alert_digest_mode", entry.Content.AlertDigestMode); err != nil {
 		return err
 	}
@@ -1910,6 +1926,8 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionJiraServiceDeskParamJiraDescription:    d.Get("action_jira_service_desk_param_jira_description").(string),
 		ActionJiraServiceDeskParamJiraCustomfields:   d.Get("action_jira_service_desk_param_jira_customfields").(string),
 		ActionWebhookParamUrl:                        d.Get("action_webhook_param_url").(string),
+		ActionBetterWebhookParamCredential:           d.Get("action_better_webhook_param_credential").(string),
+		ActionBetterWebhookParamUrl:                  d.Get("action_better_webhook_param_url").(string),
 		AlertComparator:                              d.Get("alert_comparator").(string),
 		AlertCondition:                               d.Get("alert_condition").(string),
 		AlertDigestMode:                              d.Get("alert_digest_mode").(bool),
