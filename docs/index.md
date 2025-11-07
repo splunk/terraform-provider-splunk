@@ -2,6 +2,10 @@
 
 The Splunk provider can interact with the resources supported by Splunk. The provider needs to be configured with the proper credentials before it can be used.
 
+# About the fork
+
+I published a fork of the Terraform provider for Splunk because the original repository is no longer being actively maintained by its developers. Despite community contributions and open pull requests that add valuable new functionality, these changes have not been reviewed or merged in a timely manner. My goal with this fork is to ensure continued development and responsiveness—integrating improvements and new features within a reasonable timeframe so that the provider remains reliable and up to date for users who depend on it.
+
 ## Example Usage
 
 ```
@@ -18,7 +22,7 @@ Terraform 0.13 and later must add:
 terraform {
    required_providers {
     splunk = {
-      source  = "splunk/splunk"
+      source  = "rsrdesarrollo/splunk"
     }
   }
 }
