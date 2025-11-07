@@ -10,7 +10,7 @@ import (
 
 	"github.com/avast/retry-go/v4"
 
-	"github.com/splunk/terraform-provider-splunk/client/models"
+	"github.com/rsrdesarrollo/terraform-provider-splunk/client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )

@@ -3,9 +3,10 @@ package splunk
 import (
 	"encoding/json"
 	"errors"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/splunk/terraform-provider-splunk/client/models"
 	"io"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/rsrdesarrollo/terraform-provider-splunk/client/models"
 )
 
 func lookupTableFile() *schema.Resource {

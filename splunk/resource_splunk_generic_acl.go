@@ -3,9 +3,10 @@ package splunk
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/splunk/terraform-provider-splunk/client/models"
 	"strings"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/rsrdesarrollo/terraform-provider-splunk/client/models"
 )
 
 func genericAcl() *schema.Resource {

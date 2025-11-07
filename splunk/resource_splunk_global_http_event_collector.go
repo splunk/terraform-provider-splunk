@@ -3,10 +3,11 @@ package splunk
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
-	"github.com/splunk/terraform-provider-splunk/client/models"
-	"net/http"
+	"github.com/rsrdesarrollo/terraform-provider-splunk/client/models"
 )
 
 func globalHttpEventCollector() *schema.Resource {

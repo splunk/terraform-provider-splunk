@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/google/go-querystring/query"
-	"github.com/splunk/terraform-provider-splunk/client/models"
+	"github.com/rsrdesarrollo/terraform-provider-splunk/client/models"
 )
 
 // https://docs.splunk.com/Documentation/Splunk/8.0.4/RESTUM/RESTusing#Access_Control_List

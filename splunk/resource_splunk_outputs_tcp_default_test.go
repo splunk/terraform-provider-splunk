@@ -3,11 +3,12 @@ package splunk
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
-	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/rsrdesarrollo/terraform-provider-splunk/client/models"
 )
 
 const newTCPDefaultOutput = `

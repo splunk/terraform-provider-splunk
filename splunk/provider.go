@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/splunk/terraform-provider-splunk/client"
+	"github.com/rsrdesarrollo/terraform-provider-splunk/client"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"

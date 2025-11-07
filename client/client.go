@@ -17,7 +17,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/splunk/terraform-provider-splunk/client/utils"
+	"github.com/rsrdesarrollo/terraform-provider-splunk/client/utils"
 )
 
 // Declare constants for service package
