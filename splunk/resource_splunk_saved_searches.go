@@ -64,9 +64,9 @@ func savedSearches() *schema.Resource {
 					"4 - Warning",
 			},
 			"action_snow_event_param_description": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
 				Description: "	A brief description of the event.",
 			},
 			"action_snow_event_param_ci_identifier": {
@@ -1230,6 +1230,13 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
+		if !d.IsNewResource() {
+			// This probably means someone has deleted the saved search from Splunk directly. Setting empty id here to
+			// force Terraform to delete resource from state and thereby recreating it
+			d.SetId("")
+
+			return nil
+		}
 		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
