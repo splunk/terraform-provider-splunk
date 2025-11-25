@@ -124,6 +124,10 @@ type SavedSearchObject struct {
 	ActionJiraServiceDeskParamJiraPriority       string  `json:"action.jira_service_desk.param.jira_priority,omitempty" url:"action.jira_service_desk.param.jira_priority"`
 	ActionJiraServiceDeskParamJiraDescription    string  `json:"action.jira_service_desk.param.jira_description,omitempty" url:"action.jira_service_desk.param.jira_description"`
 	ActionJiraServiceDeskParamJiraCustomfields   string  `json:"action.jira_service_desk.param.jira_customfields,omitempty" url:"action.jira_service_desk.param.jira_customfields"`
+	ActionBetterWebhookParamUrl                  string  `json:"action.better_webhook.param.url,omitempty" url:"action.better_webhook.param.url"`
+	ActionBetterWebhookParamBodyFormat           string  `json:"action.better_webhook.param.body_format,omitempty" url:"action.better_webhook.param.body_format"`
+	ActionBetterWebhookParamCredential           string  `json:"action.better_webhook.param.credential,omitempty" url:"action.better_webhook.param.credential"`
+	ActionBetterWebhookParamCredentials           string  `json:"action.better_webhook.param.credentials,omitempty" url:"action.better_webhook.param.credentials"`
 	ActionWebhookParamUrl                        string  `json:"action.webhook.param.url,omitempty" url:"action.webhook.param.url"`
 	AlertDigestMode                              bool    `json:"alert.digest_mode" url:"alert.digest_mode"`
 	AlertExpires                                 string  `json:"alert.expires,omitempty" url:"alert.expires,omitempty"`

@@ -733,6 +733,28 @@ func savedSearches() *schema.Resource {
 				Optional:    true,
 				Description: "Enter custom fields data for the issue created",
 			},
+			"action_better_webhook_param_url": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "URL to send the HTTP POST request to. Must be accessible from the Splunk server.",
+				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https?://[^\s]+$`), "Webhook URL is invalid"),
+			},
+			"action_better_webhook_param_body_format": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Format of the body to send in the HTTP POST request.",
+				Default: "{\n  \"sid\": $$sid$$,\n  \"search_name\": $$search_name$$,\n  \"app\": $$app$$,\n  \"owner\": $$owner$$,\n  \"results_link\": $$results_link$$,\n  \"result\": $$full_result$$\n}",
+			},
+			"action_better_webhook_param_credential": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Name of the credential to use for authentication when sending the HTTP POST request.",
+			},
+			"action_better_webhook_param_credentials": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Name of the credentials to use for authentication when sending the HTTP POST request.",
+			},
 			"action_webhook_param_url": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -1561,6 +1583,18 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_jira_service_desk_param_jira_customfields", entry.Content.ActionJiraServiceDeskParamJiraCustomfields); err != nil {
 		return err
 	}
+	if err = d.Set("action_better_webhook_param_url", entry.Content.ActionBetterWebhookParamUrl); err != nil {
+		return err
+	}
+	if err = d.Set("action_better_webhook_param_body_format", entry.Content.ActionBetterWebhookParamBodyFormat); err != nil {
+		return err
+	}
+	if err = d.Set("action_better_webhook_param_credential", entry.Content.ActionBetterWebhookParamCredential); err != nil {
+		return err
+	}
+	if err = d.Set("action_better_webhook_param_credentials", entry.Content.ActionBetterWebhookParamCredentials); err != nil {
+		return err
+	}
 	if err = d.Set("action_webhook_param_url", entry.Content.ActionWebhookParamUrl); err != nil {
 		return err
 	}
@@ -1909,6 +1943,10 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionJiraServiceDeskParamJiraPriority:       d.Get("action_jira_service_desk_param_jira_priority").(string),
 		ActionJiraServiceDeskParamJiraDescription:    d.Get("action_jira_service_desk_param_jira_description").(string),
 		ActionJiraServiceDeskParamJiraCustomfields:   d.Get("action_jira_service_desk_param_jira_customfields").(string),
+		ActionBetterWebhookParamUrl:                  d.Get("action_better_webhook_param_url").(string),
+		ActionBetterWebhookParamBodyFormat:           d.Get("action_better_webhook_param_body_format").(string),
+		ActionBetterWebhookParamCredential:           d.Get("action_better_webhook_param_credential").(string),
+		ActionBetterWebhookParamCredentials:          d.Get("action_better_webhook_param_credentials").(string),
 		ActionWebhookParamUrl:                        d.Get("action_webhook_param_url").(string),
 		AlertComparator:                              d.Get("alert_comparator").(string),
 		AlertCondition:                               d.Get("alert_condition").(string),
