@@ -733,6 +733,55 @@ func savedSearches() *schema.Resource {
 				Optional:    true,
 				Description: "Enter custom fields data for the issue created",
 			},
+			"action_victorops_param_message_type": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "CRITICAL",
+				Description: "Valid values: (INFO | WARNING | CRITICAL | ACKNOLEGEMENT | RECOVERY)" +
+					"Specifies the type of message to send to VictorOps. Defaults to CRITICAL.",
+			},
+			"action_victorops_param_monitoring_tool": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Valid values: (Splunk Enterprise | Splunk-ES | Splunk-SII | Splunk-ITSI)" +
+				       	"Specifies the monitoring tool sending the alert. Defaults to empty.",
+
+			},
+			"action_victorops_param_entity_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Unique identifier for the affected entity.",
+			},
+			"action_victorops_param_state_message": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Message describing the current state of the entity.",
+			},
+			"action_victorops_param_record_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Unique identifier for the alert record used in api key.",
+			},
+			"action_victorops_param_routing_key_override": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Routing key to override the default routing key configured in VictorOps.",
+			},
+			"action_victorops_param_enable_recovery": {
+				Type:         schema.TypeInt,
+				Optional:     true,
+				Description: "Specifies whether to enable recovery polling to send RECOVERY messages when the alert condition is no longer met. [1|0]",
+			},
+			"action_victorops_param_poll_interval": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Interval in seconds at which to poll for alert resolution to trigger recovery messages.",
+			},
+			"action_victorops_param_inactive_polls": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Number of consecutive polls with no alert before stopping recovery polling.",
+			},
 			"action_better_webhook_param_url": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -1583,6 +1632,33 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_jira_service_desk_param_jira_customfields", entry.Content.ActionJiraServiceDeskParamJiraCustomfields); err != nil {
 		return err
 	}
+	if err = d.Set("action_victorops_param_message_type", entry.Content.ActionVictoropsParamMessageType); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_monitoring_tool", entry.Content.ActionVictoropsParamMonitoringTool); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_entity_id", entry.Content.ActionVictoropsParamEntityId); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_state_message", entry.Content.ActionVictoropsParamStateMessage); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_record_id", entry.Content.ActionVictoropsParamRecordId); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_routing_key_override", entry.Content.ActionVictoropsParamRoutingKeyOverride); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_enable_recovery", entry.Content.ActionVictoropsParamEnableRecovery); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_poll_interval", entry.Content.ActionVictoropsParamPollInterval); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_inactive_polls", entry.Content.ActionVictoropsParamInactivePolls); err != nil {
+		return err
+	}
 	if err = d.Set("action_better_webhook_param_url", entry.Content.ActionBetterWebhookParamUrl); err != nil {
 		return err
 	}
@@ -1943,6 +2019,15 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionJiraServiceDeskParamJiraPriority:       d.Get("action_jira_service_desk_param_jira_priority").(string),
 		ActionJiraServiceDeskParamJiraDescription:    d.Get("action_jira_service_desk_param_jira_description").(string),
 		ActionJiraServiceDeskParamJiraCustomfields:   d.Get("action_jira_service_desk_param_jira_customfields").(string),
+		ActionVictoropsParamMessageType:              d.Get("action_victorops_param_message_type").(string),
+		ActionVictoropsParamMonitoringTool:           d.Get("action_victorops_param_monitoring_tool").(string),
+		ActionVictoropsParamEntityId:                 d.Get("action_victorops_param_entity_id").(string),
+		ActionVictoropsParamStateMessage:             d.Get("action_victorops_param_state_message").(string),
+		ActionVictoropsParamRecordId:                 d.Get("action_victorops_param_record_id").(string),
+		ActionVictoropsParamRoutingKeyOverride:       d.Get("action_victorops_param_routing_key_override").(string),
+		ActionVictoropsParamEnableRecovery:           d.Get("action_victorops_param_enable_recovery").(int),
+		ActionVictoropsParamPollInterval:             d.Get("action_victorops_param_poll_interval").(string),
+		ActionVictoropsParamInactivePolls:            d.Get("action_victorops_param_inactive_polls").(string),
 		ActionBetterWebhookParamUrl:                  d.Get("action_better_webhook_param_url").(string),
 		ActionBetterWebhookParamBodyFormat:           d.Get("action_better_webhook_param_body_format").(string),
 		ActionBetterWebhookParamCredential:           d.Get("action_better_webhook_param_credential").(string),
