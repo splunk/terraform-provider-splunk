@@ -197,6 +197,33 @@ resource "splunk_saved_searches" "test" {
 }
 `
 
+const newSavedSearchesVictorops = `
+resource "splunk_saved_searches" "test" {
+	name = "Test Victorops Alert"
+	actions = "victorops"
+	action_victorops_param_message_type = "CRITICAL"
+	action_victorops_param_monitoring_tool = "test"
+	action_victorops_param_entity_id = "test"
+	action_victorops_param_state_message = "error message"
+	action_victorops_param_record_id = "12345ab"
+	action_victorops_param_routing_key_override = "ops"
+	action_victorops_param_enable_recovery = 0
+	action_victorops_param_poll_interval = "5"
+	action_victorops_param_inactive_polls = "10"
+	alert_comparator    = "greater than"
+	alert_digest_mode   = true
+	alert_expires       = "30d"
+	alert_threshold     = "0"
+	alert_type          = "number of events"
+	cron_schedule       = "*/1 * * * *"
+	disabled            = false
+	is_scheduled        = true
+	is_visible          = true
+	realtime_schedule   = true
+	search              = "index=main level=error"
+}
+`
+
 const newSavedSearchesBetterWebhook = `
 resource "splunk_saved_searches" "test" {
 	name = "Test BetterWebhook Alert"
