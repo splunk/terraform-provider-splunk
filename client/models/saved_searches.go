@@ -130,9 +130,9 @@ type SavedSearchObject struct {
 	ActionVictoropsParamStateMessage             string  `json:"action.victorops.param.state_message,omitempty" url:"action.victorops.param.state_message"`
 	ActionVictoropsParamRecordId                 string  `json:"action.victorops.param.record_id,omitempty" url:"action.victorops.param.record_id"`
 	ActionVictoropsParamRoutingKeyOverride       string  `json:"action.victorops.param.routing_key_override,omitempty" url:"action.victorops.param.routing_key_override"`
-	ActionVictoropsParamEnableRecovery           int     `json:"action.victorops.param.enable_recovery,omitempty" url:"action.victorops.param.enable_recovery"`
+	ActionVictoropsParamEnableRecovery           string  `json:"action.victorops.param.enable_recovery,omitempty" url:"action.victorops.param.enable_recovery"`
 	ActionVictoropsParamPollInterval             string  `json:"action.victorops.param.poll_interval,omitempty" url:"action.victorops.param.poll_interval"`
-	ActionVictoropsParamInactivePolls            string  `json:"action.victorops.param.intactive_polls,omitempty" url:"action.victorops.param.inactive_polls"`
+	ActionVictoropsParamInactivePolls            string  `json:"action.victorops.param.inactive_polls,omitempty" url:"action.victorops.param.inactive_polls"`
 	ActionBetterWebhookParamUrl                  string  `json:"action.better_webhook.param.url,omitempty" url:"action.better_webhook.param.url"`
 	ActionBetterWebhookParamBodyFormat           string  `json:"action.better_webhook.param.body_format,omitempty" url:"action.better_webhook.param.body_format"`
 	ActionBetterWebhookParamCredential           string  `json:"action.better_webhook.param.credential,omitempty" url:"action.better_webhook.param.credential"`

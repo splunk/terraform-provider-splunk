@@ -768,9 +768,10 @@ func savedSearches() *schema.Resource {
 				Description: "Routing key to override the default routing key configured in VictorOps.",
 			},
 			"action_victorops_param_enable_recovery": {
-				Type:         schema.TypeInt,
+				Type:         schema.TypeString,
 				Optional:     true,
 				Description: "Specifies whether to enable recovery polling to send RECOVERY messages when the alert condition is no longer met. [1|0]",
+				Default: "0",
 			},
 			"action_victorops_param_poll_interval": {
 				Type:         schema.TypeString,
@@ -2025,7 +2026,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionVictoropsParamStateMessage:             d.Get("action_victorops_param_state_message").(string),
 		ActionVictoropsParamRecordId:                 d.Get("action_victorops_param_record_id").(string),
 		ActionVictoropsParamRoutingKeyOverride:       d.Get("action_victorops_param_routing_key_override").(string),
-		ActionVictoropsParamEnableRecovery:           d.Get("action_victorops_param_enable_recovery").(int),
+		ActionVictoropsParamEnableRecovery:           d.Get("action_victorops_param_enable_recovery").(string),
 		ActionVictoropsParamPollInterval:             d.Get("action_victorops_param_poll_interval").(string),
 		ActionVictoropsParamInactivePolls:            d.Get("action_victorops_param_inactive_polls").(string),
 		ActionBetterWebhookParamUrl:                  d.Get("action_better_webhook_param_url").(string),

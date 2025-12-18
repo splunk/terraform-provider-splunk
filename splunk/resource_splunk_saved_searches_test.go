@@ -207,7 +207,7 @@ resource "splunk_saved_searches" "test" {
 	action_victorops_param_state_message = "error message"
 	action_victorops_param_record_id = "12345ab"
 	action_victorops_param_routing_key_override = "ops"
-	action_victorops_param_enable_recovery = 0
+	action_victorops_param_enable_recovery = "1"
 	action_victorops_param_poll_interval = "5"
 	action_victorops_param_inactive_polls = "10"
 	alert_comparator    = "greater than"
@@ -551,7 +551,7 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_state_message", "error message"),
 					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_record_id", "12345ab"),
 					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_routing_key_override", "ops"),
-					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_enable_recovery", "0"),
+					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_enable_recovery", "1"),
 					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_poll_interval", "5"),
 					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_inactive_polls", "10"),
 					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
