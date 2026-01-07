@@ -230,8 +230,8 @@ resource "splunk_saved_searches" "test" {
 	actions = "better_webhook"
 	action_better_webhook_param_url = "https://example.com/webhook"
 	action_better_webhook_param_body_format = "{'alert': '$$app$$'}"
-	action_better_webhook_param_credetial = "better_webhooks:test:"
-	action_better_webhook_param_credetials = "test"
+	action_better_webhook_param_credential = "better_webhooks:test:"
+	action_better_webhook_param_credentials = "test"
 	alert_comparator    = "greater than"
 	alert_digest_mode   = true
 	alert_expires       = "30d"
