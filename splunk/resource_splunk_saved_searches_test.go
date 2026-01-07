@@ -197,6 +197,55 @@ resource "splunk_saved_searches" "test" {
 }
 `
 
+const newSavedSearchesVictorops = `
+resource "splunk_saved_searches" "test" {
+	name = "Test Victorops Alert"
+	actions = "victorops"
+	action_victorops_param_message_type = "CRITICAL"
+	action_victorops_param_monitoring_tool = "test"
+	action_victorops_param_entity_id = "test"
+	action_victorops_param_state_message = "error message"
+	action_victorops_param_record_id = "12345ab"
+	action_victorops_param_routing_key_override = "ops"
+	action_victorops_param_enable_recovery = "1"
+	action_victorops_param_poll_interval = "5"
+	action_victorops_param_inactive_polls = "10"
+	alert_comparator    = "greater than"
+	alert_digest_mode   = true
+	alert_expires       = "30d"
+	alert_threshold     = "0"
+	alert_type          = "number of events"
+	cron_schedule       = "*/1 * * * *"
+	disabled            = false
+	is_scheduled        = true
+	is_visible          = true
+	realtime_schedule   = true
+	search              = "index=main level=error"
+}
+`
+
+const newSavedSearchesBetterWebhook = `
+resource "splunk_saved_searches" "test" {
+	name = "Test BetterWebhook Alert"
+	actions = "better_webhook"
+	action_better_webhook_param_url = "https://example.com/webhook"
+	action_better_webhook_param_body_format = "{'alert': '$$app$$'}"
+	action_better_webhook_param_credential = "better_webhooks:test:"
+	action_better_webhook_param_credentials = "test"
+	alert_comparator    = "greater than"
+	alert_digest_mode   = true
+	alert_expires       = "30d"
+	alert_threshold     = "0"
+	alert_type          = "number of events"
+	cron_schedule       = "*/1 * * * *"
+	disabled            = false
+	is_scheduled        = true
+	is_visible          = true
+	realtime_schedule   = true
+	search              = "index=main level=error"
+}
+`
+
 const newSavedSearchesPagerduty = `
 resource "splunk_saved_searches" "test" {
 	name = "Test Pagerduty Alert"
@@ -478,6 +527,55 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "action_slack_param_attachment", "alert_link"),
 					resource.TestCheckResourceAttr(resourceName, "action_slack_param_channel", "#channel"),
 					resource.TestCheckResourceAttr(resourceName, "action_slack_param_message", "error message"),
+					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
+					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
+					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),
+					resource.TestCheckResourceAttr(resourceName, "alert_threshold", "0"),
+					resource.TestCheckResourceAttr(resourceName, "alert_type", "number of events"),
+					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/1 * * * *"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "is_scheduled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
+					resource.TestCheckResourceAttr(resourceName, "realtime_schedule", "true"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main level=error"),
+				),
+			},
+			{
+				Config: newSavedSearchesVictorops,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Victorops Alert"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "victorops"),
+					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_message_type", "CRITICAL"),
+					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_monitoring_tool", "test"),
+					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_entity_id", "test"),
+					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_state_message", "error message"),
+					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_record_id", "12345ab"),
+					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_routing_key_override", "ops"),
+					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_enable_recovery", "1"),
+					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_poll_interval", "5"),
+					resource.TestCheckResourceAttr(resourceName, "action_victorops_param_inactive_polls", "10"),
+					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
+					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
+					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),
+					resource.TestCheckResourceAttr(resourceName, "alert_threshold", "0"),
+					resource.TestCheckResourceAttr(resourceName, "alert_type", "number of events"),
+					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/1 * * * *"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "is_scheduled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
+					resource.TestCheckResourceAttr(resourceName, "realtime_schedule", "true"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main level=error"),
+				),
+			},
+			{
+				Config: newSavedSearchesBetterWebhook,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test BetterWebhook Alert"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "better_webhook"),
+					resource.TestCheckResourceAttr(resourceName, "action_better_webhook_param_url", "https://example.com/webhook"),
+					resource.TestCheckResourceAttr(resourceName, "action_better_webhook_param_body_format", "{'alert': '$$app$$'}"),
+					resource.TestCheckResourceAttr(resourceName, "action_better_webhook_param_credential", "better_webhooks:test:"),
+					resource.TestCheckResourceAttr(resourceName, "action_better_webhook_param_credentials", "test"),
 					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
 					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),

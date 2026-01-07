@@ -124,6 +124,19 @@ type SavedSearchObject struct {
 	ActionJiraServiceDeskParamJiraPriority       string  `json:"action.jira_service_desk.param.jira_priority,omitempty" url:"action.jira_service_desk.param.jira_priority"`
 	ActionJiraServiceDeskParamJiraDescription    string  `json:"action.jira_service_desk.param.jira_description,omitempty" url:"action.jira_service_desk.param.jira_description"`
 	ActionJiraServiceDeskParamJiraCustomfields   string  `json:"action.jira_service_desk.param.jira_customfields,omitempty" url:"action.jira_service_desk.param.jira_customfields"`
+	ActionVictoropsParamMessageType              string  `json:"action.victorops.param.message_type,omitempty" url:"action.victorops.param.message_type"`
+	ActionVictoropsParamMonitoringTool           string  `json:"action.victorops.param.monitoring_tool,omitempty" url:"action.victorops.param.monitoring_tool"`
+	ActionVictoropsParamEntityId                 string  `json:"action.victorops.param.entity_id,omitempty" url:"action.victorops.param.entity_id"`
+	ActionVictoropsParamStateMessage             string  `json:"action.victorops.param.state_message,omitempty" url:"action.victorops.param.state_message"`
+	ActionVictoropsParamRecordId                 string  `json:"action.victorops.param.record_id,omitempty" url:"action.victorops.param.record_id"`
+	ActionVictoropsParamRoutingKeyOverride       string  `json:"action.victorops.param.routing_key_override,omitempty" url:"action.victorops.param.routing_key_override"`
+	ActionVictoropsParamEnableRecovery           string  `json:"action.victorops.param.enable_recovery,omitempty" url:"action.victorops.param.enable_recovery"`
+	ActionVictoropsParamPollInterval             string  `json:"action.victorops.param.poll_interval,omitempty" url:"action.victorops.param.poll_interval"`
+	ActionVictoropsParamInactivePolls            string  `json:"action.victorops.param.inactive_polls,omitempty" url:"action.victorops.param.inactive_polls"`
+	ActionBetterWebhookParamUrl                  string  `json:"action.better_webhook.param.url,omitempty" url:"action.better_webhook.param.url"`
+	ActionBetterWebhookParamBodyFormat           string  `json:"action.better_webhook.param.body_format,omitempty" url:"action.better_webhook.param.body_format"`
+	ActionBetterWebhookParamCredential           string  `json:"action.better_webhook.param.credential,omitempty" url:"action.better_webhook.param.credential"`
+	ActionBetterWebhookParamCredentials          string  `json:"action.better_webhook.param.credentials,omitempty" url:"action.better_webhook.param.credentials"`
 	ActionWebhookParamUrl                        string  `json:"action.webhook.param.url,omitempty" url:"action.webhook.param.url"`
 	AlertDigestMode                              bool    `json:"alert.digest_mode" url:"alert.digest_mode"`
 	AlertExpires                                 string  `json:"alert.expires,omitempty" url:"alert.expires,omitempty"`
