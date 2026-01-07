@@ -1,3 +1,6 @@
+## 1.4.33
+* Support for Victorops params in saved_Searches
+
 ## 1.4.32
 * Support for Log Event action fields in saved_searches
 
