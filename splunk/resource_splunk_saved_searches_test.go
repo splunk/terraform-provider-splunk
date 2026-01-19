@@ -199,7 +199,7 @@ resource "splunk_saved_searches" "test" {
 `
 const newSavedSearchesSlackAppAlert = `
 resource "splunk_saved_searches" "test" {
-	name = "Test Slack Alert"
+	name = "Test Slack App Alert"
 	actions = "slack_app_alert"
 	action_slack_app_alert_param_auto_join_channel = true
 	action_slack_app_alert_param_bot_username = "SplunkBot"
