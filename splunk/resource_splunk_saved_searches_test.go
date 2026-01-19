@@ -566,7 +566,7 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 			{
 				Config: newSavedSearchesSlackAppAlert,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "name", "Test Slack Appp Alert"),
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Slack App Alert"),
 					resource.TestCheckResourceAttr(resourceName, "actions", "slack_app_alert"),
 					resource.TestCheckResourceAttr(resourceName, "action_slack_app_alert_param_auto_join_channel", "true"),
 					resource.TestCheckResourceAttr(resourceName, "action_slack_app_alert_param_bot_username", "SplunkBot"),
