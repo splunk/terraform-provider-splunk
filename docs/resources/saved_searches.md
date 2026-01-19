@@ -130,6 +130,12 @@ This resource block supports the following arguments:
 - `action_slack_param_attachment` - (Optional) Include a message attachment. Valid values are message, none, or alert_link
 - `action_slack_param_message` - (Optional) Enter the chat message to send to the Slack channel. The message can include tokens that insert text based on the results of the search.
 - `action_slack_param_webhook_url_override` - (Optional) You can override the Slack webhook URL here if you need to send the alert message to a different Slack team
+- `action_slack_app_alert_param_auto_join_channel` - (Optional) Automatically join the channel if the bot is not already a member (Should be 1 (Enabled) or 0 (Disabled))
+- `action_slack_app_alert_param_bot_username` - (Optional) The bot username that will post the message
+- `action_slack_app_alert_param_channel` - (Optional) Slack channel to send the message to (Should start with # or @)
+- `action_slack_app_alert_param_emoji` - (Optional) Emoji icon to use as the bot's avatar (Should start and end with :)
+- `action_slack_app_alert_param_message` - (Optional) Enter the chat message to send to the Slack channel. The message can include tokens that insert text based on the results of the
+- `action_slack_app_alert_param_fields`
 - `action_jira_service_desk_param_account` - (Optional) Jira Service Desk account name
 - `action_jira_service_desk_param_jira_project` - (Optional) Jira Project name
 - `action_jira_service_desk_param_jira_issue_type` - (Optional) Jira issue type name

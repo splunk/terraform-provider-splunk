@@ -195,6 +195,29 @@ resource "splunk_saved_searches" "test" {
 	realtime_schedule   = true
 	search              = "index=main level=error"
 }
+
+`
+const newSavedSearchesSlackAppAlert = `
+resource "splunk_saved_searches" "test" {
+	name = "Test Slack Alert"
+	actions = "slack_app_alert"
+	slack_app_alert_param_auto_join_channel = true
+	slack_app_alert_param_bot_user_name = "SplunkBot"
+	slack_app_alert_param_channel = "channel"
+	slack_app_alert_param_emoji = ":splunk:"
+	slack_app_alert_param_message = "error message"
+	alert_comparator    = "greater than"
+	alert_digest_mode   = true
+	alert_expires       = "30d"
+	alert_threshold     = "0"
+	alert_type          = "number of events"
+	cron_schedule       = "*/1 * * * *"
+	disabled            = false
+	is_scheduled        = true
+	is_visible          = true
+	realtime_schedule   = true
+	search              = "index=main level=error"
+}
 `
 
 const newSavedSearchesVictorops = `
@@ -527,6 +550,29 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "action_slack_param_attachment", "alert_link"),
 					resource.TestCheckResourceAttr(resourceName, "action_slack_param_channel", "#channel"),
 					resource.TestCheckResourceAttr(resourceName, "action_slack_param_message", "error message"),
+					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
+					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
+					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),
+					resource.TestCheckResourceAttr(resourceName, "alert_threshold", "0"),
+					resource.TestCheckResourceAttr(resourceName, "alert_type", "number of events"),
+					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/1 * * * *"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "is_scheduled", "true"),
+					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
+					resource.TestCheckResourceAttr(resourceName, "realtime_schedule", "true"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main level=error"),
+				),
+			},
+			{
+				Config: newSavedSearchesSlackAppAlert,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Slack Appp Alert"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "slack_app_alert"),
+					resource.TestCheckResourceAttr(resourceName, "slack_app_alert_param_auto_join_channel", "true"),
+					resource.TestCheckResourceAttr(resourceName, "slack_app_alert_param_bot_user_name", "SplunkBot"),
+					resource.TestCheckResourceAttr(resourceName, "slack_app_alert_param_channel", "channel"),
+					resource.TestCheckResourceAttr(resourceName, "slack_app_alert_param_emoji", ":splunk:"),
+					resource.TestCheckResourceAttr(resourceName, "slack_app_alert_param_message", "error message"),
 					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
 					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),
