@@ -118,10 +118,10 @@ type SavedSearchObject struct {
 	ActionSlackParamMessage                      string  `json:"action.slack.param.message,omitempty" url:"action.slack.param.message"`
 	ActionSlackParamWebhookUrlOverride           string  `json:"action.slack.param.webhook_url_override,omitempty" url:"action.slack.param.webhook_url_override"`
 	ActionSlackAppAlertParamAutoJoinChannel	     bool    `json:"action.slack_app_alert.param.auto_join_channel" url:"action.slack_app_alert.param.auto_join_channel"`
-	ActionSlackAppAlertParamBotUsername	     string  `json:"action.slack_app_alert.param.bot_username,omitempty" url:"action.slack_app_alert.param.bot_username"`
-	ActionSlackAppAlertParamChannel		     string  `json:"action.slack_app_alert.param.channel,omitempty" url:"action.slack_app_alert.param.channel"`
-	ActionSlackAppAlertParamEmoji		     string  `json:"action.slack_app_alert.param.emoji,omitempty" url:"action.slack_app_alert.param.emoji"`
-	ActionSlackAppAlertParamMessage		     string  `json:"action.slack_app_alert.param.message,omitempty" url:"action.slack_app_alert.param.message"`
+	ActionSlackAppAlertParamBotUsername          string  `json:"action.slack_app_alert.param.bot_username,omitempty" url:"action.slack_app_alert.param.bot_username"`
+	ActionSlackAppAlertParamChannel              string  `json:"action.slack_app_alert.param.channel,omitempty" url:"action.slack_app_alert.param.channel"`
+	ActionSlackAppAlertParamEmoj                 string  `json:"action.slack_app_alert.param.emoji,omitempty" url:"action.slack_app_alert.param.emoji"`
+	ActionSlackAppAlertParamMessage              string  `json:"action.slack_app_alert.param.message,omitempty" url:"action.slack_app_alert.param.message"`
 	ActionJiraServiceDeskParamAccount            string  `json:"action.jira_service_desk.param.account,omitempty" url:"action.jira_service_desk.param.account"`
 	ActionJiraServiceDeskParamJiraProject        string  `json:"action.jira_service_desk.param.jira_project,omitempty" url:"action.jira_service_desk.param.jira_project"`
 	ActionJiraServiceDeskParamJiraIssueType      string  `json:"action.jira_service_desk.param.jira_issue_type,omitempty" url:"action.jira_service_desk.param.jira_issue_type"`
