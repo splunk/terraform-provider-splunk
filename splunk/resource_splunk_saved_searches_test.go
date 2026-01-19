@@ -197,15 +197,15 @@ resource "splunk_saved_searches" "test" {
 }
 
 `
-const newSavedSearchesSlackAppAlert = `
+const newSavedSearchesSlackAppAlertIntegration = `
 resource "splunk_saved_searches" "test" {
 	name = "Test Slack App Alert"
 	actions = "slack_app_alert"
-	action_slack_app_alert_param_auto_join_channel = true
-	action_slack_app_alert_param_bot_username = "SplunkBot"
-	action_slack_app_alert_param_channel = "channel"
-	action_slack_app_alert_param_emoji = ":splunk:"
-	action_slack_app_alert_param_message = "error message"
+	action_slack_app_alert_integration_param_auto_join_channel = "1"
+	action_slack_app_alert_integration_param_bot_username = "SplunkBot"
+	action_slack_app_alert_integration_param_channel = "channel"
+	action_slack_app_alert_integration_param_emoji = ":splunk:"
+	action_slack_app_alert_integration_param_message = "error message"
 	alert_comparator    = "greater than"
 	alert_digest_mode   = true
 	alert_expires       = "30d"
@@ -564,15 +564,15 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 				),
 			},
 			{
-				Config: newSavedSearchesSlackAppAlert,
+				Config: newSavedSearchesSlackAppAlertIntegration,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", "Test Slack App Alert"),
 					resource.TestCheckResourceAttr(resourceName, "actions", "slack_app_alert"),
-					resource.TestCheckResourceAttr(resourceName, "action_slack_app_alert_param_auto_join_channel", "true"),
-					resource.TestCheckResourceAttr(resourceName, "action_slack_app_alert_param_bot_username", "SplunkBot"),
-					resource.TestCheckResourceAttr(resourceName, "action_slack_app_alert_param_channel", "channel"),
-					resource.TestCheckResourceAttr(resourceName, "action_slack_app_alert_param_emoji", ":splunk:"),
-					resource.TestCheckResourceAttr(resourceName, "action_slack_app_alert_param_message", "error message"),
+					resource.TestCheckResourceAttr(resourceName, "action_slack_app_alert_integration_param_auto_join_channel", "1"),
+					resource.TestCheckResourceAttr(resourceName, "action_slack_app_alert_integration_param_bot_username", "SplunkBot"),
+					resource.TestCheckResourceAttr(resourceName, "action_slack_app_alert_integration_param_channel", "channel"),
+					resource.TestCheckResourceAttr(resourceName, "action_slack_app_alert_integration_param_emoji", ":splunk:"),
+					resource.TestCheckResourceAttr(resourceName, "action_slack_app_alert_integration_param_message", "error message"),
 					resource.TestCheckResourceAttr(resourceName, "alert_comparator", "greater than"),
 					resource.TestCheckResourceAttr(resourceName, "alert_digest_mode", "true"),
 					resource.TestCheckResourceAttr(resourceName, "alert_expires", "30d"),
