@@ -1,3 +1,6 @@
+## 1.4.34
+* Support for Slack alert params in saved_Searches
+
 ## 1.4.33
 * Support for Victorops params in saved_Searches
 
