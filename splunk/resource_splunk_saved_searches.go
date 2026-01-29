@@ -696,6 +696,31 @@ func savedSearches() *schema.Resource {
 				Optional:    true,
 				Description: "You can override the Slack webhook URL here if you need to send the alert message to a different Slack team.",
 			},
+			"action_slack_app_alert_integration_param_auto_join_channel": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Valid values: (1 | 0) Specify whether the Slack App bot should automatically join the channel if it is not already a member. Defaults to false.",
+			},
+			"action_slack_app_alert_integration_param_bot_username": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Specify a custom bot username for the Slack App alert.",
+			},
+			"action_slack_app_alert_integration_param_channel": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Slack channel to send the message to (Should not start with #)",
+			},
+			"action_slack_app_alert_integration_param_emoji": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Specify a custom bot emoji for the Slack App alert.",
+			},
+			"action_slack_app_alert_integration_param_message": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Enter the chat message to send to the Slack channel. The message can include tokens that insert text based on the results of the search.",
+			},
 			"action_jira_service_desk_param_account": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -1608,6 +1633,21 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_slack_param_webhook_url_override", entry.Content.ActionSlackParamWebhookUrlOverride); err != nil {
 		return err
 	}
+	if err = d.Set("action_slack_app_alert_integration_param_auto_join_channel", entry.Content.ActionSlackAppAlertIntegrationParamAutoJoinChannel); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_app_alert_integration_param_bot_username", entry.Content.ActionSlackAppAlertIntegrationParamBotUsername); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_app_alert_integration_param_channel", entry.Content.ActionSlackAppAlertIntegrationParamChannel); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_app_alert_integration_param_emoji", entry.Content.ActionSlackAppAlertIntegrationParamEmoji); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_app_alert_integration_param_message", entry.Content.ActionSlackAppAlertIntegrationParamMessage); err != nil {
+		return err
+	}
 	if err = d.Set("action_jira_service_desk_param_account", entry.Content.ActionJiraServiceDeskParamAccount); err != nil {
 		return err
 	}
@@ -2013,6 +2053,11 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionSlackParamFields:                       d.Get("action_slack_param_fields").(string),
 		ActionSlackParamMessage:                      d.Get("action_slack_param_message").(string),
 		ActionSlackParamWebhookUrlOverride:           d.Get("action_slack_param_webhook_url_override").(string),
+		ActionSlackAppAlertIntegrationParamAutoJoinChannel:      d.Get("action_slack_app_alert_integration_param_auto_join_channel").(string),
+		ActionSlackAppAlertIntegrationParamBotUsername:          d.Get("action_slack_app_alert_integration_param_bot_username").(string),
+		ActionSlackAppAlertIntegrationParamChannel:              d.Get("action_slack_app_alert_integration_param_channel").(string),
+		ActionSlackAppAlertIntegrationParamEmoji:                d.Get("action_slack_app_alert_integration_param_emoji").(string),
+		ActionSlackAppAlertIntegrationParamMessage:              d.Get("action_slack_app_alert_integration_param_message").(string),
 		ActionJiraServiceDeskParamAccount:            d.Get("action_jira_service_desk_param_account").(string),
 		ActionJiraServiceDeskParamJiraProject:        d.Get("action_jira_service_desk_param_jira_project").(string),
 		ActionJiraServiceDeskParamJiraIssueType:      d.Get("action_jira_service_desk_param_jira_issue_type").(string),
