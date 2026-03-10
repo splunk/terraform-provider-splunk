@@ -1,3 +1,7 @@
+## 1.4.35
+* Fix: lookup_table_file - handle nil values in file_contents by converting to empty strings before JSON marshaling
+* Fix: lookup_table_file - properly URL-encode form parameters in Create/Read/Update operations
+
 ## 1.4.34
 * Support for Slack alert params in saved_Searches
 

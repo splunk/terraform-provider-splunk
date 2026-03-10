@@ -1,14 +1,19 @@
 package client
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
+	"net/url"
 )
 
 func (client *Client) CreateLookupTableFile(name string, owner string, app string, contents string) error {
-	values := []byte(fmt.Sprintf("namespace=%s&lookup_file=%s&owner=%s&contents=%s", app, name, owner, contents))
+	values := []byte(url.Values{
+		"namespace":   {app},
+		"lookup_file": {name},
+		"owner":       {owner},
+		"contents":    {contents},
+	}.Encode())
 	endpoint := client.BuildSplunkURL(nil, "services", "data", "lookup_edit", "lookup_contents")
 	client.urlEncoded = true
 	resp, err := client.Post(endpoint, values)
@@ -28,7 +33,11 @@ func (client *Client) CreateLookupTableFile(name string, owner string, app strin
 }
 
 func (client *Client) ReadLookupTableFile(name, owner, app string) (*http.Response, error) {
-	values := []byte(fmt.Sprintf("namespace=%s&lookup_file=%s&owner=%s", app, name, owner))
+	values := []byte(url.Values{
+		"namespace":   {app},
+		"lookup_file": {name},
+		"owner":       {owner},
+	}.Encode())
 	client.urlEncoded = true
 	endpoint := client.BuildSplunkURL(nil, "services", "data", "lookup_edit", "lookup_data")
 	resp, err := client.Post(endpoint, values)
@@ -36,7 +45,12 @@ func (client *Client) ReadLookupTableFile(name, owner, app string) (*http.Respon
 }
 
 func (client *Client) UpdateLookupTableFile(name string, owner string, app string, contents string) error {
-	values := []byte(fmt.Sprintf("namespace=%s&lookup_file=%s&owner=%s&contents=%s", app, name, owner, contents))
+	values := []byte(url.Values{
+		"namespace":   {app},
+		"lookup_file": {name},
+		"owner":       {owner},
+		"contents":    {contents},
+	}.Encode())
 	endpoint := client.BuildSplunkURL(nil, "services", "data", "lookup_edit", "lookup_contents")
 	client.urlEncoded = true
 	resp, err := client.Post(endpoint, values)
