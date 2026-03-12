@@ -123,7 +123,20 @@ func lookupTableFileDelete(d *schema.ResourceData, meta interface{}) error {
 }
 
 func getLookupTableFile(d *schema.ResourceData) (lookupTableFile *models.LookupTableFile) {
-	fileContents, _ := json.Marshal(d.Get("file_contents"))
+	rawContents := d.Get("file_contents").([]interface{})
+	contents := make([][]string, len(rawContents))
+	for i, row := range rawContents {
+		rawRow := row.([]interface{})
+		contents[i] = make([]string, len(rawRow))
+		for j, val := range rawRow {
+			if val == nil {
+				contents[i][j] = ""
+			} else {
+				contents[i][j] = val.(string)
+			}
+		}
+	}
+	fileContents, _ := json.Marshal(contents)
 	lookupTableFile = &models.LookupTableFile{
 		App:          d.Get("app").(string),
 		Owner:        d.Get("owner").(string),
