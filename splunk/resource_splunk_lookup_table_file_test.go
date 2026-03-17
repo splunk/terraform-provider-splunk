@@ -3,6 +3,7 @@ package splunk
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -37,6 +38,13 @@ resource "splunk_lookup_table_file" "test" {
 `
 
 func TestAccSplunkLookupTableFile(t *testing.T) {
+	// The splunk_lookup_table_file resource uses the lookup_edit API (e.g. from the
+	// Splunk App for Lookup File Editing), which is not part of core Splunk. If that
+	// API is not available, the provider gets 404. Skip this test unless the env var
+	// is set so CI and default runs do not fail.
+	if os.Getenv("SPLUNK_TEST_LOOKUP_TABLE_FILE") == "" {
+		t.Skip("Skipping lookup table file test; set SPLUNK_TEST_LOOKUP_TABLE_FILE=1 when Splunk has the Lookup File Editing API available (e.g. Splunk App for Lookup File Editing installed)")
+	}
 	resourceName := "splunk_lookup_table_file.test"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
