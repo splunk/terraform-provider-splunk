@@ -1,3 +1,7 @@
+## 1.4.37
+* Fix: saved search `action_email_include_*` fields (results_link, view_link, search, trigger, trigger_time) — removed omitempty from URL parameters so value 0 is sent to Splunk and can be set in config
+* Change: saved search `action_email_include_results_link` and `action_email_include_view_link` now default to 1 to match Splunk savedsearches.conf; removed Computed so defaults apply
+
 ## 1.4.36
 * Fix: saved search action_email_include_results_link handles 0 value 
 * Fix: saved search action_email_include_view_link handles 0 value

@@ -44,11 +44,11 @@ This resource block supports the following arguments:
 - `action_email_format` - (Optional) Valid values: (table | plain | html | raw | csv)Specify the format of text in the email. This value also applies to any attachments.
 - `action_email_from` - (Optional) Email address from which the email action originates.Defaults to splunk@$LOCALHOST or whatever value is set in alert_actions.conf.
 - `action_email_hostname` - (Optional) Sets the hostname used in the web link (url) sent in email actions.This value accepts two forms:hostname (for example, splunkserver, splunkserver.example.com)
-- `action_email_include_results_link` - (Optional) Specify whether to include a link to the results. Defaults to 0.
-- `action_email_include_search` - (Optional) Specify whether to include the search that caused an email to be sent. Defaults to 0.
-- `action_email_include_trigger` - (Optional) Specify whether to show the trigger condition that caused the alert to fire. Defaults to 0.
-- `action_email_include_trigger_time` - (Optional) Specify whether to show the time that the alert was fired. Defaults to 0.
-- `action_email_include_view_link` - (Optional) Specify whether to show the title and a link to enable the user to edit the saved search. Defaults to 0.
+- `action_email_include_results_link` - (Optional) Specify whether to include a link to the results. Defaults to 1 (true). [1|0]
+- `action_email_include_search` - (Optional) Specify whether to include the search that caused an email to be sent. Defaults to 0. [1|0]
+- `action_email_include_trigger` - (Optional) Specify whether to show the trigger condition that caused the alert to fire. Defaults to 0. [1|0]
+- `action_email_include_trigger_time` - (Optional) Specify whether to show the time that the alert was fired. Defaults to 0. [1|0]
+- `action_email_include_view_link` - (Optional) Specify whether to show the title and a link to enable the user to edit the saved search. Defaults to 1 (true). [1|0]
 - `action_email_inline` - (Optional) Indicates whether the search results are contained in the body of the email.Results can be either inline or attached to an email.
 - `action_email_mailserver` - (Optional) Set the address of the MTA server to be used to send the emails.Defaults to <LOCALHOST> or whatever is set in alert_actions.conf.
 - `action_email_max_results` - (Optional) Sets the global maximum number of search results to send when email.action is enabled. Defaults to 100.

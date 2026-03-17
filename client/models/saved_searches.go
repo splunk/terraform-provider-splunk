@@ -23,9 +23,9 @@ type SavedSearchObject struct {
 	ActionEmailFrom                              string  `json:"action.email.from,omitempty" url:"action.email.from,omitempty"`
 	ActionEmailHostname                          string  `json:"action.email.hostname,omitempty" url:"action.email.hostname,omitempty"`
 	ActionEmailIncludeResultsLink                int     `json:"action.email.include.results_link,string,omitempty" url:"action.email.include.results_link"`
-	ActionEmailIncludeSearch                     int     `json:"action.email.include.search,string,omitempty" url:"action.email.include.search,omitempty"`
-	ActionEmailIncludeTrigger                    int     `json:"action.email.include.trigger,string,omitempty" url:"action.email.include.trigger,omitempty"`
-	ActionEmailIncludeTriggerTime                int     `json:"action.email.include.trigger_time,string,omitempty" url:"action.email.include.trigger_time,omitempty"`
+	ActionEmailIncludeSearch                     int     `json:"action.email.include.search,string,omitempty" url:"action.email.include.search"`
+	ActionEmailIncludeTrigger                    int     `json:"action.email.include.trigger,string,omitempty" url:"action.email.include.trigger"`
+	ActionEmailIncludeTriggerTime                int     `json:"action.email.include.trigger_time,string,omitempty" url:"action.email.include.trigger_time"`
 	ActionEmailIncludeViewLink                   int     `json:"action.email.include.view_link,string,omitempty" url:"action.email.include.view_link"`
 	ActionEmailInline                            bool    `json:"action.email.inline" url:"action.email.inline"`
 	ActionEmailMailserver                        string  `json:"action.email.mailserver,omitempty" url:"action.email.mailserver,omitempty"`
