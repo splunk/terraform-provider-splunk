@@ -1,3 +1,7 @@
+## 1.4.36
+* Fix: saved search action_email_include_results_link handles 0 value 
+* Fix: saved search action_email_include_view_link handles 0 value
+
 ## 1.4.35
 * Fix: lookup_table_file - handle nil values in file_contents by converting to empty strings before JSON marshaling
 * Fix: lookup_table_file - properly URL-encode form parameters in Create/Read/Update operations

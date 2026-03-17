@@ -21,11 +21,13 @@ fmt:
 build:
 	go build -o terraform-provider-splunk .
 
+# Use external linker on macOS to avoid dyld "missing LC_UUID" abort (macOS 15+).
+# TF_ACC= ensures acceptance tests are skipped (no API required).
 test:
-	go test ./...
+	TF_ACC= go test -ldflags="-linkmode=external" ./...
 
 testacc:
-	TF_ACC=1 go test ./... -v
+	TF_ACC=1 go test -ldflags="-linkmode=external" ./... -v
 
 init:
 	@terraform init

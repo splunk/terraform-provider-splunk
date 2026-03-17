@@ -1,6 +1,9 @@
 # Resource: splunk_lookup_table_file
 Create and manage lookup table files.
 
+## Requirements
+This resource uses the Splunk `data/lookup_edit` REST API to create and update lookup file contents. That API is not part of core Splunk Enterprise; it is typically provided by the **Splunk App for Lookup File Editing** (Lookup Editor app). If the API is not available, the provider will receive 404 errors. Install the app on your Splunk instance if you need to manage lookup table file contents with Terraform.
+
 ## Example Usage
 ```
 resource "splunk_lookup_table_file" "lookup_table_file" {

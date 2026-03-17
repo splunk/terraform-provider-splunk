@@ -97,6 +97,40 @@ resource "splunk_saved_searches" "test" {
     }
 }
 `
+
+// savedSearchesEmailIncludeLinksZero sets action_email_include_results_link and
+// action_email_include_view_link to 0 to verify they are sent to the API and
+// returned on read (and thus appear in savedsearches.conf).
+const savedSearchesEmailIncludeLinksZero = `
+resource "splunk_saved_searches" "test" {
+    name = "Test Email Include Links Zero"
+    search = "index=main"
+    actions = "email"
+    action_email_include_results_link = 0
+    action_email_include_view_link = 0
+    action_email_include_search = 0
+    action_email_include_trigger = 1
+    action_email_format = "table"
+    action_email_max_time = "5m"
+    action_email_max_results = 10
+    action_email_send_csv = 1
+    action_email_send_results = false
+    action_email_subject = "Splunk Alert: $name$"
+    action_email_to = "splunk@splunk.com"
+    action_email_track_alert = true
+    alert_track = true
+    dispatch_earliest_time = "rt-15m"
+    dispatch_latest_time = "rt-0m"
+    dispatch_index_earliest = "-10m"
+    dispatch_index_latest = "-5m"
+    cron_schedule = "*/5 * * * *"
+    acl {
+      owner = "admin"
+      sharing = "app"
+      app = "launcher"
+    }
+}
+`
 const newSavedSearchesLogEvent = `
 resource "splunk_saved_searches" "test" {
 	name = "Test Log Event Alert"
@@ -737,6 +771,30 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 				ResourceName:      "splunk_saved_searches.test",
 				ImportState:       true,
 				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+// TestAccSplunkSavedSearchesEmailIncludeLinksZero verifies that setting
+// action_email_include_results_link and action_email_include_view_link to 0
+// sends them to the API and they are returned on read (and appear in savedsearches.conf).
+func TestAccSplunkSavedSearchesEmailIncludeLinksZero(t *testing.T) {
+	resourceName := "splunk_saved_searches.test"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testAccSplunkSavedSearchesDestroyResources,
+		Steps: []resource.TestStep{
+			{
+				Config: savedSearchesEmailIncludeLinksZero,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Email Include Links Zero"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_include_results_link", "0"),
+					resource.TestCheckResourceAttr(resourceName, "action_email_include_view_link", "0"),
+				),
 			},
 		},
 	})
