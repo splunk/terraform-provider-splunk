@@ -1,21 +1,21 @@
-# Resource: splunk_saved_eventtypes
-Create and manage saved searches.
+# Resource: splunk_saved_event_types
+Create and manage saved event types (knowledge objects).
 
 ## Example Usage
 ```
 resource "splunk_saved_event_types" "test" {
-    name        = "test"
-    description = "Test New event description"
-    disabled 	= "0"
-    priority 	= 1
-    search 		= "index=main"
-    color		= "blue"
-    tags 		= "tag"
-    acl {
-      owner = "admin"
-      sharing = "app"
-      app = "launcher"
-    }
+  name        = "test"
+  description = "Test New event description"
+  disabled    = false
+  priority    = 1
+  search      = "index=main"
+  color       = "et_blue"
+  tags        = ["tag"]
+  acl {
+    owner   = "admin"
+    sharing = "app"
+    app     = "launcher"
+  }
 }
 ```
 

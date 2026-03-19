@@ -10,23 +10,23 @@ import (
 
 const newSavedEventTypes = `
 resource "splunk_saved_event_types" "event-type" {
-    name 		= "test"
-    description = "Test New event description"
-    disabled 	= "0"
-    priority 	= 1
-    search 		= "index=main"
-    color		= "blue"
-    tags 		= "tag"
-    acl {
-      owner = "admin"
-      sharing = "app"
-      app = "launcher"
-    }
+  name        = "test"
+  description = "Test New event description"
+  disabled    = false
+  priority    = 1
+  search      = "index=main"
+  color       = "et_blue"
+  tags        = ["tag"]
+  acl {
+    owner   = "admin"
+    sharing = "app"
+    app     = "launcher"
+  }
 }
 `
 
 func TestAccSplunkSavedEventTypes(t *testing.T) {
-	resourceName := "splunk_saved_event_types.test"
+	resourceName := "splunk_saved_event_types.event-type"
 	resource.Test(t, resource.TestCase{
 		PreCheck: func() {
 			testAccPreCheck(t)
@@ -39,14 +39,15 @@ func TestAccSplunkSavedEventTypes(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "name", "test"),
 					resource.TestCheckResourceAttr(resourceName, "search", "index=main"),
 					resource.TestCheckResourceAttr(resourceName, "description", "Test New event description"),
-					resource.TestCheckResourceAttr(resourceName, "disabled", "0"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
 					resource.TestCheckResourceAttr(resourceName, "priority", "1"),
-					resource.TestCheckResourceAttr(resourceName, "color", "blue"),
-					resource.TestCheckResourceAttr(resourceName, "tags", "tag"),
+					resource.TestCheckResourceAttr(resourceName, "color", "et_blue"),
+					resource.TestCheckResourceAttr(resourceName, "tags.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "tags.0", "tag"),
 				),
 			},
 			{
-				ResourceName:      "splunk_saved_event_types.test",
+				ResourceName:      "splunk_saved_event_types.event-type",
 				ImportState:       true,
 				ImportStateVerify: true,
 			},

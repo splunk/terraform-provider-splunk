@@ -199,10 +199,12 @@ func savedEventTypesDelete(d *schema.ResourceData, meta interface{}) error {
 		return nil
 
 	default:
-		errorResponse := &models.InputsUDPResponse{}
+		errorResponse := &models.SavedEventTypesResponse{}
 		_ = json.NewDecoder(resp.Body).Decode(errorResponse)
-		err := errors.New(errorResponse.Messages[0].Text)
-		return err
+		if len(errorResponse.Messages) > 0 {
+			return errors.New(errorResponse.Messages[0].Text)
+		}
+		return fmt.Errorf("delete failed with status %d", resp.StatusCode)
 	}
 }
 
