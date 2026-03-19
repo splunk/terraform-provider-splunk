@@ -10,7 +10,7 @@ import (
 
 const newSavedEventTypes = `
 resource "splunk_saved_event_types" "event-type" {
-  name        = "test"
+  name        = "test-acc-saved-event-type"
   description = "Test New event description"
   disabled    = false
   priority    = 1
@@ -20,7 +20,7 @@ resource "splunk_saved_event_types" "event-type" {
   acl {
     owner   = "admin"
     sharing = "app"
-    app     = "launcher"
+    app     = "search"
   }
 }
 `
@@ -37,7 +37,7 @@ func TestAccSplunkSavedEventTypes(t *testing.T) {
 			{
 				Config: newSavedEventTypes,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr(resourceName, "name", "test"),
+					resource.TestCheckResourceAttr(resourceName, "name", "test-acc-saved-event-type"),
 					resource.TestCheckResourceAttr(resourceName, "search", "index=main"),
 					resource.TestCheckResourceAttr(resourceName, "description", "Test New event description"),
 					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
