@@ -71,6 +71,23 @@ resource "splunk_inputs_http_event_collector" "new-token" {
 }
 `
 
+// hecTokenListEndpointConfig creates a HEC token with no acl block (default nobody/splunk_httpinput).
+const hecTokenListEndpointConfig = `
+resource "splunk_global_http_event_collector" "http" {
+  disabled   = false
+  enable_ssl = true
+}
+
+resource "splunk_inputs_http_event_collector" "list_endpoint_test" {
+  name       = "test-hec-list-endpoint"
+  index      = "main"
+  indexes    = ["main"]
+  disabled   = false
+  use_ack    = 0
+  depends_on = ["splunk_global_http_event_collector.http"]
+}
+`
+
 func TestAccSplunkHttpEventCollectorInput(t *testing.T) {
 	resourceName := "splunk_inputs_http_event_collector.new-token"
 	resource.Test(t, resource.TestCase{
@@ -158,6 +175,38 @@ func TestAccSplunkHttpEventCollectorInputWithToken(t *testing.T) {
 				ResourceName:      "splunk_inputs_http_event_collector.new-token",
 				ImportState:       true,
 				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
+// TestAccSplunkHttpEventCollectorInputListEndpoint creates a HEC token with default ACL (no acl block)
+// and asserts it can be read back. After create, the provider runs Read(), which lists tokens via
+// ReadAllHttpEventCollectorObject(), finds the entry by name, then reads the token with that entry’s
+// owner and app. The test passes only if the list returns the token and the subsequent read succeeds.
+func TestAccSplunkHttpEventCollectorInputListEndpoint(t *testing.T) {
+	resourceName := "splunk_inputs_http_event_collector.list_endpoint_test"
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testAccSplunkHttpEventCollectorInputDestroyResources,
+		Steps: []resource.TestStep{
+			{
+				Config: hecTokenListEndpointConfig,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "test-hec-list-endpoint"),
+					resource.TestCheckResourceAttr(resourceName, "index", "main"),
+					resource.TestCheckResourceAttr(resourceName, "indexes.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "indexes.0", "main"),
+					resource.TestCheckResourceAttr(resourceName, "disabled", "false"),
+					resource.TestCheckResourceAttr(resourceName, "use_ack", "0"),
+					resource.TestCheckResourceAttrSet(resourceName, "token"),
+					resource.TestCheckResourceAttr(resourceName, "acl.#", "1"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "splunk_httpinput"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "nobody"),
+				),
 			},
 		},
 	})

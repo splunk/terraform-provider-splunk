@@ -58,9 +58,12 @@ func (client *Client) DeleteHttpEventCollectorObject(name, owner, app string) (*
 	return resp, nil
 }
 
-// services/data/inputs/http
+// ReadAllHttpEventCollectorObject returns the list of HTTP Event Collector tokens.
+// Per Splunk RESTREF (https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTinput#data.2Finputs.2Fhttp),
+// the documented list endpoint is GET /services/data/inputs/http (global, no servicesNS).
+// GET /servicesNS/-/-/data/inputs/http returns empty in some deployments (see issue #56).
 func (client *Client) ReadAllHttpEventCollectorObject() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "inputs", "http")
+	endpoint := client.BuildSplunkURL(nil, "services", "data", "inputs", "http")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
