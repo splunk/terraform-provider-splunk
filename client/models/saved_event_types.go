@@ -13,7 +13,7 @@ type SavedEventTypesEntry struct {
 
 type SavedEventTypeObject struct {
 	Name        string   `json:"name"`
-	Description string   `json:"description"`
+	Description string   `json:"description" url:"description,omitempty"`
 	Disabled    bool     `json:"disabled,omitempty" url:"disabled,omitempty"`
 	Color       string   `json:"color,omitempty" url:"color,omitempty"`
 	Priority    int      `json:"priority,omitempty" url:"priority,omitempty"`

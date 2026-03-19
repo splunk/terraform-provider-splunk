@@ -31,6 +31,7 @@ func TestAccSplunkSavedEventTypes(t *testing.T) {
 		PreCheck: func() {
 			testAccPreCheck(t)
 		},
+		Providers:    testAccProviders,
 		CheckDestroy: testAccSplunkSavedEventsDestroyResources,
 		Steps: []resource.TestStep{
 			{
