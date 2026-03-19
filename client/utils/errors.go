@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -27,7 +27,7 @@ func ParseHTTPStatusCodeInResponse(response *http.Response) (*http.Response, err
 			Message: response.Status,
 		}
 		if response.Body != nil {
-			body, err := ioutil.ReadAll(response.Body)
+			body, err := io.ReadAll(response.Body)
 			if err != nil {
 				return response, err
 			}

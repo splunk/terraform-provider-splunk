@@ -3,7 +3,6 @@ package splunk
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
 	"regexp"
@@ -70,8 +69,11 @@ func adminSAMLGroupsRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
+	// an empty entry (with no error) means the resource wasn't found
+	// mark it as such so it can be re-created
 	if entry == nil {
-		return fmt.Errorf("Unable to find resource: %v", name)
+		d.SetId("")
+		return nil
 	}
 
 	if err = d.Set("name", entry.Name); err != nil {
@@ -130,9 +132,10 @@ func getAdminSAMLGroupsConfig(d *schema.ResourceData) (adminSAMLGroupsObject *mo
 
 func getAdminSAMLGroupsByName(name string, httpResponse *http.Response) (AdminSAMLGroupsEntry *models.AdminSAMLGroupsEntry, err error) {
 	response := &models.AdminSAMLGroupsResponse{}
+	_ = json.NewDecoder(httpResponse.Body).Decode(response)
+
 	switch httpResponse.StatusCode {
 	case 200, 201:
-		_ = json.NewDecoder(httpResponse.Body).Decode(&response)
 		re := regexp.MustCompile(`(.*)`)
 		for _, entry := range response.Entry {
 			if name == re.FindStringSubmatch(entry.Name)[1] {
@@ -140,11 +143,18 @@ func getAdminSAMLGroupsByName(name string, httpResponse *http.Response) (AdminSA
 			}
 		}
 
-	default:
-		_ = json.NewDecoder(httpResponse.Body).Decode(response)
+	case 400:
+		// Splunk returns a 400 when a SAML group mapping is not found
+		// try to catch that here
+		re := regexp.MustCompile("Unable to find a role mapping for")
+		if re.MatchString(response.Messages[0].Text) {
+			return nil, nil
+		}
+
+		// but if the error didn't match, don't assume the 400 status was just a missing resource
 		err := errors.New(response.Messages[0].Text)
-		return AdminSAMLGroupsEntry, err
+		return nil, err
 	}
 
-	return AdminSAMLGroupsEntry, nil
+	return nil, errors.New(response.Messages[0].Text)
 }

@@ -1,6 +1,7 @@
 package splunk
 
 import (
+	"net/url"
 	"time"
 
 	"github.com/splunk/terraform-provider-splunk/client"
@@ -85,11 +86,13 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_inputs_tcp_cooked":           inputsTCPCooked(),
 		"splunk_inputs_tcp_splunk_tcp_token": inputsTCPSplunkTCPToken(),
 		"splunk_inputs_tcp_ssl":              inputsTCPSSL(),
+		"splunk_lookup_table_file":           lookupTableFile(),
 		"splunk_outputs_tcp_default":         outputsTCPDefault(),
 		"splunk_outputs_tcp_server":          outputsTCPServer(),
 		"splunk_outputs_tcp_group":           outputsTCPGroup(),
 		"splunk_outputs_tcp_syslog":          outputsTCPSyslog(),
 		"splunk_saved_searches":              savedSearches(),
+		"splunk_lookup_definition":           splunkLookupDefinitions(),
 		"splunk_sh_indexes_manager":          shIndexesManager(),
 		"splunk_indexes":                     index(),
 		"splunk_configs_conf":                configsConf(),
@@ -111,11 +114,20 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	// Ensure scheme to parse host and path
+	providerUrl := d.Get("url").(string)
+	if !hasScheme(providerUrl) {
+		providerUrl = "http://" + providerUrl // add http scheme so url.Parse works
+	}
+	u, err := url.Parse(providerUrl)
+	if err != nil {
+		return nil, err
+	}
 	if token, ok := d.GetOk("auth_token"); ok {
 		splunkdClient, err = client.NewSplunkdClientWithAuthToken(token.(string),
 			[2]string{d.Get("username").(string), d.Get("password").(string)},
-			d.Get("url").(string),
+			u.Host,
+			u.Path,
 			httpClient)
 		if err != nil {
 			return splunkdClient, err
@@ -123,7 +135,8 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 	} else {
 		splunkdClient, err = client.NewSplunkdClient("",
 			[2]string{d.Get("username").(string), d.Get("password").(string)},
-			d.Get("url").(string),
+			u.Host,
+			u.Path,
 			httpClient)
 		if err != nil {
 			return splunkdClient, err
@@ -137,4 +150,10 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 
 	provider.Client = splunkdClient
 	return provider, nil
+}
+
+// hasScheme checks if a URL has scheme and host
+func hasScheme(providerUrl string) bool {
+	parsed, err := url.Parse(providerUrl)
+	return err == nil && parsed.Scheme != "" && parsed.Host != ""
 }

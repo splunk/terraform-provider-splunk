@@ -41,8 +41,10 @@ type Client struct {
 	sessionKey string
 	auth       [2]string
 	host       string
+	path       string
 	httpClient *http.Client
 	userAgent  string
+	urlEncoded bool
 }
 
 // NewRequest creates a new HTTP Request and set proper header
@@ -60,6 +62,9 @@ func (c *Client) NewRequest(httpMethod, url string, body io.Reader) (*http.Reque
 	}
 	request.Header.Set("Accept", "application/json")
 	request.Header.Set("User-Agent", c.userAgent)
+	if c.urlEncoded {
+		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
 	return request, nil
 }
 
@@ -73,7 +78,7 @@ func getEnv(key, defaultValue string) string {
 }
 
 func (c *Client) BuildSplunkURL(queryValues url.Values, urlPathParts ...string) url.URL {
-	buildPath := ""
+	buildPath := c.path
 	for _, pathPart := range urlPathParts {
 		pathPart = strings.ReplaceAll(pathPart, " ", "+") // url parameters cannot have spaces
 		buildPath = path.Join(buildPath, pathPart)
@@ -148,7 +153,18 @@ func (c *Client) DoRequest(method string, requestURL url.URL, body interface{}) 
 	if err != nil {
 		return nil, err
 	}
-	return utils.ParseHTTPStatusCodeInResponse(response)
+	if response == nil {
+		return nil, fmt.Errorf("nil response for '%s' request", &requestURL)
+	}
+	if response.StatusCode != 200 && response.StatusCode != 201 {
+		body, err := io.ReadAll(response.Body)
+		if err != nil {
+			return nil, err
+		}
+		return response, fmt.Errorf("%s: %s", response.Status, string(body))
+	}
+
+	return response, nil
 }
 
 func (c *Client) Login() (e error) {
@@ -262,13 +278,14 @@ func NewDefaultSplunkdClient() (*Client, error) {
 }
 
 // NewSplunkdClient creates a Client with custom values passed in
-func NewSplunkdClient(sessionKey string, auth [2]string, host string, httpClient *http.Client) (*Client, error) {
+func NewSplunkdClient(sessionKey string, auth [2]string, host string, path string, httpClient *http.Client) (*Client, error) {
 	c, err := NewDefaultSplunkdClient()
 	if err != nil {
 		return nil, err
 	}
 	c.auth = auth
 	c.host = host
+	c.path = path
 	c.sessionKey = sessionKey
 	if httpClient != nil {
 		c.httpClient = httpClient
@@ -277,13 +294,14 @@ func NewSplunkdClient(sessionKey string, auth [2]string, host string, httpClient
 }
 
 // NewSplunkdClient creates a Client with custom values passed in
-func NewSplunkdClientWithAuthToken(authToken string, auth [2]string, host string, httpClient *http.Client) (*Client, error) {
+func NewSplunkdClientWithAuthToken(authToken string, auth [2]string, host string, path string, httpClient *http.Client) (*Client, error) {
 	c, err := NewDefaultSplunkdClient()
 	if err != nil {
 		return nil, err
 	}
 	c.auth = auth
 	c.host = host
+	c.path = path
 	c.authToken = authToken
 	if httpClient != nil {
 		c.httpClient = httpClient

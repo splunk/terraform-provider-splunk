@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/splunk/terraform-provider-splunk/client/models"
-	"io/ioutil"
+	"io"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
+
+	"github.com/avast/retry-go/v4"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -31,7 +34,7 @@ func configsConf() *schema.Resource {
 				Type:         schema.TypeString,
 				Required:     true,
 				ForceNew:     true,
-				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^[a-zA-Z0-9\-.]+/[a-zA-Z0-9\-.]+`), "A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza"),
+				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^[a-zA-Z0-9_\-.]+/[a-zA-Z0-9_\-.:/]+`), "A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza"),
 				Description:  `A '/' separated string consisting of {conf_file_name}/{stanza_name} ex. props/custom_stanza`,
 			},
 			"acl": aclSchema(),
@@ -64,7 +67,18 @@ func configsConfCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 	if _, ok := d.GetOk("acl"); ok {
 		conf, stanza := (*provider.Client).SplitConfStanza(name)
-		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, stanza, aclObject, "configs", "conf-"+conf)
+		// add retry as sometimes config object is not yet propagated and acl endpoint return 404
+		err = retry.Do(
+			func() error {
+				err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, stanza, aclObject, "configs", "conf-"+conf)
+				if err != nil {
+					return err
+				}
+				return nil
+			}, retry.Attempts(10), retry.OnRetry(func(n uint, err error) {
+				log.Printf("#%d: %s. Retrying...\n", n, err)
+			}), retry.DelayType(retry.BackOffDelay),
+		)
 		if err != nil {
 			return err
 		}
@@ -109,7 +123,7 @@ func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 	defer contentResp.Body.Close()
 
 	var result map[string]interface{}
-	b, _ := ioutil.ReadAll(contentResp.Body)
+	b, _ := io.ReadAll(contentResp.Body)
 
 	err = json.Unmarshal(b, &result)
 	if err != nil {

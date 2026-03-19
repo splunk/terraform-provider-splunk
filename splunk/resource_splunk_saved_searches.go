@@ -13,6 +13,12 @@ import (
 	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
+func suppressDefault(defaultValue string) schema.SchemaDiffSuppressFunc {
+    return func(k, old, new string, d *schema.ResourceData) bool {
+        return old == defaultValue && new == ""
+    }
+}
+
 func savedSearches() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
@@ -21,6 +27,72 @@ func savedSearches() *schema.Resource {
 				Optional:    true,
 				Computed:    true,
 				Description: "A comma-separated list of actions to enable. For example: rss,email ",
+			},
+			"action_snow_event_param_account": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Account(s) for which the event is/ are to be created across ServiceNow instance(s).",
+			},
+			"action_snow_event_param_node": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The node, formatted to follow your organization's ITIL standards and mapping. If the node value matches a CI with the same host name, the event is automatically assigned to the matching CI.",
+			},
+			"action_snow_event_param_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The type, formatted to follow your organization's ITIL standards and mapping. For example, type='Virtual Machine'.",
+			},
+			"action_snow_event_param_resource": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The resource, formatted to follow your organization's ITIL standards and mapping. For example, resource='CPU'.",
+			},
+			"action_snow_event_param_severity": {
+				Type:     schema.TypeInt,
+				Optional: true,
+				Computed: true,
+				Description: "The severity associated with the event. " +
+					"0 - Clear " +
+					"1 - Critical " +
+					"2 - Major " +
+					"3 - Minor " +
+					"4 - Warning",
+			},
+			"action_snow_event_param_description": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "	A brief description of the event.",
+			},
+			"action_snow_event_param_ci_identifier": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "String that represents a configuration item in your network. You can pass value as || separated key-value format. For example, k1=v1||k2=v2.",
+			},
+			"action_snow_event_param_custom_fields": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "The custom fields which are configured at the ServiceNow Instance. " +
+					"You can pass the custom fields and their values in the || separated format. For example, custom_field1=value1||custom_field2=value2||..." +
+					"custom_fields used must be present in the em_event table of ServiceNow.",
+			},
+			"action_snow_event_param_additional_info": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "You can pass additional information that might be of use to the user. " +
+					"This field can also be used to supply the URL of your Splunk search head. " +
+					"When you use the snow_event.py alert-triggered script, the Splunk platform uses the URL to create a deep link that allows a ServiceNow user to navigate back to this Splunk platform search. " +
+					"You can find the resulting full URL for navigation from ServiceNow to the Splunk platform search by clicking Splunk Drilldown in the event page in ServiceNow. See an example below. " +
+					"Note that if you create events using the commands snowevent or snoweventstream, you must supply the URL in this field." +
+					"You can pass the URL of Splunk as url=<value>. You can also pass other fields and their values by || separated key-value format. For example, url=<value>||k1=v1||k2=v2||....",
 			},
 			"action_email": {
 				Type:     schema.TypeBool,
@@ -275,6 +347,35 @@ func savedSearches() *schema.Resource {
 				Description: "Indicates whether columns should be sorted from least wide to most wide, left to right." +
 					"Only valid if format=text.",
 			},
+			"action_pagerduty_custom_details": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The PagerDuty custom details information.",
+			},
+			"action_pagerduty_integration_key": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+				Description: "The PagerDuty integration Key." +
+					"NOTE: None.",
+			},
+			"action_pagerduty_integration_key_override": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "The PagerDuty integration Key override.",
+			},
+			"action_pagerduty_integration_url": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The pagerduty integration URL. This integration uses Splunk's native webhooks to send events to PagerDuty.",
+			},
+			"action_pagerduty_integration_url_override": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The pagerduty integration URL override. This integration uses Splunk's native webhooks to send events to PagerDuty.",
+			},
 			"action_populate_lookup": {
 				Type:     schema.TypeBool,
 				Computed: true,
@@ -487,6 +588,87 @@ func savedSearches() *schema.Resource {
 				Description: "Valid values are: Integer[p] Specifies the minimum time-to-live in seconds of the search artifacts if this action is triggered. " +
 					"If p follows Integer, specifies the number of scheduled periods. Defaults to 86400 (24 hours).",
 			},
+			"action_logevent": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Enabled event logging.",
+			},
+			"action_logevent_param_event": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Event text for the logged event entry.",
+			},
+			"action_logevent_param_host": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Value of the host field for the logged event entry.",
+			},
+			"action_logevent_param_index": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Destination index for the logged event.",
+			},
+			"action_logevent_param_sourcetype": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Destination sourcetype for the logged event.",
+			},
+			"action_logevent_param_source": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Computed:    true,
+				Description: "Value of the source field for the logged event entry.",
+			},
+			"action_create_xsoar_incident": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enabled XSOAR Alert Sending.",
+			},
+			"action_create_xsoar_incident_param_send_all_servers": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enabled XSOAR alert sending to all servers.",
+			},
+			"action_create_xsoar_incident_param_server_url": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enter the XSOAR server URL.",
+			},
+			"action_create_xsoar_incident_param_incident_name": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enter the XSOAR incident name.",
+			},
+			"action_create_xsoar_incident_param_details": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enter the XSOAR incident details.",
+			},
+			"action_create_xsoar_incident_param_custom_fields": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enter the XSOAR incident custom_fields.",
+			},
+			"action_create_xsoar_incident_param_severity": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enter the XSOAR incident serverity.",
+			},
+			"action_create_xsoar_incident_param_occurred": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Eneter the XSOAR incident occurred datetime.",
+			},
+			"action_create_xsoar_incident_param_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enter the XSOAR incident type.",
+			},
 			"action_slack_param_channel": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -513,6 +695,140 @@ func savedSearches() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Description: "You can override the Slack webhook URL here if you need to send the alert message to a different Slack team.",
+			},
+			"action_slack_app_alert_integration_param_auto_join_channel": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Valid values: (1 | 0) Specify whether the Slack App bot should automatically join the channel if it is not already a member. Defaults to false.",
+			},
+			"action_slack_app_alert_integration_param_bot_username": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Specify a custom bot username for the Slack App alert.",
+			},
+			"action_slack_app_alert_integration_param_channel": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Slack channel to send the message to (Should not start with #)",
+			},
+			"action_slack_app_alert_integration_param_emoji": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Specify a custom bot emoji for the Slack App alert.",
+			},
+			"action_slack_app_alert_integration_param_message": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Enter the chat message to send to the Slack channel. The message can include tokens that insert text based on the results of the search.",
+			},
+			"action_jira_service_desk_param_account": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "This is where you would put the account name you set in the Jira Service Desk",
+			},
+			"action_jira_service_desk_param_jira_project": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Jira Project where the issue will be created",
+			},
+			"action_jira_service_desk_param_jira_issue_type": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Jira Issue Type you would like to create",
+			},
+			"action_jira_service_desk_param_jira_summary": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Jira Issue Summary or title",
+				DiffSuppressFunc: suppressDefault("Splunk Alert: $name$"),
+			},
+			"action_jira_service_desk_param_jira_priority": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Priority of issue created",
+			},
+			"action_jira_service_desk_param_jira_description": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enter the description of issue created",
+				DiffSuppressFunc: suppressDefault("The alert condition for '$name$' was triggered."),
+			},
+			"action_jira_service_desk_param_jira_customfields": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enter custom fields data for the issue created",
+			},
+			"action_victorops_param_message_type": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Default:      "CRITICAL",
+				Description: "Valid values: (INFO | WARNING | CRITICAL | ACKNOLEGEMENT | RECOVERY)" +
+					"Specifies the type of message to send to VictorOps. Defaults to CRITICAL.",
+			},
+			"action_victorops_param_monitoring_tool": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Valid values: (Splunk Enterprise | Splunk-ES | Splunk-SII | Splunk-ITSI)" +
+				       	"Specifies the monitoring tool sending the alert. Defaults to empty.",
+
+			},
+			"action_victorops_param_entity_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Unique identifier for the affected entity.",
+			},
+			"action_victorops_param_state_message": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Message describing the current state of the entity.",
+			},
+			"action_victorops_param_record_id": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Unique identifier for the alert record used in api key.",
+			},
+			"action_victorops_param_routing_key_override": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Routing key to override the default routing key configured in VictorOps.",
+			},
+			"action_victorops_param_enable_recovery": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Specifies whether to enable recovery polling to send RECOVERY messages when the alert condition is no longer met. [1|0]",
+				Default: "0",
+			},
+			"action_victorops_param_poll_interval": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Interval in seconds at which to poll for alert resolution to trigger recovery messages.",
+			},
+			"action_victorops_param_inactive_polls": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description: "Number of consecutive polls with no alert before stopping recovery polling.",
+			},
+			"action_better_webhook_param_url": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "URL to send the HTTP POST request to. Must be accessible from the Splunk server.",
+				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https?://[^\s]+$`), "Webhook URL is invalid"),
+			},
+			"action_better_webhook_param_body_format": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Format of the body to send in the HTTP POST request.",
+				Default: "{\n  \"sid\": $$sid$$,\n  \"search_name\": $$search_name$$,\n  \"app\": $$app$$,\n  \"owner\": $$owner$$,\n  \"results_link\": $$results_link$$,\n  \"result\": $$full_result$$\n}",
+			},
+			"action_better_webhook_param_credential": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Name of the credential to use for authentication when sending the HTTP POST request.",
+			},
+			"action_better_webhook_param_credentials": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				Description:  "Name of the credentials to use for authentication when sending the HTTP POST request.",
 			},
 			"action_webhook_param_url": {
 				Type:         schema.TypeString,
@@ -977,22 +1293,15 @@ func savedSearchesCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
 	savedSearchesConfig := getSavedSearchesConfig(d)
-	aclObject := &models.ACLObject{}
-	if r, ok := d.GetOk("acl"); ok {
-		aclObject = getACLConfig(r.([]interface{}))
-	} else {
-		aclObject.App = "search"
-		aclObject.Owner = "nobody"
-	}
+	aclObject := getResourceDataSearchACL(d)
 	err := (*provider.Client).CreateSavedSearches(name, aclObject.Owner, aclObject.App, savedSearchesConfig)
 	if err != nil {
 		return err
 	}
 
 	if _, ok := d.GetOk("acl"); ok {
-		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "saved", "searches")
-		if err != nil {
-			return err
+		if err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "saved", "searches"); err != nil {
+			return fmt.Errorf("savedSearchesCreate: updateacl: %s\n%#v", err, aclObject)
 		}
 	}
 
@@ -1003,8 +1312,10 @@ func savedSearchesCreate(d *schema.ResourceData, meta interface{}) error {
 func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
-	// We first get list of searches to get owner and app name for the specific input
-	resp, err := (*provider.Client).ReadAllSavedSearches()
+
+	aclObject := getResourceDataSearchACL(d)
+
+	resp, err := (*provider.Client).ReadSavedSearches(name, aclObject.Owner, aclObject.App)
 	if err != nil {
 		return err
 	}
@@ -1019,26 +1330,37 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
-	// Now we read the configuration with proper owner and app
-	resp, err = (*provider.Client).ReadSavedSearches(name, entry.ACL.Owner, entry.ACL.App)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	entry, err = getSavedSearchesConfigByName(name, resp)
-	if err != nil {
-		return err
-	}
-
-	if entry == nil {
-		return fmt.Errorf("Unable to find resource: %v", name)
-	}
-
 	if err = d.Set("name", d.Id()); err != nil {
 		return err
 	}
 	if err = d.Set("actions", entry.Content.Actions); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_account", entry.Content.ActionSnowEventParamAccount); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_node", entry.Content.ActionSnowEventParamNode); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_type", entry.Content.ActionSnowEventParamType); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_resource", entry.Content.ActionSnowEventParamResource); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_severity", entry.Content.ActionSnowEventParamSeverity); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_description", entry.Content.ActionSnowEventParamDescription); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_ci_identifier", entry.Content.ActionSnowEventParamCiIdentifier); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_custom_fields", entry.Content.ActionSnowEventParamCustomFields); err != nil {
+		return err
+	}
+	if err = d.Set("action_snow_event_param_additional_info", entry.Content.ActionSnowEventParamAdditionalInfo); err != nil {
 		return err
 	}
 	if err = d.Set("action_email", entry.Content.ActionEmail); err != nil {
@@ -1152,6 +1474,9 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_email_width_sort_columns", entry.Content.ActionEmailWidthSortColumns); err != nil {
 		return err
 	}
+	if err = d.Set("action_pagerduty_integration_url", entry.Content.ActionPagerdutyIntegrationURL); err != nil {
+		return err
+	}
 	if err = d.Set("action_populate_lookup", entry.Content.ActionPopulateLookup); err != nil {
 		return err
 	}
@@ -1248,6 +1573,51 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_summary_index_ttl", entry.Content.ActionSummaryIndexTTL); err != nil {
 		return err
 	}
+	if err = d.Set("action_logevent", entry.Content.ActionLogEvent); err != nil {
+		return err
+	}
+	if err = d.Set("action_logevent_param_event", entry.Content.ActionLogEventParamEvent); err != nil {
+		return err
+	}
+	if err = d.Set("action_logevent_param_host", entry.Content.ActionLogEventParamHost); err != nil {
+		return err
+	}
+	if err = d.Set("action_logevent_param_index", entry.Content.ActionLogEventParamIndex); err != nil {
+		return err
+	}
+	if err = d.Set("action_logevent_param_sourcetype", entry.Content.ActionLogEventParamSourceType); err != nil {
+		return err
+	}
+	if err = d.Set("action_logevent_param_source", entry.Content.ActionLogEventParamSource); err != nil {
+		return err
+	}
+	if err = d.Set("action_create_xsoar_incident", entry.Content.ActionCreateXsoarIncident); err != nil {
+		return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_send_all_servers", entry.Content.ActionCreateXsoarIncidentParamSendAllServers); err != nil {
+		return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_server_url", entry.Content.ActionCreateXsoarIncidentParamServerUrl); err != nil {
+		return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_incident_name", entry.Content.ActionCreateXsoarIncidentParamIncidentName); err != nil {
+		return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_details", entry.Content.ActionCreateXsoarIncidentParamDetails); err != nil {
+		return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_custom_fields", entry.Content.ActionCreateXsoarIncidentParamCustomFields); err != nil {
+		return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_severity", entry.Content.ActionCreateXsoarIncidentParamSeverity); err != nil {
+		return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_occurred", entry.Content.ActionCreateXsoarIncidentParamOccurred); err != nil {
+		return err
+	}
+	if err = d.Set("action_create_xsoar_incident_param_type", entry.Content.ActionCreateXsoarIncidentParamType); err != nil {
+		return err
+	}
 	if err = d.Set("action_slack_param_attachment", entry.Content.ActionSlackParamAttachment); err != nil {
 		return err
 	}
@@ -1261,6 +1631,85 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	if err = d.Set("action_slack_param_webhook_url_override", entry.Content.ActionSlackParamWebhookUrlOverride); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_app_alert_integration_param_auto_join_channel", entry.Content.ActionSlackAppAlertIntegrationParamAutoJoinChannel); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_app_alert_integration_param_bot_username", entry.Content.ActionSlackAppAlertIntegrationParamBotUsername); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_app_alert_integration_param_channel", entry.Content.ActionSlackAppAlertIntegrationParamChannel); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_app_alert_integration_param_emoji", entry.Content.ActionSlackAppAlertIntegrationParamEmoji); err != nil {
+		return err
+	}
+	if err = d.Set("action_slack_app_alert_integration_param_message", entry.Content.ActionSlackAppAlertIntegrationParamMessage); err != nil {
+		return err
+	}
+	if err = d.Set("action_jira_service_desk_param_account", entry.Content.ActionJiraServiceDeskParamAccount); err != nil {
+		return err
+	}
+	if err = d.Set("action_jira_service_desk_param_jira_project", entry.Content.ActionJiraServiceDeskParamJiraProject); err != nil {
+		return err
+	}
+	if err = d.Set("action_jira_service_desk_param_jira_issue_type", entry.Content.ActionJiraServiceDeskParamJiraIssueType); err != nil {
+		return err
+	}
+	if entry.Content.ActionJiraServiceDeskParamJiraSummary != "Splunk Alert: $name$" {
+		if err = d.Set("action_jira_service_desk_param_jira_summary", entry.Content.ActionJiraServiceDeskParamJiraSummary); err != nil {
+			return err
+		}
+	}
+	if err = d.Set("action_jira_service_desk_param_jira_priority", entry.Content.ActionJiraServiceDeskParamJiraPriority); err != nil {
+		return err
+	}
+	if entry.Content.ActionJiraServiceDeskParamJiraDescription != "The alert condition for '$name$' was triggered." {
+		if err = d.Set("action_jira_service_desk_param_jira_description", entry.Content.ActionJiraServiceDeskParamJiraDescription); err != nil {
+			return err
+		}
+	}
+	if err = d.Set("action_jira_service_desk_param_jira_customfields", entry.Content.ActionJiraServiceDeskParamJiraCustomfields); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_message_type", entry.Content.ActionVictoropsParamMessageType); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_monitoring_tool", entry.Content.ActionVictoropsParamMonitoringTool); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_entity_id", entry.Content.ActionVictoropsParamEntityId); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_state_message", entry.Content.ActionVictoropsParamStateMessage); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_record_id", entry.Content.ActionVictoropsParamRecordId); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_routing_key_override", entry.Content.ActionVictoropsParamRoutingKeyOverride); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_enable_recovery", entry.Content.ActionVictoropsParamEnableRecovery); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_poll_interval", entry.Content.ActionVictoropsParamPollInterval); err != nil {
+		return err
+	}
+	if err = d.Set("action_victorops_param_inactive_polls", entry.Content.ActionVictoropsParamInactivePolls); err != nil {
+		return err
+	}
+	if err = d.Set("action_better_webhook_param_url", entry.Content.ActionBetterWebhookParamUrl); err != nil {
+		return err
+	}
+	if err = d.Set("action_better_webhook_param_body_format", entry.Content.ActionBetterWebhookParamBodyFormat); err != nil {
+		return err
+	}
+	if err = d.Set("action_better_webhook_param_credential", entry.Content.ActionBetterWebhookParamCredential); err != nil {
+		return err
+	}
+	if err = d.Set("action_better_webhook_param_credentials", entry.Content.ActionBetterWebhookParamCredentials); err != nil {
 		return err
 	}
 	if err = d.Set("action_webhook_param_url", entry.Content.ActionWebhookParamUrl); err != nil {
@@ -1503,137 +1952,191 @@ func savedSearchesDelete(d *schema.ResourceData, meta interface{}) error {
 
 func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.SavedSearchObject) {
 	savedSearchesObj = &models.SavedSearchObject{
-		Actions:                            d.Get("actions").(string),
-		ActionEmail:                        d.Get("action_email").(bool),
-		ActionEmailAuthPassword:            d.Get("action_email_auth_password").(string),
-		ActionEmailAuthUsername:            d.Get("action_email_auth_username").(string),
-		ActionEmailBCC:                     d.Get("action_email_bcc").(string),
-		ActionEmailCC:                      d.Get("action_email_cc").(string),
-		ActionEmailFormat:                  d.Get("action_email_format").(string),
-		ActionEmailFrom:                    d.Get("action_email_from").(string),
-		ActionEmailHostname:                d.Get("action_email_hostname").(string),
-		ActionEmailIncludeResultsLink:      d.Get("action_email_include_results_link").(int),
-		ActionEmailIncludeSearch:           d.Get("action_email_include_search").(int),
-		ActionEmailIncludeTrigger:          d.Get("action_email_include_trigger").(int),
-		ActionEmailIncludeTriggerTime:      d.Get("action_email_include_trigger_time").(int),
-		ActionEmailIncludeViewLink:         d.Get("action_email_include_view_link").(int),
-		ActionEmailInline:                  d.Get("action_email_inline").(bool),
-		ActionEmailMailserver:              d.Get("action_email_mailserver").(string),
-		ActionEmailMaxResults:              d.Get("action_email_max_results").(int),
-		ActionEmailMaxTime:                 d.Get("action_email_max_time").(string),
-		ActionEmailMessageAlert:            d.Get("action_email_message_alert").(string),
-		ActionEmailMessageReport:           d.Get("action_email_message_report").(string),
-		ActionEmailPDFView:                 d.Get("action_email_pdfview").(string),
-		ActionEmailPreprocessResults:       d.Get("action_email_preprocess_results").(string),
-		ActionEmailReportCIDFontList:       d.Get("action_email_report_cid_font_list").(string),
-		ActionEmailReportIncludeSplunkLogo: d.Get("action_email_report_include_splunk_logo").(bool),
-		ActionEmailReportPaperOrientation:  d.Get("action_email_report_paper_orientation").(string),
-		ActionEmailReportPaperSize:         d.Get("action_email_report_paper_size").(string),
-		ActionEmailReportServerEnabled:     d.Get("action_email_report_server_enabled").(bool),
-		ActionEmailReportServerURL:         d.Get("action_email_report_server_url").(string),
-		ActionEmailSendCSV:                 d.Get("action_email_send_csv").(int),
-		ActionEmailSendPDF:                 d.Get("action_email_send_pdf").(bool),
-		ActionEmailSendResults:             d.Get("action_email_send_results").(bool),
-		ActionEmailSubject:                 d.Get("action_email_subject").(string),
-		ActionEmailTo:                      d.Get("action_email_to").(string),
-		ActionEmailTrackAlert:              d.Get("action_email_track_alert").(bool),
-		ActionEmailTTL:                     d.Get("action_email_ttl").(string),
-		ActionEmailUseSSL:                  d.Get("action_email_use_ssl").(bool),
-		ActionEmailUseTLS:                  d.Get("action_email_use_tls").(bool),
-		ActionEmailWidthSortColumns:        d.Get("action_email_width_sort_columns").(bool),
-		ActionPopulateLookupCommand:        d.Get("action_populate_lookup_command").(string),
-		ActionPopulateLookupDest:           d.Get("action_populate_lookup_dest").(string),
-		ActionPopulateLookupHostname:       d.Get("action_populate_lookup_hostname").(string),
-		ActionPopulateLookupMaxResults:     d.Get("action_populate_lookup_max_results").(int),
-		ActionPopulateLookupMaxTime:        d.Get("action_populate_lookup_max_time").(int),
-		ActionPopulateLookupTrackAlert:     d.Get("action_populate_lookup_track_alert").(bool),
-		ActionPopulateLookupTTL:            d.Get("action_populate_lookup_ttl").(string),
-		ActionRSSCommand:                   d.Get("action_rss_command").(string),
-		ActionRSSHostname:                  d.Get("action_rss_hostname").(string),
-		ActionRSSMaxResults:                d.Get("action_rss_max_results").(int),
-		ActionRSSMaxTime:                   d.Get("action_rss_max_time").(int),
-		ActionRSSTrackAlert:                d.Get("action_rss_track_alert").(bool),
-		ActionRSSTTL:                       d.Get("action_rss_ttl").(string),
-		ActionScriptCommand:                d.Get("action_script_command").(string),
-		ActionScriptFilename:               d.Get("action_script_filename").(string),
-		ActionScriptHostname:               d.Get("action_script_hostname").(string),
-		ActionScriptMaxResults:             d.Get("action_script_max_results").(int),
-		ActionScriptMaxTime:                d.Get("action_script_max_time").(int),
-		ActionScriptTrackAlert:             d.Get("action_script_track_alert").(bool),
-		ActionScriptTTL:                    d.Get("action_script_ttl").(string),
-		ActionSummaryIndex:                 d.Get("action_summary_index").(bool),
-		ActionSummaryIndexCommand:          d.Get("action_summary_index_command").(string),
-		ActionSummaryIndexHostname:         d.Get("action_summary_index_hostname").(string),
-		ActionSummaryIndexInline:           d.Get("action_summary_index_inline").(bool),
-		ActionSummaryIndexMaxResults:       d.Get("action_summary_index_max_results").(int),
-		ActionSummaryIndexMaxTime:          d.Get("action_summary_index_max_time").(int),
-		ActionSummaryIndexName:             d.Get("action_summary_index_name").(string),
-		ActionSummaryIndexTrackAlert:       d.Get("action_summary_index_track_alert").(bool),
-		ActionSummaryIndexTTL:              d.Get("action_summary_index_ttl").(string),
-		ActionSlackParamAttachment:         d.Get("action_slack_param_attachment").(string),
-		ActionSlackParamChannel:            d.Get("action_slack_param_channel").(string),
-		ActionSlackParamFields:             d.Get("action_slack_param_fields").(string),
-		ActionSlackParamMessage:            d.Get("action_slack_param_message").(string),
-		ActionSlackParamWebhookUrlOverride: d.Get("action_slack_param_webhook_url_override").(string),
-		ActionWebhookParamUrl:              d.Get("action_webhook_param_url").(string),
-		AlertComparator:                    d.Get("alert_comparator").(string),
-		AlertCondition:                     d.Get("alert_condition").(string),
-		AlertDigestMode:                    d.Get("alert_digest_mode").(bool),
-		AlertExpires:                       d.Get("alert_expires").(string),
-		AlertSeverity:                      d.Get("alert_severity").(int),
-		AlertSuppress:                      d.Get("alert_suppress").(bool),
-		AlertSuppressFields:                d.Get("alert_suppress_fields").(string),
-		AlertSuppressPeriod:                d.Get("alert_suppress_period").(string),
-		AlertThreshold:                     d.Get("alert_threshold").(string),
-		AlertTrack:                         d.Get("alert_track").(bool),
-		AlertType:                          d.Get("alert_type").(string),
-		AutoSummarize:                      d.Get("auto_summarize").(bool),
-		AutoSummarizeCommand:               d.Get("auto_summarize_command").(string),
-		AutoSummarizeCronSchedule:          d.Get("auto_summarize_cron_schedule").(string),
-		AutoSummarizeDispatchEarliestTime:  d.Get("auto_summarize_dispatch_earliest_time").(string),
-		AutoSummarizeDispatchLatestTime:    d.Get("auto_summarize_dispatch_latest_time").(string),
-		AutoSummarizeDispatchTimeFormat:    d.Get("auto_summarize_dispatch_time_format").(string),
-		AutoSummarizeDispatchTTL:           d.Get("auto_summarize_dispatch_ttl").(string),
-		AutoSummarizeMaxDisabledBuckets:    d.Get("auto_summarize_max_disabled_buckets").(int),
-		AutoSummarizeMaxSummaryRatio:       d.Get("auto_summarize_max_summary_ratio").(float64),
-		AutoSummarizeMaxSummarySize:        d.Get("auto_summarize_max_summary_size").(int),
-		AutoSummarizeMaxTime:               d.Get("auto_summarize_max_time").(int),
-		AutoSummarizeSuspendPeriod:         d.Get("auto_summarize_suspend_period").(string),
-		AutoSummarizeTimespan:              d.Get("auto_summarize_timespan").(string),
-		CronSchedule:                       d.Get("cron_schedule").(string),
-		Description:                        d.Get("description").(string),
-		Disabled:                           d.Get("disabled").(bool),
-		DispatchBuckets:                    d.Get("dispatch_buckets").(int),
-		DispatchEarliestTime:               d.Get("dispatch_earliest_time").(string),
-		DispatchIndexEarliest:              d.Get("dispatch_index_earliest").(string),
-		DispatchIndexLatest:                d.Get("dispatch_index_latest").(string),
-		DispatchIndexedRealtime:            d.Get("dispatch_indexed_realtime").(bool),
-		DispatchIndexedRealtimeOffset:      d.Get("dispatch_indexed_realtime_offset").(int),
-		DispatchIndexedRealtimeMinspan:     d.Get("dispatch_indexed_realtime_minspan").(int),
-		DispatchLatestTime:                 d.Get("dispatch_latest_time").(string),
-		DispatchLookups:                    d.Get("dispatch_lookups").(bool),
-		DispatchMaxCount:                   d.Get("dispatch_max_count").(int),
-		DispatchMaxTime:                    d.Get("dispatch_max_time").(int),
-		DispatchReduceFreq:                 d.Get("dispatch_reduce_freq").(int),
-		DispatchRtBackfill:                 d.Get("dispatch_rt_backfill").(bool),
-		DispatchRtMaximumSpan:              d.Get("dispatch_rt_maximum_span").(int),
-		DispatchSpawnProcess:               d.Get("dispatch_spawn_process").(bool),
-		DispatchTimeFormat:                 d.Get("dispatch_time_format").(string),
-		DispatchTTL:                        d.Get("dispatch_ttl").(string),
-		DisplayView:                        d.Get("display_view").(string),
-		IsScheduled:                        d.Get("is_scheduled").(bool),
-		IsVisible:                          d.Get("is_visible").(bool),
-		MaxConcurrent:                      d.Get("max_concurrent").(int),
-		RealtimeSchedule:                   d.Get("realtime_schedule").(bool),
-		RequestUIDispatchApp:               d.Get("request_ui_dispatch_app").(string),
-		RequestUIDispatchView:              d.Get("request_ui_dispatch_view").(string),
-		RestartOnSearchPeerAdd:             d.Get("restart_on_searchpeer_add").(bool),
-		RunOnStartup:                       d.Get("run_on_startup").(bool),
-		ScheduleWindow:                     d.Get("schedule_window").(string),
-		SchedulePriority:                   d.Get("schedule_priority").(string),
-		Search:                             d.Get("search").(string),
-		VSID:                               d.Get("vsid").(string),
-		WorkloadPool:                       d.Get("workload_pool").(string),
+		Actions:                                      d.Get("actions").(string),
+		ActionEmail:                                  d.Get("action_email").(bool),
+		ActionEmailAuthPassword:                      d.Get("action_email_auth_password").(string),
+		ActionEmailAuthUsername:                      d.Get("action_email_auth_username").(string),
+		ActionEmailBCC:                               d.Get("action_email_bcc").(string),
+		ActionEmailCC:                                d.Get("action_email_cc").(string),
+		ActionEmailFormat:                            d.Get("action_email_format").(string),
+		ActionEmailFrom:                              d.Get("action_email_from").(string),
+		ActionEmailHostname:                          d.Get("action_email_hostname").(string),
+		ActionEmailIncludeResultsLink:                d.Get("action_email_include_results_link").(int),
+		ActionEmailIncludeSearch:                     d.Get("action_email_include_search").(int),
+		ActionEmailIncludeTrigger:                    d.Get("action_email_include_trigger").(int),
+		ActionEmailIncludeTriggerTime:                d.Get("action_email_include_trigger_time").(int),
+		ActionEmailIncludeViewLink:                   d.Get("action_email_include_view_link").(int),
+		ActionEmailInline:                            d.Get("action_email_inline").(bool),
+		ActionEmailMailserver:                        d.Get("action_email_mailserver").(string),
+		ActionEmailMaxResults:                        d.Get("action_email_max_results").(int),
+		ActionEmailMaxTime:                           d.Get("action_email_max_time").(string),
+		ActionEmailMessageAlert:                      d.Get("action_email_message_alert").(string),
+		ActionEmailMessageReport:                     d.Get("action_email_message_report").(string),
+		ActionEmailPDFView:                           d.Get("action_email_pdfview").(string),
+		ActionEmailPreprocessResults:                 d.Get("action_email_preprocess_results").(string),
+		ActionEmailReportCIDFontList:                 d.Get("action_email_report_cid_font_list").(string),
+		ActionEmailReportIncludeSplunkLogo:           d.Get("action_email_report_include_splunk_logo").(bool),
+		ActionEmailReportPaperOrientation:            d.Get("action_email_report_paper_orientation").(string),
+		ActionEmailReportPaperSize:                   d.Get("action_email_report_paper_size").(string),
+		ActionEmailReportServerEnabled:               d.Get("action_email_report_server_enabled").(bool),
+		ActionEmailReportServerURL:                   d.Get("action_email_report_server_url").(string),
+		ActionEmailSendCSV:                           d.Get("action_email_send_csv").(int),
+		ActionEmailSendPDF:                           d.Get("action_email_send_pdf").(bool),
+		ActionEmailSendResults:                       d.Get("action_email_send_results").(bool),
+		ActionEmailSubject:                           d.Get("action_email_subject").(string),
+		ActionEmailTo:                                d.Get("action_email_to").(string),
+		ActionEmailTrackAlert:                        d.Get("action_email_track_alert").(bool),
+		ActionEmailTTL:                               d.Get("action_email_ttl").(string),
+		ActionEmailUseSSL:                            d.Get("action_email_use_ssl").(bool),
+		ActionEmailUseTLS:                            d.Get("action_email_use_tls").(bool),
+		ActionEmailWidthSortColumns:                  d.Get("action_email_width_sort_columns").(bool),
+		ActionPagerdutyIntegrationURL:                d.Get("action_pagerduty_integration_url").(string),
+		ActionPagerdutyIntegrationURLOverride:        d.Get("action_pagerduty_integration_url_override").(string),
+		ActionPagerdutyParamCustDetails:              d.Get("action_pagerduty_custom_details").(string),
+		ActionPagerdutyParamIntKey:                   d.Get("action_pagerduty_integration_key").(string),
+		ActionPagerdutyParamIntKeyOverride:           d.Get("action_pagerduty_integration_key_override").(string),
+		ActionPopulateLookupCommand:                  d.Get("action_populate_lookup_command").(string),
+		ActionPopulateLookupDest:                     d.Get("action_populate_lookup_dest").(string),
+		ActionPopulateLookupHostname:                 d.Get("action_populate_lookup_hostname").(string),
+		ActionPopulateLookupMaxResults:               d.Get("action_populate_lookup_max_results").(int),
+		ActionPopulateLookupMaxTime:                  d.Get("action_populate_lookup_max_time").(int),
+		ActionPopulateLookupTrackAlert:               d.Get("action_populate_lookup_track_alert").(bool),
+		ActionPopulateLookupTTL:                      d.Get("action_populate_lookup_ttl").(string),
+		ActionRSSCommand:                             d.Get("action_rss_command").(string),
+		ActionRSSHostname:                            d.Get("action_rss_hostname").(string),
+		ActionRSSMaxResults:                          d.Get("action_rss_max_results").(int),
+		ActionRSSMaxTime:                             d.Get("action_rss_max_time").(int),
+		ActionRSSTrackAlert:                          d.Get("action_rss_track_alert").(bool),
+		ActionRSSTTL:                                 d.Get("action_rss_ttl").(string),
+		ActionScriptCommand:                          d.Get("action_script_command").(string),
+		ActionScriptFilename:                         d.Get("action_script_filename").(string),
+		ActionScriptHostname:                         d.Get("action_script_hostname").(string),
+		ActionScriptMaxResults:                       d.Get("action_script_max_results").(int),
+		ActionScriptMaxTime:                          d.Get("action_script_max_time").(int),
+		ActionScriptTrackAlert:                       d.Get("action_script_track_alert").(bool),
+		ActionScriptTTL:                              d.Get("action_script_ttl").(string),
+		ActionSnowEventParamAccount:                  d.Get("action_snow_event_param_account").(string),
+		ActionSnowEventParamNode:                     d.Get("action_snow_event_param_node").(string),
+		ActionSnowEventParamType:                     d.Get("action_snow_event_param_type").(string),
+		ActionSnowEventParamResource:                 d.Get("action_snow_event_param_resource").(string),
+		ActionSnowEventParamSeverity:                 d.Get("action_snow_event_param_severity").(int),
+		ActionSnowEventParamDescription:              d.Get("action_snow_event_param_description").(string),
+		ActionSnowEventParamCiIdentifier:             d.Get("action_snow_event_param_ci_identifier").(string),
+		ActionSnowEventParamCustomFields:             d.Get("action_snow_event_param_custom_fields").(string),
+		ActionSnowEventParamAdditionalInfo:           d.Get("action_snow_event_param_additional_info").(string),
+		ActionSummaryIndex:                           d.Get("action_summary_index").(bool),
+		ActionSummaryIndexCommand:                    d.Get("action_summary_index_command").(string),
+		ActionSummaryIndexHostname:                   d.Get("action_summary_index_hostname").(string),
+		ActionSummaryIndexInline:                     d.Get("action_summary_index_inline").(bool),
+		ActionSummaryIndexMaxResults:                 d.Get("action_summary_index_max_results").(int),
+		ActionSummaryIndexMaxTime:                    d.Get("action_summary_index_max_time").(int),
+		ActionSummaryIndexName:                       d.Get("action_summary_index_name").(string),
+		ActionSummaryIndexTrackAlert:                 d.Get("action_summary_index_track_alert").(bool),
+		ActionSummaryIndexTTL:                        d.Get("action_summary_index_ttl").(string),
+		ActionLogEvent:                               d.Get("action_logevent").(string),
+		ActionLogEventParamEvent:                     d.Get("action_logevent_param_event").(string),
+		ActionLogEventParamHost:                      d.Get("action_logevent_param_host").(string),
+		ActionLogEventParamIndex:                     d.Get("action_logevent_param_index").(string),
+		ActionLogEventParamSourceType:                d.Get("action_logevent_param_sourcetype").(string),
+		ActionLogEventParamSource:                    d.Get("action_logevent_param_source").(string),
+		ActionCreateXsoarIncident:                    d.Get("action_create_xsoar_incident").(string),
+		ActionCreateXsoarIncidentParamSendAllServers: d.Get("action_create_xsoar_incident_param_send_all_servers").(string),
+		ActionCreateXsoarIncidentParamServerUrl:      d.Get("action_create_xsoar_incident_param_server_url").(string),
+		ActionCreateXsoarIncidentParamIncidentName:   d.Get("action_create_xsoar_incident_param_incident_name").(string),
+		ActionCreateXsoarIncidentParamDetails:        d.Get("action_create_xsoar_incident_param_details").(string),
+		ActionCreateXsoarIncidentParamCustomFields:   d.Get("action_create_xsoar_incident_param_custom_fields").(string),
+		ActionCreateXsoarIncidentParamSeverity:       d.Get("action_create_xsoar_incident_param_severity").(string),
+		ActionCreateXsoarIncidentParamOccurred:       d.Get("action_create_xsoar_incident_param_occurred").(string),
+		ActionCreateXsoarIncidentParamType:           d.Get("action_create_xsoar_incident_param_type").(string),
+		ActionSlackParamAttachment:                   d.Get("action_slack_param_attachment").(string),
+		ActionSlackParamChannel:                      d.Get("action_slack_param_channel").(string),
+		ActionSlackParamFields:                       d.Get("action_slack_param_fields").(string),
+		ActionSlackParamMessage:                      d.Get("action_slack_param_message").(string),
+		ActionSlackParamWebhookUrlOverride:           d.Get("action_slack_param_webhook_url_override").(string),
+		ActionSlackAppAlertIntegrationParamAutoJoinChannel:      d.Get("action_slack_app_alert_integration_param_auto_join_channel").(string),
+		ActionSlackAppAlertIntegrationParamBotUsername:          d.Get("action_slack_app_alert_integration_param_bot_username").(string),
+		ActionSlackAppAlertIntegrationParamChannel:              d.Get("action_slack_app_alert_integration_param_channel").(string),
+		ActionSlackAppAlertIntegrationParamEmoji:                d.Get("action_slack_app_alert_integration_param_emoji").(string),
+		ActionSlackAppAlertIntegrationParamMessage:              d.Get("action_slack_app_alert_integration_param_message").(string),
+		ActionJiraServiceDeskParamAccount:            d.Get("action_jira_service_desk_param_account").(string),
+		ActionJiraServiceDeskParamJiraProject:        d.Get("action_jira_service_desk_param_jira_project").(string),
+		ActionJiraServiceDeskParamJiraIssueType:      d.Get("action_jira_service_desk_param_jira_issue_type").(string),
+		ActionJiraServiceDeskParamJiraSummary:        d.Get("action_jira_service_desk_param_jira_summary").(string),
+		ActionJiraServiceDeskParamJiraPriority:       d.Get("action_jira_service_desk_param_jira_priority").(string),
+		ActionJiraServiceDeskParamJiraDescription:    d.Get("action_jira_service_desk_param_jira_description").(string),
+		ActionJiraServiceDeskParamJiraCustomfields:   d.Get("action_jira_service_desk_param_jira_customfields").(string),
+		ActionVictoropsParamMessageType:              d.Get("action_victorops_param_message_type").(string),
+		ActionVictoropsParamMonitoringTool:           d.Get("action_victorops_param_monitoring_tool").(string),
+		ActionVictoropsParamEntityId:                 d.Get("action_victorops_param_entity_id").(string),
+		ActionVictoropsParamStateMessage:             d.Get("action_victorops_param_state_message").(string),
+		ActionVictoropsParamRecordId:                 d.Get("action_victorops_param_record_id").(string),
+		ActionVictoropsParamRoutingKeyOverride:       d.Get("action_victorops_param_routing_key_override").(string),
+		ActionVictoropsParamEnableRecovery:           d.Get("action_victorops_param_enable_recovery").(string),
+		ActionVictoropsParamPollInterval:             d.Get("action_victorops_param_poll_interval").(string),
+		ActionVictoropsParamInactivePolls:            d.Get("action_victorops_param_inactive_polls").(string),
+		ActionBetterWebhookParamUrl:                  d.Get("action_better_webhook_param_url").(string),
+		ActionBetterWebhookParamBodyFormat:           d.Get("action_better_webhook_param_body_format").(string),
+		ActionBetterWebhookParamCredential:           d.Get("action_better_webhook_param_credential").(string),
+		ActionBetterWebhookParamCredentials:          d.Get("action_better_webhook_param_credentials").(string),
+		ActionWebhookParamUrl:                        d.Get("action_webhook_param_url").(string),
+		AlertComparator:                              d.Get("alert_comparator").(string),
+		AlertCondition:                               d.Get("alert_condition").(string),
+		AlertDigestMode:                              d.Get("alert_digest_mode").(bool),
+		AlertExpires:                                 d.Get("alert_expires").(string),
+		AlertSeverity:                                d.Get("alert_severity").(int),
+		AlertSuppress:                                d.Get("alert_suppress").(bool),
+		AlertSuppressFields:                          d.Get("alert_suppress_fields").(string),
+		AlertSuppressPeriod:                          d.Get("alert_suppress_period").(string),
+		AlertThreshold:                               d.Get("alert_threshold").(string),
+		AlertTrack:                                   d.Get("alert_track").(bool),
+		AlertType:                                    d.Get("alert_type").(string),
+		AutoSummarize:                                d.Get("auto_summarize").(bool),
+		AutoSummarizeCommand:                         d.Get("auto_summarize_command").(string),
+		AutoSummarizeCronSchedule:                    d.Get("auto_summarize_cron_schedule").(string),
+		AutoSummarizeDispatchEarliestTime:            d.Get("auto_summarize_dispatch_earliest_time").(string),
+		AutoSummarizeDispatchLatestTime:              d.Get("auto_summarize_dispatch_latest_time").(string),
+		AutoSummarizeDispatchTimeFormat:              d.Get("auto_summarize_dispatch_time_format").(string),
+		AutoSummarizeDispatchTTL:                     d.Get("auto_summarize_dispatch_ttl").(string),
+		AutoSummarizeMaxDisabledBuckets:              d.Get("auto_summarize_max_disabled_buckets").(int),
+		AutoSummarizeMaxSummaryRatio:                 d.Get("auto_summarize_max_summary_ratio").(float64),
+		AutoSummarizeMaxSummarySize:                  d.Get("auto_summarize_max_summary_size").(int),
+		AutoSummarizeMaxTime:                         d.Get("auto_summarize_max_time").(int),
+		AutoSummarizeSuspendPeriod:                   d.Get("auto_summarize_suspend_period").(string),
+		AutoSummarizeTimespan:                        d.Get("auto_summarize_timespan").(string),
+		CronSchedule:                                 d.Get("cron_schedule").(string),
+		Description:                                  d.Get("description").(string),
+		Disabled:                                     d.Get("disabled").(bool),
+		DispatchBuckets:                              d.Get("dispatch_buckets").(int),
+		DispatchEarliestTime:                         d.Get("dispatch_earliest_time").(string),
+		DispatchIndexEarliest:                        d.Get("dispatch_index_earliest").(string),
+		DispatchIndexLatest:                          d.Get("dispatch_index_latest").(string),
+		DispatchIndexedRealtime:                      d.Get("dispatch_indexed_realtime").(bool),
+		DispatchIndexedRealtimeOffset:                d.Get("dispatch_indexed_realtime_offset").(int),
+		DispatchIndexedRealtimeMinspan:               d.Get("dispatch_indexed_realtime_minspan").(int),
+		DispatchLatestTime:                           d.Get("dispatch_latest_time").(string),
+		DispatchLookups:                              d.Get("dispatch_lookups").(bool),
+		DispatchMaxCount:                             d.Get("dispatch_max_count").(int),
+		DispatchMaxTime:                              d.Get("dispatch_max_time").(int),
+		DispatchReduceFreq:                           d.Get("dispatch_reduce_freq").(int),
+		DispatchRtBackfill:                           d.Get("dispatch_rt_backfill").(bool),
+		DispatchRtMaximumSpan:                        d.Get("dispatch_rt_maximum_span").(int),
+		DispatchSpawnProcess:                         d.Get("dispatch_spawn_process").(bool),
+		DispatchTimeFormat:                           d.Get("dispatch_time_format").(string),
+		DispatchTTL:                                  d.Get("dispatch_ttl").(string),
+		DisplayView:                                  d.Get("display_view").(string),
+		IsScheduled:                                  d.Get("is_scheduled").(bool),
+		IsVisible:                                    d.Get("is_visible").(bool),
+		MaxConcurrent:                                d.Get("max_concurrent").(int),
+		RealtimeSchedule:                             d.Get("realtime_schedule").(bool),
+		RequestUIDispatchApp:                         d.Get("request_ui_dispatch_app").(string),
+		RequestUIDispatchView:                        d.Get("request_ui_dispatch_view").(string),
+		RestartOnSearchPeerAdd:                       d.Get("restart_on_searchpeer_add").(bool),
+		RunOnStartup:                                 d.Get("run_on_startup").(bool),
+		ScheduleWindow:                               d.Get("schedule_window").(string),
+		SchedulePriority:                             d.Get("schedule_priority").(string),
+		Search:                                       d.Get("search").(string),
+		VSID:                                         d.Get("vsid").(string),
+		WorkloadPool:                                 d.Get("workload_pool").(string),
 	}
 	return savedSearchesObj
 }
@@ -1657,4 +2160,17 @@ func getSavedSearchesConfigByName(name string, httpResponse *http.Response) (sav
 	}
 
 	return savedSearchesEntry, nil
+}
+
+// getResourceDataSearchACL implements psuedo-defaults for the acl field for search resources.
+func getResourceDataSearchACL(d *schema.ResourceData) *models.ACLObject {
+	aclObject := &models.ACLObject{}
+	if r, ok := d.GetOk("acl"); ok {
+		aclObject = getACLConfig(r.([]interface{}))
+	} else {
+		aclObject.App = "search"
+		aclObject.Owner = "nobody"
+	}
+
+	return aclObject
 }

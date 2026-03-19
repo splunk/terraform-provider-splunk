@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
 	"net/url"
 	"regexp"
+
+	"github.com/splunk/terraform-provider-splunk/client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
@@ -68,7 +69,7 @@ func inputsScript() *schema.Resource {
 				Type:         schema.TypeInt,
 				Required:     true,
 				ValidateFunc: validation.IntAtLeast(60),
-				Description:  "Specify an integer or cron schedule. This parameter specifies how often to execute the specified script, in seconds or a valid cron schedule. If you specify a cron schedule, the script is not executed on start-up.",
+				Description:  "Specify an integer. This parameter specifies how often to execute the specified script, in seconds. Cron schedule is not supported",
 			},
 			"acl": aclSchema(),
 		},
@@ -138,6 +139,7 @@ func inputsScriptRead(d *schema.ResourceData, meta interface{}) error {
 	defer resp.Body.Close()
 
 	entry, err = getScriptedInputsConfigByName(name, resp)
+
 	if err != nil {
 		return err
 	}
@@ -170,7 +172,12 @@ func inputsScriptRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if err = d.Set("interval", entry.Content.Interval); err != nil {
+	interval, ok := entry.Content.Interval.(float64)
+	if !ok {
+		fmt.Print(ok)
+		return err
+	}
+	if err = d.Set("interval", int(interval)); err != nil {
 		return err
 	}
 

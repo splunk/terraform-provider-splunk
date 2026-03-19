@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
+
+	"github.com/avast/retry-go/v4"
 
 	"github.com/splunk/terraform-provider-splunk/client/models"
 
@@ -43,24 +46,28 @@ func splunkDashboardsCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
 	splunkDashboardsObj := getSplunkDashboardsConfig(d)
-	aclObject := &models.ACLObject{}
-	if r, ok := d.GetOk("acl"); ok {
-		aclObject = getACLConfig(r.([]interface{}))
-	} else {
-		aclObject.App = "search"
-		aclObject.Owner = "admin"
-		aclObject.Sharing = "user"
-	}
+	aclObject := getResourceDataViewACL(d)
+
 	err := (*provider.Client).CreateDashboardObject(aclObject.Owner, aclObject.App, splunkDashboardsObj)
 	if err != nil {
 		return err
 	}
 
-	if _, ok := d.GetOk("acl"); ok {
-		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views")
-		if err != nil {
-			return err
-		}
+	// add retry as sometimes dashboard object is not yet propagated and acl endpoint return 404
+	err = retry.Do(
+		func() error {
+			err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views")
+			if err != nil {
+				return err
+			}
+			return nil
+		}, retry.Attempts(10), retry.OnRetry(func(n uint, err error) {
+			log.Printf("#%d: %s. Retrying...\n", n, err)
+		}), retry.DelayType(retry.BackOffDelay),
+	)
+
+	if err != nil {
+		return err
 	}
 
 	d.SetId(name)
@@ -70,28 +77,23 @@ func splunkDashboardsCreate(d *schema.ResourceData, meta interface{}) error {
 func splunkDashboardsRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
-	resp, err := (*provider.Client).ReadAllDashboardObject()
+
+	aclObject := getResourceDataViewACL(d)
+
+	readUser := "nobody"
+
+	if aclObject.Sharing == "user" {
+		// If we have a private dashboard we can only query it using the owner
+		readUser = aclObject.Owner
+	}
+
+	resp, err := (*provider.Client).ReadDashboardObject(name, readUser, aclObject.App)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
 	entry, err := getDashboardByName(name, resp)
-	if err != nil {
-		return err
-	}
-
-	if entry == nil {
-		return fmt.Errorf("unable to find resource: %v", name)
-	}
-
-	resp, err = (*provider.Client).ReadDashboardObject(name, entry.ACL.Owner, entry.ACL.App)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	entry, err = getDashboardByName(name, resp)
 	if err != nil {
 		return err
 	}
@@ -120,25 +122,21 @@ func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
 	splunkDashboardsObj := getSplunkDashboardsConfig(d)
-	aclObject := &models.ACLObject{}
-	if r, ok := d.GetOk("acl"); ok {
-		aclObject = getACLConfig(r.([]interface{}))
-	} else {
-		aclObject.App = "search"
-		aclObject.Owner = "admin"
-		aclObject.Sharing = "user"
+	aclObject := getResourceDataViewACL(d)
+
+	updateUser := "nobody"
+
+	if aclObject.Sharing == "user" {
+		// If we have a private dashboard we can only update it using the owner
+		updateUser = aclObject.Owner
 	}
-	err := (*provider.Client).UpdateDashboardObject(aclObject.Owner, aclObject.App, name, splunkDashboardsObj)
-	if err != nil {
+
+	if err := (*provider.Client).UpdateDashboardObject(updateUser, aclObject.App, name, splunkDashboardsObj); err != nil {
 		return err
 	}
 
-	//ACL update
-	if _, ok := d.GetOk("acl"); ok {
-		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views")
-		if err != nil {
-			return err
-		}
+	if err := (*provider.Client).UpdateAcl(updateUser, aclObject.App, name, aclObject, "data", "ui", "views"); err != nil {
+		return err
 	}
 
 	return splunkDashboardsRead(d, meta)
@@ -147,14 +145,7 @@ func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 func splunkDashboardsDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
-	aclObject := &models.ACLObject{}
-	if r, ok := d.GetOk("acl"); ok {
-		aclObject = getACLConfig(r.([]interface{}))
-	} else {
-		aclObject.App = "search"
-		aclObject.Owner = "admin"
-		aclObject.Sharing = "user"
-	}
+	aclObject := getResourceDataViewACL(d)
 	if aclObject.Sharing != "user" {
 		aclObject.Owner = "nobody"
 	}
@@ -208,4 +199,18 @@ func getDashboardByName(name string, httpResponse *http.Response) (dashboardEntr
 	}
 
 	return dashboardEntry, nil
+}
+
+// getResourceDataViewACL implements psuedo-defaults for the acl field for view resources.
+func getResourceDataViewACL(d *schema.ResourceData) *models.ACLObject {
+	aclObject := &models.ACLObject{}
+	if r, ok := d.GetOk("acl"); ok {
+		aclObject = getACLConfig(r.([]interface{}))
+	} else {
+		aclObject.App = "search"
+		aclObject.Owner = "admin"
+		aclObject.Sharing = "user"
+	}
+
+	return aclObject
 }

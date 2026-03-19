@@ -21,7 +21,7 @@ func authorizationRoles() *schema.Resource {
 				Description: "Required. The name of the user role to create.",
 			},
 			"capabilities": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				Computed: true,
 				Elem: &schema.Schema{
@@ -283,7 +283,7 @@ func authorizationRolesDelete(d *schema.ResourceData, meta interface{}) error {
 func getAuthorizationRolesConfig(d *schema.ResourceData) (authenticationUserObject *models.AuthorizationRolesObject) {
 	authenticationUserObject = &models.AuthorizationRolesObject{}
 	if val, ok := d.GetOk("capabilities"); ok {
-		for _, v := range val.([]interface{}) {
+		for _, v := range val.(*schema.Set).List() {
 			authenticationUserObject.Capabilities = append(authenticationUserObject.Capabilities, v.(string))
 		}
 	}

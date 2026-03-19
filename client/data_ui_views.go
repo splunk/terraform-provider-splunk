@@ -59,13 +59,3 @@ func (client *Client) DeleteDashboardObject(owner string, app string, name strin
 
 	return resp, nil
 }
-
-func (client *Client) ReadAllDashboardObject() (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", "-", "-", "data", "ui", "views")
-	resp, err := client.Get(endpoint)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}

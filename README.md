@@ -1,4 +1,4 @@
-# **Terraform provider for Splunk**
+# **Terraform Provider for Splunk Enterprise**
 
 
 ### Requirements
@@ -54,6 +54,7 @@ After merging, our team will update the changelog.MD file and create a version t
 **NOTE:** Create a resource block first before importing resources. Docs on the import [usage](https://www.terraform.io/docs/import/usage.html)
 
 #### Notes and Troubleshooting
+* For __Splunk Cloud Platform__ instance configurations, use [Terraform Provider for Splunk Cloud Platform](https://github.com/splunk/terraform-provider-scp) instead.
 * When conflicts arise during resource creation, import the resource first using `terraform import` command and make modifications to the resource.
 * The error `too many open files` may be due to `ulimit` settings on your machine. Check current and increase the maximum number of open files `1024` using `ulimit -n 1024`
 * When deleting or editing conf files <b>manually</b>, restart Splunk to ensure state consistency before applying or reapplying a template.

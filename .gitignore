@@ -1,10 +1,13 @@
 # Ignore dist file
 .idea
 .terraform
+.terraform.lock.hcl
 dist
 terraform-provider-splunk
 terraform.tfstate
-terraform.tfstate.backup
+terraform.tfstate.*
 *.log
 .DS_Store
 .vscode
+
+dist/

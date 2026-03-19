@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
 	"log"
 	"math"
 	"net/http"
@@ -185,7 +184,7 @@ func TestNewRequest(t *testing.T) {
 		if test.method == MethodGet || test.method == MethodDelete {
 			t.Skipf("Skip NewRequest body test for %v and %v method", MethodGet, MethodDelete)
 		} else {
-			gotBody, _ := ioutil.ReadAll(req.Body)
+			gotBody, _ := io.ReadAll(req.Body)
 			if bytes.Compare(gotBody, body) != -1 {
 				t.Errorf("NewRequest url is %v, want %v", gotBody, body)
 			}
@@ -220,6 +219,36 @@ func TestNewRequestUserAgentHeader(t *testing.T) {
 	expectedUserAgent := []string{"splunk-simple-go-client"}
 	if got, want := req.Header["User-Agent"], expectedUserAgent; !reflect.DeepEqual(got, want) {
 		t.Errorf("NewRequest authorization is %v, want %v", got, want)
+	}
+}
+
+func TestNewRequestWithoutContentTypeHeader(t *testing.T) {
+	client, err := NewDefaultSplunkdClient()
+	if err != nil {
+		t.Error(err)
+	}
+	req, err := client.NewRequest(MethodGet, testURL, nil)
+	if err != nil {
+		t.Errorf("NewRequest returns unexpected error %v", err)
+	}
+	if req.Header["Content-Type"] != nil {
+		t.Errorf("NewRequest Content-Type is %v, want nil", req.Header["Content-Type"])
+	}
+}
+
+func TestNewRequestWithContentTypeHeader(t *testing.T) {
+	client, err := NewDefaultSplunkdClient()
+	if err != nil {
+		t.Error(err)
+	}
+	client.urlEncoded = true
+	req, err := client.NewRequest(MethodGet, testURL, nil)
+	if err != nil {
+		t.Errorf("NewRequest returns unexpected error %v", err)
+	}
+	expectedContentType := []string{"application/x-www-form-urlencoded"}
+	if got, want := req.Header["Content-Type"], expectedContentType; !reflect.DeepEqual(got, want) {
+		t.Errorf("NewRequest Content-Type is %v, want %v", got, want)
 	}
 }
 

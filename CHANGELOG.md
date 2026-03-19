@@ -1,15 +1,104 @@
-##1.4.8 (Aug 23, 2021)
+## 1.4.36
+* Fix: saved search action_email_include_results_link handles 0 value 
+* Fix: saved search action_email_include_view_link handles 0 value
+
+## 1.4.35
+* Fix: lookup_table_file - handle nil values in file_contents by converting to empty strings before JSON marshaling
+* Fix: lookup_table_file - properly URL-encode form parameters in Create/Read/Update operations
+
+## 1.4.34
+* Support for Slack alert params in saved_Searches
+
+## 1.4.33
+* Support for Victorops params in saved_Searches
+
+## 1.4.32
+* Support for Log Event action fields in saved_searches
+
+## 1.4.31
+* Fix: URL parsing of Splunk client path
+
+## 1.4.30
+* Suppress defaults when planning changes to Jira service desk params
+
+## 1.4.29
+* Support ':' and '/' characters in configs_conf stanza name
+* Fix: Add retry mechanism to configs_conf acl endpoint
+
+## 1.4.28 
+* Support for lookup definition
+
+## 1.4.27
+* Support for lookup table files
+
+## 1.4.26
+* Fix: Add retry mechanism to dashboard's acl endpoint
+
+## 1.4.25
+* Support for customfields in Jira service desk params
+
+## 1.4.24
+* Fix goreleaser configuration
+
+## 1.4.23
+* Upgrade: golang.org/x/crypto to remediate CVE-2020-928
+
+## 1.4.22
+* Fix: Encode name parameter of URI for Admin SAML Groups.
+
+## 1.4.21
+* Fix: pagerduty integration key, custom details.
+
+## 1.4.20
+* Support for defining pagerduty integration key, custom details.
+* Fix: Better error handling for non 20X error codes.
+
+## 1.4.19
+* Support for Pager Duty fields in saved_searches
+
+## 1.4.18
+* Support for SNOW alert actions
+* Prerequisite: Install ServiceNow Addon into Splunk instance.
+
+## 1.4.17
+* Support for XSOAR alert actions
+
+## 1.4.16
+* Fix incorrect revert in v1.4.15
+
+## 1.4.15
+* Support for jira service desk actions in saved_searches
+
+## 1.4.14
+* Fix: Omit auto_summarize field in saved_searches when empty
+
+## 1.4.13
+* Fix: configs_conf permits underscores in conf filename
+
+## 1.4.12
+* Fix: Don't read all searches just to find one search
+
+## 1.4.11
+* Fix: Don't read all views just to find one view
+
+## 1.4.10
+Role Capabilities are unordered (#95)
+
+## 1.4.9 (Sep 29, 2021)
+Handle missing SAML groups (#89)
+
+## 1.4.8 (Aug 23, 2021)
 * Added splunk_generic_acl resource
 
-##1.4.7 (Aug 06, 2021)
+## 1.4.7 (Aug 06, 2021)
 * Support for webhook alert action in saved_searches
 
-##1.4.6 (June 22, 2021)
+## 1.4.6 (June 22, 2021)
 * Fix:  Adds Cookie handling (fixes #49) (#75)
 * Primarily helps with sending subsequent requests to the same SH when SH cluster is enabled with ELB.
 * Example: With AWS, `lb_cookie_stickiness_policy` has to configured for requests to be sent to the same SH.
 
-##1.4.5 (June 14, 2021)
+## 1.4.5 (June 14, 2021)
 * Fix: Enabling to explicitly set values to roles attributes #76
 
 ## 1.4.4 (April 12, 2021)
