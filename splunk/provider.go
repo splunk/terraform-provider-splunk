@@ -70,10 +70,9 @@ func providerSchema() map[string]*schema.Schema {
 		"acl_get_mode": {
 			Type:         schema.TypeString,
 			Optional:     true,
-			DefaultFunc:  schema.EnvDefaultFunc("SPLUNK_ACL_GET_MODE", client.ACLGetModeEnterprise),
-			ValidateFunc: validation.StringInSlice([]string{client.ACLGetModeCloud, client.ACLGetModeEnterprise}, false),
-			Description: "splunk_generic_acl GET .../acl: \"enterprise\" (default) does not add owner/sharing query parameters; " +
-				"\"cloud\" adds them. Required for some Splunk Cloud deployments (see provider docs).",
+			DefaultFunc:  schema.EnvDefaultFunc("SPLUNK_ACL_GET_MODE", "enterprise"),
+			ValidateFunc: validation.StringInSlice([]string{client.ACLGetModeCloud, "enterprise"}, false),
+			Description: "For splunk_generic_acl GET .../acl: \"enterprise\" (default) omits owner/sharing query parameters; \"cloud\" includes them.",
 		},
 	}
 }

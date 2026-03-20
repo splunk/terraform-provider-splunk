@@ -8,8 +8,7 @@ import (
 	"testing"
 )
 
-// TestGetAcl_CloudMode_QueryStringIncludesOwnerAndSharing verifies that with ACLGetModeCloud,
-// GET .../acl includes owner and sharing query parameters (Splunk Cloud / issue #224).
+// TestGetAcl_CloudMode_QueryStringIncludesOwnerAndSharing verifies owner and sharing appear on the GET query when ACLGetMode is cloud.
 func TestGetAcl_CloudMode_QueryStringIncludesOwnerAndSharing(t *testing.T) {
 	t.Setenv(envVarHTTPScheme, "http")
 
@@ -56,9 +55,8 @@ func TestGetAcl_CloudMode_QueryStringIncludesOwnerAndSharing(t *testing.T) {
 	}
 }
 
-// TestGetAcl_EnterpriseMode_OmitsOwnerSharingFromQuery verifies default Enterprise behavior:
-// no owner/sharing in the query string (only output_mode / count from BuildSplunkURL).
-func TestGetAcl_EnterpriseMode_OmitsOwnerSharingFromQuery(t *testing.T) {
+// TestGetAcl_NonCloudMode_OmitsOwnerSharingFromQuery verifies owner/sharing are not query parameters unless mode is cloud.
+func TestGetAcl_NonCloudMode_OmitsOwnerSharingFromQuery(t *testing.T) {
 	t.Setenv(envVarHTTPScheme, "http")
 
 	var got string
@@ -78,7 +76,7 @@ func TestGetAcl_EnterpriseMode_OmitsOwnerSharingFromQuery(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	c.ACLGetMode = ACLGetModeEnterprise
+	c.ACLGetMode = ""
 
 	resp, err := c.GetAcl("nobody", "system", "myapp", "app", "apps", "local")
 	if err != nil {
@@ -91,9 +89,9 @@ func TestGetAcl_EnterpriseMode_OmitsOwnerSharingFromQuery(t *testing.T) {
 		t.Fatalf("parse query: %v", err)
 	}
 	if q.Get("owner") != "" {
-		t.Errorf("enterprise mode should not set owner query param, got %q", q.Get("owner"))
+		t.Errorf("non-cloud mode should not set owner query param, got %q", q.Get("owner"))
 	}
 	if q.Get("sharing") != "" {
-		t.Errorf("enterprise mode should not set sharing query param, got %q", q.Get("sharing"))
+		t.Errorf("non-cloud mode should not set sharing query param, got %q", q.Get("sharing"))
 	}
 }

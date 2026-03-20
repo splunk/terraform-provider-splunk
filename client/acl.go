@@ -13,12 +13,7 @@ import (
 	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
-// ACL GET: Splunk Cloud expects owner/sharing as query parameters on some GET .../acl calls (#224);
-// Splunk Enterprise rejects those parameters on other handlers.
-const (
-	ACLGetModeCloud      = "cloud"
-	ACLGetModeEnterprise = "enterprise"
-)
+const ACLGetModeCloud = "cloud"
 
 func (client *Client) getAclHTTP(endpoint url.URL) (*http.Response, error) {
 	req, err := client.NewRequest(http.MethodGet, endpoint.String(), nil)
@@ -26,17 +21,6 @@ func (client *Client) getAclHTTP(endpoint url.URL) (*http.Response, error) {
 		return nil, err
 	}
 	return client.Do(req)
-}
-
-func aclOwnerSharingQuery(owner, sharing string) url.Values {
-	q := url.Values{}
-	if owner != "" {
-		q.Set("owner", owner)
-	}
-	if sharing != "" {
-		q.Set("sharing", sharing)
-	}
-	return q
 }
 
 // https://docs.splunk.com/Documentation/Splunk/8.0.4/RESTUM/RESTusing#Access_Control_List
@@ -47,7 +31,13 @@ func (client *Client) GetAcl(owner, app, name, sharing string, resources ...stri
 
 	var q url.Values
 	if strings.EqualFold(strings.TrimSpace(client.ACLGetMode), ACLGetModeCloud) {
-		q = aclOwnerSharingQuery(owner, sharing)
+		q = url.Values{}
+		if owner != "" {
+			q.Set("owner", owner)
+		}
+		if sharing != "" {
+			q.Set("sharing", sharing)
+		}
 	}
 	endpoint := client.BuildSplunkURL(q, resourcePath...)
 	resp, err := client.getAclHTTP(endpoint)

@@ -8,9 +8,7 @@ import (
 	"strings"
 )
 
-// ensureGenericACLQueryContext fills namespace fields when state has no acl block yet or Splunk Cloud
-// requires owner/sharing on ACL GET. Scoped to splunk_generic_acl only so
-// other resources keep prior getACLConfig empty-list semantics.
+// ensureGenericACLQueryContext sets owner, app, and sharing when they are empty (splunk_generic_acl read only).
 func ensureGenericACLQueryContext(acl *models.ACLObject) {
 	if acl.Owner == "" {
 		acl.Owner = "nobody"
@@ -56,8 +54,9 @@ func genericAclCreate(d *schema.ResourceData, meta interface{}) error {
 	if r, ok := d.GetOk("acl"); ok {
 		aclObject = getACLConfig(r.([]interface{}))
 	} else {
-		aclObject = defaultACLConfigForGenericResource()
+		aclObject = getACLConfig(nil)
 	}
+	ensureGenericACLQueryContext(aclObject)
 
 	err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, resources...)
 	if err != nil {

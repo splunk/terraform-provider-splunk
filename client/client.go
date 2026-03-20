@@ -45,8 +45,7 @@ type Client struct {
 	httpClient *http.Client
 	userAgent  string
 	urlEncoded bool
-	// ACLGetMode controls GET .../acl query parameters; see ACLGetMode* constants in acl.go.
-	ACLGetMode string
+	ACLGetMode string // provider acl_get_mode: "cloud" adds owner/sharing on ACL GET; otherwise omitted
 }
 
 // NewRequest creates a new HTTP Request and set proper header

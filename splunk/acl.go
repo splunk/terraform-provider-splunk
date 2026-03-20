@@ -128,15 +128,6 @@ func aclValidator(diff *schema.ResourceDiff, v interface{}) error {
 	return nil
 }
 
-// defaultACLConfigForGenericResource matches splunk_generic_acl create when no acl block is set.
-func defaultACLConfigForGenericResource() *models.ACLObject {
-	return &models.ACLObject{
-		App:     "search",
-		Owner:   "nobody",
-		Sharing: "app",
-	}
-}
-
 func aclStringFromMapOptional(m map[string]interface{}, key string) string {
 	if v, ok := m[key]; ok && v != nil {
 		if s, ok := v.(string); ok {
