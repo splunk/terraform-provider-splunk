@@ -176,12 +176,8 @@ func getACLConfig(r []interface{}) (acl *models.ACLObject) {
 		} else {
 			acl.Sharing = "app"
 		}
-		for _, x := range aclStringListFromInterface(a["read"]) {
-			acl.Perms.Read = append(acl.Perms.Read, x)
-		}
-		for _, x := range aclStringListFromInterface(a["write"]) {
-			acl.Perms.Write = append(acl.Perms.Write, x)
-		}
+		acl.Perms.Read = append(acl.Perms.Read, aclStringListFromInterface(a["read"])...)
+		acl.Perms.Write = append(acl.Perms.Write, aclStringListFromInterface(a["write"])...)
 	}
 	return acl
 }
