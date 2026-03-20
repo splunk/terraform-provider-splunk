@@ -45,6 +45,8 @@ type Client struct {
 	httpClient *http.Client
 	userAgent  string
 	urlEncoded bool
+	// ACLGetMode controls GET .../acl query parameters; see ACLGetMode* constants in acl.go.
+	ACLGetMode string
 }
 
 // NewRequest creates a new HTTP Request and set proper header

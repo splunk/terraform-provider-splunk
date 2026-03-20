@@ -2,27 +2,67 @@ package client
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httputil"
+	"net/url"
 	"strings"
 
 	"github.com/google/go-querystring/query"
 	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
+// ACL GET: Splunk Cloud expects owner/sharing as query parameters on some GET .../acl calls (#224);
+// Splunk Enterprise rejects those parameters on other handlers.
+const (
+	ACLGetModeCloud      = "cloud"
+	ACLGetModeEnterprise = "enterprise"
+)
+
+func (client *Client) getAclHTTP(endpoint url.URL) (*http.Response, error) {
+	req, err := client.NewRequest(http.MethodGet, endpoint.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return client.Do(req)
+}
+
+func aclOwnerSharingQuery(owner, sharing string) url.Values {
+	q := url.Values{}
+	if owner != "" {
+		q.Set("owner", owner)
+	}
+	if sharing != "" {
+		q.Set("sharing", sharing)
+	}
+	return q
+}
+
 // https://docs.splunk.com/Documentation/Splunk/8.0.4/RESTUM/RESTusing#Access_Control_List
-func (client *Client) GetAcl(owner, app, name string, resources ...string) (*http.Response, error) {
+func (client *Client) GetAcl(owner, app, name, sharing string, resources ...string) (*http.Response, error) {
 	resourcePath := []string{"servicesNS", owner, app}
 	resourcePath = append(resourcePath, resources...)
 	resourcePath = append(resourcePath, name, "acl")
-	endpoint := client.BuildSplunkURL(nil, resourcePath...)
-	resp, err := client.Get(endpoint)
+
+	var q url.Values
+	if strings.EqualFold(strings.TrimSpace(client.ACLGetMode), ACLGetModeCloud) {
+		q = aclOwnerSharingQuery(owner, sharing)
+	}
+	endpoint := client.BuildSplunkURL(q, resourcePath...)
+	resp, err := client.getAclHTTP(endpoint)
 	if err != nil {
 		return nil, fmt.Errorf("GET failed for endpoint %s: %s", endpoint.Path, err)
 	}
-
-	return resp, nil
+	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated {
+		return resp, nil
+	}
+	body, readErr := io.ReadAll(resp.Body)
+	resp.Body.Close()
+	if readErr != nil {
+		return nil, readErr
+	}
+	return nil, fmt.Errorf("%s: %s", resp.Status, string(body))
 }
 
 func (client *Client) ResourcesAndNameForPath(path string) (resources []string, name string, ok bool) {

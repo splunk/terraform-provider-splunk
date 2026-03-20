@@ -128,38 +128,70 @@ func aclValidator(diff *schema.ResourceDiff, v interface{}) error {
 	return nil
 }
 
+// defaultACLConfigForGenericResource matches splunk_generic_acl create when no acl block is set.
+func defaultACLConfigForGenericResource() *models.ACLObject {
+	return &models.ACLObject{
+		App:     "search",
+		Owner:   "nobody",
+		Sharing: "app",
+	}
+}
+
+func aclStringFromMapOptional(m map[string]interface{}, key string) string {
+	if v, ok := m[key]; ok && v != nil {
+		if s, ok := v.(string); ok {
+			return s
+		}
+	}
+	return ""
+}
+
+func aclStringListFromInterface(raw interface{}) []string {
+	if raw == nil {
+		return nil
+	}
+	list, ok := raw.([]interface{})
+	if !ok {
+		return nil
+	}
+	out := make([]string, 0, len(list))
+	for _, v := range list {
+		if s, ok := v.(string); ok {
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
 func getACLConfig(r []interface{}) (acl *models.ACLObject) {
 	acl = &models.ACLObject{}
 	for _, v := range r {
-		a := v.(map[string]interface{})
-
-		if a["app"] != "" {
-			acl.App = a["app"].(string)
+		a, ok := v.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if s := aclStringFromMapOptional(a, "app"); s != "" {
+			acl.App = s
 		} else {
 			acl.App = "search"
 		}
-
-		if a["owner"] != "" {
-			acl.Owner = a["owner"].(string)
+		if s := aclStringFromMapOptional(a, "owner"); s != "" {
+			acl.Owner = s
 		} else {
 			acl.Owner = "nobody"
 		}
-
-		if a["sharing"] != "" {
-			acl.Sharing = a["sharing"].(string)
+		if s := aclStringFromMapOptional(a, "sharing"); s != "" {
+			acl.Sharing = s
 		} else {
 			acl.Sharing = "app"
 		}
-
-		for _, v := range a["read"].([]interface{}) {
-			acl.Perms.Read = append(acl.Perms.Read, v.(string))
+		for _, x := range aclStringListFromInterface(a["read"]) {
+			acl.Perms.Read = append(acl.Perms.Read, x)
 		}
-
-		for _, w := range a["write"].([]interface{}) {
-			acl.Perms.Write = append(acl.Perms.Write, w.(string))
+		for _, x := range aclStringListFromInterface(a["write"]) {
+			acl.Perms.Write = append(acl.Perms.Write, x)
 		}
 	}
-
 	return acl
 }
 

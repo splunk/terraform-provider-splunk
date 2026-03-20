@@ -5,6 +5,8 @@ managed in Terraform, use the `acl` block on that configured resource instead of
 Note: This resource doesn't actually create any remote resources, because ACLs can only exist (and always exist) for
 knowledge objects. They can, however, be managed separately.
 
+On **Splunk Cloud**, if ACL reads fail with missing `owner`/`sharing`, set the provider argument `acl_get_mode = "cloud"` (or env `SPLUNK_ACL_GET_MODE=cloud`). The default `enterprise` omits those query parameters on GET, which matches Splunk Enterprise.
+
 ## Example Usage
 ```
 resource "splunk_generic_acl" "my_app" {
