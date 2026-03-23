@@ -35,6 +35,7 @@ Below arguments for the provider can also be set as environment variables.
 If specified, auth token takes priority over username/password.
 * `insecure_skip_verify` or `SPLUNK_INSECURE_SKIP_VERIFY` - (Optional) Insecure skip verification flag (Defaults to `true`)
 * `timeout` or `SPLUNK_TIMEOUT` -  (Optional) Timeout when making calls to Splunk server. (Defaults to `60 seconds`)
+* `acl_get_mode` or `SPLUNK_ACL_GET_MODE` - (Optional) Controls `splunk_generic_acl` GET requests: `enterprise` (default) omits `owner`/`sharing` query parameters; `cloud` includes them. Set to `cloud` when using Splunk Cloud if ACL reads return 400 missing owner/sharing.
 
 (NOTE: Auth token can only be used with certain type of Splunk deployments.
 Read more on authentication with tokens here: https://docs.splunk.com/Documentation/Splunk/latest/Security/Setupauthenticationwithtokens)

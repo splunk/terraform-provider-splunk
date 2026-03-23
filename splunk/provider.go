@@ -7,6 +7,7 @@ import (
 	"github.com/splunk/terraform-provider-splunk/client"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
@@ -65,6 +66,13 @@ func providerSchema() map[string]*schema.Schema {
 			Optional:    true,
 			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_TIMEOUT", 60),
 			Description: "Timeout when making calls to Splunk server. Defaults to 60 seconds",
+		},
+		"acl_get_mode": {
+			Type:         schema.TypeString,
+			Optional:     true,
+			DefaultFunc:  schema.EnvDefaultFunc("SPLUNK_ACL_GET_MODE", "enterprise"),
+			ValidateFunc: validation.StringInSlice([]string{client.ACLGetModeCloud, "enterprise"}, false),
+			Description: "For splunk_generic_acl GET .../acl: \"enterprise\" (default) omits owner/sharing query parameters; \"cloud\" includes them.",
 		},
 	}
 }
@@ -148,6 +156,7 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 		}
 	}
 
+	splunkdClient.ACLGetMode = d.Get("acl_get_mode").(string)
 	provider.Client = splunkdClient
 	return provider, nil
 }
