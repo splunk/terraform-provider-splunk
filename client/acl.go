@@ -91,7 +91,17 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 	resourcePath := []string{"servicesNS", owner, app}
 	resourcePath = append(resourcePath, resources...)
 	resourcePath = append(resourcePath, name, "acl")
-	endpoint := client.BuildSplunkURL(nil, resourcePath...)
+	var q url.Values
+	if strings.EqualFold(strings.TrimSpace(client.ACLGetMode), ACLGetModeCloud) {
+		q = url.Values{}
+		if owner != "" {
+			q.Set("owner", owner)
+		}
+		if acl.Sharing != "" {
+			q.Set("sharing", acl.Sharing)
+		}
+	}
+	endpoint := client.BuildSplunkURL(q, resourcePath...)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, err)
