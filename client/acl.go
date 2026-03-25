@@ -93,20 +93,23 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 	resourcePath = append(resourcePath, name, "acl")
 	endpoint := client.BuildSplunkURL(nil, resourcePath...)
 	resp, err := client.Post(endpoint, values)
-	requestBody, _ := httputil.DumpRequest(resp.Request, false)
 	if err != nil {
-		return fmt.Errorf("GET failed for endpoint %s: %s", endpoint.Path, err)
+		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, err)
 	}
-
 	defer resp.Body.Close()
 
-	respBody, error := httputil.DumpResponse(resp, true)
-	if error != nil {
-		log.Printf("[ERROR] Error occured during acl creation %s", error)
+	requestBody, _ := httputil.DumpRequest(resp.Request, false)
+	respBody, dumpErr := httputil.DumpResponse(resp, true)
+	if dumpErr != nil {
+		log.Printf("[ERROR] Error occured during acl update %s", dumpErr)
 	}
 
 	log.Printf("[DEBUG] Request object coming acl is: %s and body: %s", string(requestBody), string(values.Encode()))
-	log.Printf("[DEBUG] Response object returned from acl creation: %s", string(respBody))
+	log.Printf("[DEBUG] Response object returned from acl update: %s", string(respBody))
+
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, resp.Status)
+	}
 
 	return nil
 }
