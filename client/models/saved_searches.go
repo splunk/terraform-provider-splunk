@@ -1,5 +1,43 @@
 package models
 
+import (
+	"encoding/json"
+	"fmt"
+)
+
+// FlexInt unmarshals JSON values that Splunk returns as either a
+// string-encoded integer ("0", "1"), a bare integer (0, 1), or a
+// boolean (false, true). Splunk Enterprise returns string-encoded
+// integers; Splunk Cloud returns booleans for the same fields.
+// See: https://github.com/splunk/terraform-provider-splunk/issues/130
+type FlexInt int
+
+func (f *FlexInt) UnmarshalJSON(data []byte) error {
+	var raw interface{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	switch v := raw.(type) {
+	case float64:
+		*f = FlexInt(int(v))
+	case string:
+		var i int
+		if _, err := fmt.Sscanf(v, "%d", &i); err != nil {
+			return fmt.Errorf("cannot parse %q as int: %w", v, err)
+		}
+		*f = FlexInt(i)
+	case bool:
+		if v {
+			*f = 1
+		} else {
+			*f = 0
+		}
+	default:
+		return fmt.Errorf("cannot unmarshal %T into FlexInt", raw)
+	}
+	return nil
+}
+
 type SavedSearchesResponse struct {
 	Entry    []SavedSearchesEntry `json:"entry"`
 	Messages []ErrorMessage       `json:"messages"`
@@ -22,11 +60,11 @@ type SavedSearchObject struct {
 	ActionEmailFormat                            string  `json:"action.email.format,omitempty" url:"action.email.format,omitempty"`
 	ActionEmailFrom                              string  `json:"action.email.from,omitempty" url:"action.email.from,omitempty"`
 	ActionEmailHostname                          string  `json:"action.email.hostname,omitempty" url:"action.email.hostname,omitempty"`
-	ActionEmailIncludeResultsLink                int     `json:"action.email.include.results_link,string,omitempty" url:"action.email.include.results_link"`
-	ActionEmailIncludeSearch                     int     `json:"action.email.include.search,string,omitempty" url:"action.email.include.search"`
-	ActionEmailIncludeTrigger                    int     `json:"action.email.include.trigger,string,omitempty" url:"action.email.include.trigger"`
-	ActionEmailIncludeTriggerTime                int     `json:"action.email.include.trigger_time,string,omitempty" url:"action.email.include.trigger_time"`
-	ActionEmailIncludeViewLink                   int     `json:"action.email.include.view_link,string,omitempty" url:"action.email.include.view_link"`
+	ActionEmailIncludeResultsLink                FlexInt `json:"action.email.include.results_link,omitempty" url:"action.email.include.results_link"`
+	ActionEmailIncludeSearch                     FlexInt `json:"action.email.include.search,omitempty" url:"action.email.include.search"`
+	ActionEmailIncludeTrigger                    FlexInt `json:"action.email.include.trigger,omitempty" url:"action.email.include.trigger"`
+	ActionEmailIncludeTriggerTime                FlexInt `json:"action.email.include.trigger_time,omitempty" url:"action.email.include.trigger_time"`
+	ActionEmailIncludeViewLink                   FlexInt `json:"action.email.include.view_link,omitempty" url:"action.email.include.view_link"`
 	ActionEmailInline                            bool    `json:"action.email.inline" url:"action.email.inline"`
 	ActionEmailMailserver                        string  `json:"action.email.mailserver,omitempty" url:"action.email.mailserver,omitempty"`
 	ActionEmailMaxResults                        int     `json:"action.email.maxresults,omitempty" url:"action.email.maxresults,omitempty"`
@@ -41,7 +79,7 @@ type SavedSearchObject struct {
 	ActionEmailReportPaperSize                   string  `json:"action.email.reportPaperSize,omitempty" url:"action.email.reportPaperSize,omitempty"`
 	ActionEmailReportServerEnabled               bool    `json:"action.email.reportServerEnabled" url:"action.email.reportServerEnabled"`
 	ActionEmailReportServerURL                   string  `json:"action.email.reportServerURL,omitempty" url:"action.email.reportServerURL,omitempty"`
-	ActionEmailSendCSV                           int     `json:"action.email.sendcsv,string,omitempty" url:"action.email.sendcsv,omitempty"`
+	ActionEmailSendCSV                           FlexInt `json:"action.email.sendcsv,omitempty" url:"action.email.sendcsv,omitempty"`
 	ActionEmailSendPDF                           bool    `json:"action.email.sendpdf" url:"action.email.sendpdf"`
 	ActionEmailSendResults                       bool    `json:"action.email.sendresults" url:"action.email.sendresults"`
 	ActionEmailSubject                           string  `json:"action.email.subject,omitempty" url:"action.email.subject,omitempty"`
@@ -83,7 +121,7 @@ type SavedSearchObject struct {
 	ActionSnowEventParamNode                     string  `json:"action.snow_event.param.node,omitempty" url:"action.snow_event.param.node,omitempty"`
 	ActionSnowEventParamType                     string  `json:"action.snow_event.param.type,omitempty" url:"action.snow_event.param.type,omitempty"`
 	ActionSnowEventParamResource                 string  `json:"action.snow_event.param.resource,omitempty" url:"action.snow_event.param.resource,omitempty"`
-	ActionSnowEventParamSeverity                 int     `json:"action.snow_event.param.severity,string,omitempty" url:"action.snow_event.param.severity,omitempty"`
+	ActionSnowEventParamSeverity                 FlexInt `json:"action.snow_event.param.severity,omitempty" url:"action.snow_event.param.severity,omitempty"`
 	ActionSnowEventParamDescription              string  `json:"action.snow_event.param.description,omitempty" url:"action.snow_event.param.description,omitempty"`
 	ActionSnowEventParamCiIdentifier             string  `json:"action.snow_event.param.ci_identifier,omitempty" url:"action.snow_event.param.ci_identifier,omitempty"`
 	ActionSnowEventParamCustomFields             string  `json:"action.snow_event.param.custom_fields,omitempty" url:"action.snow_event.param.custom_fields,omitempty"`
