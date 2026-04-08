@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/google/go-querystring/query"
 	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
@@ -76,15 +75,13 @@ func (client *Client) ResourcesAndNameForPath(path string) (resources []string, 
 }
 
 func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, resources ...string) error {
-	values, err := query.Values(&acl)
-	if err != nil {
-		return err
+	values := url.Values{}
+	if owner != "" {
+		values.Set("owner", owner)
 	}
-	// remove app from url values during POST
-	values.Del("app")
-	values.Del("perms[read]")
-	values.Del("perms[write]")
-	// Flatten []string
+	if acl.Sharing != "" {
+		values.Set("sharing", acl.Sharing)
+	}
 	values.Set("perms.read", strings.Join(acl.Perms.Read, ","))
 	values.Set("perms.write", strings.Join(acl.Perms.Write, ","))
 	// Adding resources
