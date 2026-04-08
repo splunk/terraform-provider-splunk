@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/google/go-querystring/query"
 	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
