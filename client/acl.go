@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"path"
 	"strings"
 
 	"github.com/google/go-querystring/query"
@@ -89,17 +90,16 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 	resourcePath := []string{"servicesNS", owner, app}
 	resourcePath = append(resourcePath, resources...)
 	resourcePath = append(resourcePath, name, "acl")
-	var q url.Values
-	if strings.EqualFold(strings.TrimSpace(client.ACLGetMode), ACLGetModeCloud) {
-		q = url.Values{}
-		if owner != "" {
-			q.Set("owner", owner)
-		}
-		if acl.Sharing != "" {
-			q.Set("sharing", acl.Sharing)
-		}
+	buildPath := client.path
+	for _, pathPart := range resourcePath {
+		pathPart = strings.ReplaceAll(pathPart, " ", "+")
+		buildPath = path.Join(buildPath, pathPart)
 	}
-	endpoint := client.BuildSplunkURL(q, resourcePath...)
+	endpoint := url.URL{
+		Scheme: getEnv(envVarHTTPScheme, defaultScheme),
+		Host:   client.host,
+		Path:   buildPath,
+	}
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, err)
