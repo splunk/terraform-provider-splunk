@@ -100,7 +100,7 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 		Host:   client.host,
 		Path:   buildPath,
 	}
-	resp, err := client.Post(endpoint, values)
+	resp, err := client.Post(endpoint, []byte(values.Encode()))
 	if err != nil {
 		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, err)
 	}
