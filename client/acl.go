@@ -98,6 +98,9 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 		values.Set("perms.read", readPerms)
 		values.Set("perms.write", writePerms)
 
+		// Splunk Cloud app ACL updates require a raw form-encoded POST body here; the
+		// generic client.Post/object-encoding path can return 200 OK without persisting
+		// the ACL change.
 		req, reqErr := client.NewRequest(http.MethodPost, endpoint.String(), strings.NewReader(values.Encode()))
 		if reqErr != nil {
 			return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, reqErr)
