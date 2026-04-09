@@ -79,6 +79,8 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 	resourcePath = append(resourcePath, resources...)
 	resourcePath = append(resourcePath, name, "acl")
 	isCloud := strings.EqualFold(strings.TrimSpace(client.ACLGetMode), ACLGetModeCloud)
+	readPerms := strings.Join(acl.Perms.Read, ",")
+	writePerms := strings.Join(acl.Perms.Write, ",")
 
 	var (
 		resp     *http.Response
@@ -94,8 +96,8 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 		if acl.Sharing != "" {
 			values.Set("sharing", acl.Sharing)
 		}
-		values.Set("perms.read", strings.Join(acl.Perms.Read, ","))
-		values.Set("perms.write", strings.Join(acl.Perms.Write, ","))
+		values.Set("perms.read", readPerms)
+		values.Set("perms.write", writePerms)
 
 		buildPath := client.path
 		for _, pathPart := range resourcePath {
@@ -123,8 +125,8 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 		values.Del("app")
 		values.Del("perms[read]")
 		values.Del("perms[write]")
-		values.Set("perms.read", strings.Join(acl.Perms.Read, ","))
-		values.Set("perms.write", strings.Join(acl.Perms.Write, ","))
+		values.Set("perms.read", readPerms)
+		values.Set("perms.write", writePerms)
 
 		endpoint = client.BuildSplunkURL(nil, resourcePath...)
 		resp, err = client.Post(endpoint, values)
