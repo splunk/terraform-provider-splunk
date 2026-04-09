@@ -3,9 +3,7 @@ package client
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"path"
 	"strings"
@@ -112,15 +110,6 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, err)
 	}
 	defer resp.Body.Close()
-
-	requestBody, _ := httputil.DumpRequestOut(req, true)
-	respBody, dumpErr := httputil.DumpResponse(resp, true)
-	if dumpErr != nil {
-		log.Printf("[ERROR] Error occured during acl update %s", dumpErr)
-	}
-
-	log.Printf("[DEBUG] Request object coming acl is: %s and body: %s", string(requestBody), string(values.Encode()))
-	log.Printf("[DEBUG] Response object returned from acl update: %s", string(respBody))
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, resp.Status)
