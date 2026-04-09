@@ -75,6 +75,36 @@ func (client *Client) ResourcesAndNameForPath(path string) (resources []string, 
 }
 
 func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, resources ...string) error {
+	if !strings.EqualFold(strings.TrimSpace(client.ACLGetMode), ACLGetModeCloud) {
+		values, err := query.Values(&acl)
+		if err != nil {
+			return err
+		}
+		// remove app from url values during POST
+		values.Del("app")
+		values.Del("perms[read]")
+		values.Del("perms[write]")
+		// Flatten []string
+		values.Set("perms.read", strings.Join(acl.Perms.Read, ","))
+		values.Set("perms.write", strings.Join(acl.Perms.Write, ","))
+		// Adding resources
+		resourcePath := []string{"servicesNS", owner, app}
+		resourcePath = append(resourcePath, resources...)
+		resourcePath = append(resourcePath, name, "acl")
+		endpoint := client.BuildSplunkURL(nil, resourcePath...)
+		resp, err := client.Post(endpoint, values)
+		if err != nil {
+			return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+			return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, resp.Status)
+		}
+
+		return nil
+	}
+
 	values := url.Values{}
 	if owner != "" {
 		values.Set("owner", owner)
