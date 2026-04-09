@@ -100,13 +100,20 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 		Host:   client.host,
 		Path:   buildPath,
 	}
-	resp, err := client.Post(endpoint, []byte(values.Encode()))
+
+	req, err := client.NewRequest(http.MethodPost, endpoint.String(), strings.NewReader(values.Encode()))
+	if err != nil {
+		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, err)
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, err)
 	}
 	defer resp.Body.Close()
 
-	requestBody, _ := httputil.DumpRequest(resp.Request, false)
+	requestBody, _ := httputil.DumpRequestOut(req, true)
 	respBody, dumpErr := httputil.DumpResponse(resp, true)
 	if dumpErr != nil {
 		log.Printf("[ERROR] Error occured during acl update %s", dumpErr)
