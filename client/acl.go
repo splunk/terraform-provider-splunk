@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
 
 	"github.com/google/go-querystring/query"
@@ -78,14 +77,14 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 	resourcePath := []string{"servicesNS", owner, app}
 	resourcePath = append(resourcePath, resources...)
 	resourcePath = append(resourcePath, name, "acl")
+	endpoint := client.BuildSplunkURL(nil, resourcePath...)
 	isCloud := strings.EqualFold(strings.TrimSpace(client.ACLGetMode), ACLGetModeCloud)
 	readPerms := strings.Join(acl.Perms.Read, ",")
 	writePerms := strings.Join(acl.Perms.Write, ",")
 
 	var (
-		resp     *http.Response
-		err      error
-		endpoint url.URL
+		resp *http.Response
+		err  error
 	)
 
 	if isCloud {
@@ -98,17 +97,6 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 		}
 		values.Set("perms.read", readPerms)
 		values.Set("perms.write", writePerms)
-
-		buildPath := client.path
-		for _, pathPart := range resourcePath {
-			pathPart = strings.ReplaceAll(pathPart, " ", "+")
-			buildPath = path.Join(buildPath, pathPart)
-		}
-		endpoint = url.URL{
-			Scheme: getEnv(envVarHTTPScheme, defaultScheme),
-			Host:   client.host,
-			Path:   buildPath,
-		}
 
 		req, reqErr := client.NewRequest(http.MethodPost, endpoint.String(), strings.NewReader(values.Encode()))
 		if reqErr != nil {
@@ -127,8 +115,6 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 		values.Del("perms[write]")
 		values.Set("perms.read", readPerms)
 		values.Set("perms.write", writePerms)
-
-		endpoint = client.BuildSplunkURL(nil, resourcePath...)
 		resp, err = client.Post(endpoint, values)
 	}
 	if err != nil {
