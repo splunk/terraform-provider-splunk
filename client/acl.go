@@ -3,9 +3,7 @@ package client
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"strings"
 
@@ -76,37 +74,60 @@ func (client *Client) ResourcesAndNameForPath(path string) (resources []string, 
 }
 
 func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, resources ...string) error {
-	values, err := query.Values(&acl)
-	if err != nil {
-		return err
-	}
-	// remove app from url values during POST
-	values.Del("app")
-	values.Del("perms[read]")
-	values.Del("perms[write]")
-	// Flatten []string
-	values.Set("perms.read", strings.Join(acl.Perms.Read, ","))
-	values.Set("perms.write", strings.Join(acl.Perms.Write, ","))
-	// Adding resources
 	resourcePath := []string{"servicesNS", owner, app}
 	resourcePath = append(resourcePath, resources...)
 	resourcePath = append(resourcePath, name, "acl")
 	endpoint := client.BuildSplunkURL(nil, resourcePath...)
-	resp, err := client.Post(endpoint, values)
-	requestBody, _ := httputil.DumpRequest(resp.Request, false)
-	if err != nil {
-		return fmt.Errorf("GET failed for endpoint %s: %s", endpoint.Path, err)
-	}
+	isCloud := strings.EqualFold(strings.TrimSpace(client.ACLGetMode), ACLGetModeCloud)
+	readPerms := strings.Join(acl.Perms.Read, ",")
+	writePerms := strings.Join(acl.Perms.Write, ",")
 
+	var (
+		resp *http.Response
+		err  error
+	)
+
+	if isCloud {
+		values := url.Values{}
+		if owner != "" {
+			values.Set("owner", owner)
+		}
+		if acl.Sharing != "" {
+			values.Set("sharing", acl.Sharing)
+		}
+		values.Set("perms.read", readPerms)
+		values.Set("perms.write", writePerms)
+
+		// Splunk Cloud app ACL updates require a raw form-encoded POST body here; the
+		// generic client.Post/object-encoding path can return 200 OK without persisting
+		// the ACL change.
+		req, reqErr := client.NewRequest(http.MethodPost, endpoint.String(), strings.NewReader(values.Encode()))
+		if reqErr != nil {
+			return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, reqErr)
+		}
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+		resp, err = client.Do(req)
+	} else {
+		values, valuesErr := query.Values(&acl)
+		if valuesErr != nil {
+			return valuesErr
+		}
+		values.Del("app")
+		values.Del("perms[read]")
+		values.Del("perms[write]")
+		values.Set("perms.read", readPerms)
+		values.Set("perms.write", writePerms)
+		resp, err = client.Post(endpoint, values)
+	}
+	if err != nil {
+		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, err)
+	}
 	defer resp.Body.Close()
 
-	respBody, error := httputil.DumpResponse(resp, true)
-	if error != nil {
-		log.Printf("[ERROR] Error occured during acl creation %s", error)
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
+		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, resp.Status)
 	}
-
-	log.Printf("[DEBUG] Request object coming acl is: %s and body: %s", string(requestBody), string(values.Encode()))
-	log.Printf("[DEBUG] Response object returned from acl creation: %s", string(respBody))
 
 	return nil
 }
