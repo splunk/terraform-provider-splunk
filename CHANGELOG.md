@@ -1,3 +1,6 @@
+## 1.5.1
+* Fix: generic_acl app ACL updates on Splunk Cloud
+
 ## 1.5.0
 * New resource: `splunk_saved_event_types` for managing saved event types knowledge objects.
 * Fix: saved search `action_email_include_*` fields (results_link, view_link, search, trigger, trigger_time) — removed omitempty from URL parameters so value 0 is sent to Splunk and can be set in config

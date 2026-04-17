@@ -18,7 +18,7 @@ resource "splunk_saved_event_types" "event-type" {
   color       = "et_blue"
   tags        = ["tag"]
   acl {
-    owner   = "admin"
+    owner   = "nobody"
     sharing = "app"
     app     = "search"
   }
