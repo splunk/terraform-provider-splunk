@@ -78,7 +78,7 @@ func providerSchema() map[string]*schema.Schema {
 			Type:        schema.TypeBool,
 			Optional:    true,
 			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_IGNORE_SCHEDULE_PRIORITY", false),
-			Description: "Ignore schedule_priority field in saved search",
+			Description: "When true, omit schedule_priority from splunk_saved_searches create/update API calls and do not sync it on read. Defaults to false for Splunk Enterprise. Set to true on Splunk Cloud when updates fail with schedule_priority is not supported by this handler.",
 		},
 	}
 }

@@ -1306,7 +1306,7 @@ func resourceAlertTrackStateUpgradeV0(rawState map[string]interface{}, meta inte
 func savedSearchesCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
-	savedSearchesConfig := getSavedSearchesConfig(d)
+	savedSearchesConfig := getSavedSearchesConfig(d, provider.Client.GetIgnoreSchedulePriority())
 	aclObject := getResourceDataSearchACL(d)
 	err := (*provider.Client).CreateSavedSearches(name, aclObject.Owner, aclObject.App, savedSearchesConfig)
 	if err != nil {
@@ -1895,8 +1895,10 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("schedule_window", entry.Content.ScheduleWindow); err != nil {
 		return err
 	}
-	if err = d.Set("schedule_priority", entry.Content.SchedulePriority); err != nil {
-		return err
+	if !provider.Client.GetIgnoreSchedulePriority() {
+		if err = d.Set("schedule_priority", entry.Content.SchedulePriority); err != nil {
+			return err
+		}
 	}
 	if err = d.Set("search", entry.Content.Search); err != nil {
 		return err
@@ -1918,10 +1920,7 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 
 func savedSearchesUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
-	savedSearchesConfig := getSavedSearchesConfig(d)
-	if provider.Client.GetIgnoreSchedulePriority() {
-		savedSearchesConfig.SchedulePriority = ""
-	}
+	savedSearchesConfig := getSavedSearchesConfig(d, provider.Client.GetIgnoreSchedulePriority())
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
 
 	// Update will create a new resource with private `user` permissions if resource had shared permissions set
@@ -1967,7 +1966,12 @@ func savedSearchesDelete(d *schema.ResourceData, meta interface{}) error {
 	}
 }
 
-func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.SavedSearchObject) {
+func getSavedSearchesConfig(d *schema.ResourceData, ignoreSchedulePriority bool) (savedSearchesObj *models.SavedSearchObject) {
+	schedulePriority := d.Get("schedule_priority").(string)
+	if ignoreSchedulePriority {
+		schedulePriority = ""
+	}
+
 	savedSearchesObj = &models.SavedSearchObject{
 		Actions:                                      d.Get("actions").(string),
 		ActionEmail:                                  d.Get("action_email").(bool),
@@ -2150,7 +2154,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		RestartOnSearchPeerAdd:                       d.Get("restart_on_searchpeer_add").(bool),
 		RunOnStartup:                                 d.Get("run_on_startup").(bool),
 		ScheduleWindow:                               d.Get("schedule_window").(string),
-		SchedulePriority:                             d.Get("schedule_priority").(string),
+		SchedulePriority:                             schedulePriority,
 		Search:                                       d.Get("search").(string),
 		VSID:                                         d.Get("vsid").(string),
 		WorkloadPool:                                 d.Get("workload_pool").(string),

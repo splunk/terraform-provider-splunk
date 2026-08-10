@@ -6,7 +6,7 @@ terraform {
   required_providers {
     splunk = {
       source  = "splunk/splunk"
-      version = "1.4.25"
+      version = "1.4.4"
     }
   }
 }
@@ -20,11 +20,10 @@ provider "aws" {
 
 provider "splunk" {
   // Provide splunk instance credentials and details either via resource block or env variables
-  url                      = "localhost:8089"
-  username                 = "admin"
-  password                 = "changeme"
-  insecure_skip_verify     = true
-  ignore_schedule_priority = false
+  url                  = "localhost:8089"
+  username             = "admin"
+  password             = "changeme"
+  insecure_skip_verify = true
 }
 
 resource "splunk_indexes" "vpc-flow-logs-index" {

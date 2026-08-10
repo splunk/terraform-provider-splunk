@@ -128,7 +128,7 @@ func TestNamespacedResourceReadersEscapeFinalPathSegment(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			client, err := NewSplunkdClient("", defaultAuth, backend.Host, "", server.Client())
+			client, err := NewSplunkdClient("", defaultAuth, backend.Host, "", false, server.Client())
 			if err != nil {
 				t.Fatal(err)
 			}

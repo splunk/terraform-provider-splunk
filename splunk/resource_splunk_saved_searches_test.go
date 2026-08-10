@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
@@ -887,5 +888,22 @@ func TestResourceExampleInstanceStateUpgradeV0(t *testing.T) {
 
 	if !reflect.DeepEqual(expected, actual) {
 		t.Fatalf("\n\nexpected:\n\n%#v\n\ngot:\n\n%#v\n\n", expected, actual)
+	}
+}
+
+func TestGetSavedSearchesConfigSchedulePriority(t *testing.T) {
+	resourceData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"search":            "index=main",
+		"schedule_priority": "high",
+	})
+
+	enterpriseConfig := getSavedSearchesConfig(resourceData, false)
+	if got, want := enterpriseConfig.SchedulePriority, "high"; got != want {
+		t.Errorf("SchedulePriority with ignore=false: got %q, want %q", got, want)
+	}
+
+	cloudConfig := getSavedSearchesConfig(resourceData, true)
+	if got, want := cloudConfig.SchedulePriority, ""; got != want {
+		t.Errorf("SchedulePriority with ignore=true: got %q, want empty string", got)
 	}
 }
