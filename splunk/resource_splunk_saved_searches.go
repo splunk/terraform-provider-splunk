@@ -1231,6 +1231,12 @@ func savedSearches() *schema.Resource {
 				Computed:    true,
 				Description: "Raises the scheduling priority of the named search. Defaults to Default",
 			},
+			"ignore_schedule_priority": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "When true, omit schedule_priority from create/update API calls and do not sync it on read. Defaults to false for Splunk Enterprise. Set to true on Splunk Cloud when updates fail with schedule_priority is not supported by this handler.",
+			},
 			"search": {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -1895,7 +1901,12 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("schedule_window", entry.Content.ScheduleWindow); err != nil {
 		return err
 	}
-	if err = d.Set("schedule_priority", entry.Content.SchedulePriority); err != nil {
+	if !d.Get("ignore_schedule_priority").(bool) {
+		if err = d.Set("schedule_priority", entry.Content.SchedulePriority); err != nil {
+			return err
+		}
+	}
+	if err = d.Set("ignore_schedule_priority", d.Get("ignore_schedule_priority").(bool)); err != nil {
 		return err
 	}
 	if err = d.Set("search", entry.Content.Search); err != nil {
@@ -1965,6 +1976,11 @@ func savedSearchesDelete(d *schema.ResourceData, meta interface{}) error {
 }
 
 func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.SavedSearchObject) {
+	schedulePriority := d.Get("schedule_priority").(string)
+	if d.Get("ignore_schedule_priority").(bool) {
+		schedulePriority = ""
+	}
+
 	savedSearchesObj = &models.SavedSearchObject{
 		Actions:                                      d.Get("actions").(string),
 		ActionEmail:                                  d.Get("action_email").(bool),
@@ -2147,7 +2163,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		RestartOnSearchPeerAdd:                       d.Get("restart_on_searchpeer_add").(bool),
 		RunOnStartup:                                 d.Get("run_on_startup").(bool),
 		ScheduleWindow:                               d.Get("schedule_window").(string),
-		SchedulePriority:                             d.Get("schedule_priority").(string),
+		SchedulePriority:                             schedulePriority,
 		Search:                                       d.Get("search").(string),
 		VSID:                                         d.Get("vsid").(string),
 		WorkloadPool:                                 d.Get("workload_pool").(string),
