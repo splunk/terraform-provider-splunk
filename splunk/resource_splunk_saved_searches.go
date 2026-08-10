@@ -1906,6 +1906,9 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 			return err
 		}
 	}
+	if err = d.Set("ignore_schedule_priority", d.Get("ignore_schedule_priority").(bool)); err != nil {
+		return err
+	}
 	if err = d.Set("search", entry.Content.Search); err != nil {
 		return err
 	}
