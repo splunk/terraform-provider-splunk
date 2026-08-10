@@ -892,18 +892,31 @@ func TestResourceExampleInstanceStateUpgradeV0(t *testing.T) {
 }
 
 func TestGetSavedSearchesConfigSchedulePriority(t *testing.T) {
-	resourceData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+	enterpriseData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
 		"search":            "index=main",
 		"schedule_priority": "high",
 	})
-
-	enterpriseConfig := getSavedSearchesConfig(resourceData, false)
+	enterpriseConfig := getSavedSearchesConfig(enterpriseData)
 	if got, want := enterpriseConfig.SchedulePriority, "high"; got != want {
 		t.Errorf("SchedulePriority with ignore=false: got %q, want %q", got, want)
 	}
 
-	cloudConfig := getSavedSearchesConfig(resourceData, true)
+	cloudData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"search":                   "index=main",
+		"schedule_priority":        "high",
+		"ignore_schedule_priority": true,
+	})
+	cloudConfig := getSavedSearchesConfig(cloudData)
 	if got, want := cloudConfig.SchedulePriority, ""; got != want {
 		t.Errorf("SchedulePriority with ignore=true: got %q, want empty string", got)
+	}
+}
+
+func TestSavedSearchesSchemaIgnoreSchedulePriorityDefault(t *testing.T) {
+	resourceData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"search": "index=main",
+	})
+	if got, want := resourceData.Get("ignore_schedule_priority").(bool), false; got != want {
+		t.Errorf("ignore_schedule_priority default: got %v, want %v", got, want)
 	}
 }

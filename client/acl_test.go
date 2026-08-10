@@ -27,7 +27,7 @@ func TestGetAcl_CloudMode_QueryStringIncludesOwnerAndSharing(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	c, err := NewSplunkdClient("", defaultAuth, backend.Host, "", false, ts.Client())
+	c, err := NewSplunkdClient("", defaultAuth, backend.Host, "", ts.Client())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -74,7 +74,7 @@ func TestGetAcl_NonCloudMode_OmitsOwnerSharingFromQuery(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	c, err := NewSplunkdClient("", defaultAuth, backend.Host, "", false, ts.Client())
+	c, err := NewSplunkdClient("", defaultAuth, backend.Host, "", ts.Client())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -156,7 +156,7 @@ func TestAclURLsEscapeResourceName(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			client, err := NewSplunkdClient("", defaultAuth, backend.Host, "", false, server.Client())
+			client, err := NewSplunkdClient("", defaultAuth, backend.Host, "", server.Client())
 			if err != nil {
 				t.Fatal(err)
 			}

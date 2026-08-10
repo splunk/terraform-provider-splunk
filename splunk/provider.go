@@ -74,12 +74,6 @@ func providerSchema() map[string]*schema.Schema {
 			ValidateFunc: validation.StringInSlice([]string{client.ACLGetModeCloud, "enterprise"}, false),
 			Description: "For splunk_generic_acl GET .../acl: \"enterprise\" (default) omits owner/sharing query parameters; \"cloud\" includes them.",
 		},
-		"ignore_schedule_priority": {
-			Type:        schema.TypeBool,
-			Optional:    true,
-			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_IGNORE_SCHEDULE_PRIORITY", false),
-			Description: "When true, omit schedule_priority from splunk_saved_searches create/update API calls and do not sync it on read. Defaults to false for Splunk Enterprise. Set to true on Splunk Cloud when updates fail with schedule_priority is not supported by this handler.",
-		},
 	}
 }
 
@@ -142,7 +136,6 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 			[2]string{d.Get("username").(string), d.Get("password").(string)},
 			u.Host,
 			u.Path,
-			d.Get("ignore_schedule_priority").(bool),
 			httpClient)
 		if err != nil {
 			return splunkdClient, err
@@ -152,7 +145,6 @@ func providerConfigure(d *schema.ResourceData) (interface{}, error) {
 			[2]string{d.Get("username").(string), d.Get("password").(string)},
 			u.Host,
 			u.Path,
-			d.Get("ignore_schedule_priority").(bool),
 			httpClient)
 		if err != nil {
 			return splunkdClient, err

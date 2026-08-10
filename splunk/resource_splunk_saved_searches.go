@@ -1231,6 +1231,12 @@ func savedSearches() *schema.Resource {
 				Computed:    true,
 				Description: "Raises the scheduling priority of the named search. Defaults to Default",
 			},
+			"ignore_schedule_priority": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "When true, omit schedule_priority from create/update API calls and do not sync it on read. Defaults to false for Splunk Enterprise. Set to true on Splunk Cloud when updates fail with schedule_priority is not supported by this handler.",
+			},
 			"search": {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -1306,7 +1312,7 @@ func resourceAlertTrackStateUpgradeV0(rawState map[string]interface{}, meta inte
 func savedSearchesCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
-	savedSearchesConfig := getSavedSearchesConfig(d, provider.Client.GetIgnoreSchedulePriority())
+	savedSearchesConfig := getSavedSearchesConfig(d)
 	aclObject := getResourceDataSearchACL(d)
 	err := (*provider.Client).CreateSavedSearches(name, aclObject.Owner, aclObject.App, savedSearchesConfig)
 	if err != nil {
@@ -1895,7 +1901,7 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("schedule_window", entry.Content.ScheduleWindow); err != nil {
 		return err
 	}
-	if !provider.Client.GetIgnoreSchedulePriority() {
+	if !d.Get("ignore_schedule_priority").(bool) {
 		if err = d.Set("schedule_priority", entry.Content.SchedulePriority); err != nil {
 			return err
 		}
@@ -1920,7 +1926,7 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 
 func savedSearchesUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
-	savedSearchesConfig := getSavedSearchesConfig(d, provider.Client.GetIgnoreSchedulePriority())
+	savedSearchesConfig := getSavedSearchesConfig(d)
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
 
 	// Update will create a new resource with private `user` permissions if resource had shared permissions set
@@ -1966,9 +1972,9 @@ func savedSearchesDelete(d *schema.ResourceData, meta interface{}) error {
 	}
 }
 
-func getSavedSearchesConfig(d *schema.ResourceData, ignoreSchedulePriority bool) (savedSearchesObj *models.SavedSearchObject) {
+func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.SavedSearchObject) {
 	schedulePriority := d.Get("schedule_priority").(string)
-	if ignoreSchedulePriority {
+	if d.Get("ignore_schedule_priority").(bool) {
 		schedulePriority = ""
 	}
 

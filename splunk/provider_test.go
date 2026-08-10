@@ -73,23 +73,6 @@ func TestProviderConfigure(t *testing.T) {
 	}
 }
 
-func TestProviderSchemaIgnoreSchedulePriorityDefault(t *testing.T) {
-	resourceData := schema.TestResourceDataRaw(t, providerSchema(), map[string]interface{}{
-		"url": "localhost:8089",
-	})
-	if got, want := resourceData.Get("ignore_schedule_priority").(bool), false; got != want {
-		t.Errorf("ignore_schedule_priority default: got %v, want %v", got, want)
-	}
-
-	resourceData = schema.TestResourceDataRaw(t, providerSchema(), map[string]interface{}{
-		"url":                      "localhost:8089",
-		"ignore_schedule_priority": true,
-	})
-	if got, want := resourceData.Get("ignore_schedule_priority").(bool), true; got != want {
-		t.Errorf("ignore_schedule_priority explicit: got %v, want %v", got, want)
-	}
-}
-
 func init() {
 	testAccProvider = Provider().(*schema.Provider)
 	testAccProviders = map[string]terraform.ResourceProvider{
@@ -119,7 +102,6 @@ func newTestClient() (*client.Client, error) {
 			os.Getenv("SPLUNK_PASSWORD")},
 		host,
 		"",
-		false,
 		http)
 }
 

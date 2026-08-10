@@ -46,7 +46,6 @@ type Client struct {
 	userAgent  string
 	urlEncoded bool
 	ACLGetMode string // provider acl_get_mode: "cloud" adds owner/sharing on ACL GET; otherwise omitted
-	ignoreSchedulePriority bool
 }
 
 // NewRequest creates a new HTTP Request and set proper header
@@ -300,7 +299,7 @@ func NewDefaultSplunkdClient() (*Client, error) {
 }
 
 // NewSplunkdClient creates a Client with custom values passed in
-func NewSplunkdClient(sessionKey string, auth [2]string, host string, path string, ignoreSchedulePriority bool, httpClient *http.Client) (*Client, error) {
+func NewSplunkdClient(sessionKey string, auth [2]string, host string, path string, httpClient *http.Client) (*Client, error) {
 	c, err := NewDefaultSplunkdClient()
 	if err != nil {
 		return nil, err
@@ -308,7 +307,6 @@ func NewSplunkdClient(sessionKey string, auth [2]string, host string, path strin
 	c.auth = auth
 	c.host = host
 	c.path = path
-	c.ignoreSchedulePriority = ignoreSchedulePriority
 	c.sessionKey = sessionKey
 	if httpClient != nil {
 		c.httpClient = httpClient
@@ -317,7 +315,7 @@ func NewSplunkdClient(sessionKey string, auth [2]string, host string, path strin
 }
 
 // NewSplunkdClient creates a Client with custom values passed in
-func NewSplunkdClientWithAuthToken(authToken string, auth [2]string, host string, path string, ignoreSchedulePriority bool, httpClient *http.Client) (*Client, error) {
+func NewSplunkdClientWithAuthToken(authToken string, auth [2]string, host string, path string, httpClient *http.Client) (*Client, error) {
 	c, err := NewDefaultSplunkdClient()
 	if err != nil {
 		return nil, err
@@ -325,7 +323,6 @@ func NewSplunkdClientWithAuthToken(authToken string, auth [2]string, host string
 	c.auth = auth
 	c.host = host
 	c.path = path
-	c.ignoreSchedulePriority = ignoreSchedulePriority
 	c.authToken = authToken
 	if httpClient != nil {
 		c.httpClient = httpClient
@@ -355,8 +352,4 @@ func NewSplunkdHTTPClient(timeout time.Duration, skipValidateTLS bool) (*http.Cl
 
 	return client, nil
 
-}
-
-func (c *Client) GetIgnoreSchedulePriority() bool {
-	return c.ignoreSchedulePriority
 }
