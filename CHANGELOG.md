@@ -1,3 +1,6 @@
+## 1.5.4
+* Fix: Splunk Cloud saved search updates that fail on `schedule_priority` — set `ignore_schedule_priority = true` on the resource and omit `schedule_priority` from your config. No change required for Splunk Enterprise.
+
 ## 1.5.3
 * Fix: release pipeline pins provider binary and artifact names to `terraform-provider-splunk` so installs work with registry address `splunk/splunk` (v1.5.2 release artifacts used incorrect names after the GitHub repo rename)
 

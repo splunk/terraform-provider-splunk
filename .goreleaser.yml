@@ -38,7 +38,8 @@ builds:
         goarch: '386'
     binary: terraform-provider-splunk_v{{ .Version }}
 archives:
-  - format: zip
+  - formats:
+      - zip
     name_template: terraform-provider-splunk_{{ .Version }}_{{ .Os }}_{{ .Arch }}
 checksum:
   name_template: terraform-provider-splunk_{{ .Version }}_SHA256SUMS
