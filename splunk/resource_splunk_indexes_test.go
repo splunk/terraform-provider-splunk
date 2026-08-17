@@ -38,6 +38,14 @@ func TestAccCreateSplunkIndex(t *testing.T) {
 				),
 			},
 			{
+				// to test re-creation of remotely deleted or missing resources, delete the new index before updating it
+				PreConfig: func() {
+					client, _ := newTestClient()
+
+					if _, err := client.DeleteIndexObject("new-index", "nobody", "system"); err != nil {
+						t.Error("PreConfig deletion of new-index failed")
+					}
+				},
 				Config: updateIndex,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "max_time_unreplicated_no_acks", "301"),
