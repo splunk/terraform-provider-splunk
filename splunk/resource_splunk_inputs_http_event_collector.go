@@ -34,7 +34,7 @@ func inputsHttpEventCollector() *schema.Resource {
 				Description: "Index to store generated events",
 			},
 			"indexes": {
-				Type:        schema.TypeList,
+				Type:        schema.TypeSet,
 				Optional:    true,
 				Computed:    true,
 				Elem:        &schema.Schema{Type: schema.TypeString},
