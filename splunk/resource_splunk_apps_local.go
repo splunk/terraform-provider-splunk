@@ -24,8 +24,9 @@ func appsLocal() *schema.Resource {
 					"The app folder name cannot include spaces or special characters.",
 			},
 			"auth": {
-				Type:     schema.TypeString,
-				Optional: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Sensitive: true,
 				Description: "Splunkbase session token for operations like install and update that require login. " +
 					"Use auth or session when installing or updating an app through Splunkbase.",
 			},
@@ -71,6 +72,7 @@ func appsLocal() *schema.Resource {
 			"session": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Sensitive:   true,
 				Description: "Login session token for installing or updating an app on Splunkbase. Alternatively, use auth.",
 			},
 			"version": {
