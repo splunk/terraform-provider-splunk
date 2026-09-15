@@ -25,6 +25,7 @@ func inputsTCPSplunkTCPToken() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
+				Sensitive:   true,
 				Description: "Optional. Token value to use. If unspecified, a token is generated automatically.",
 			},
 			"acl": aclSchema(),

@@ -1,3 +1,6 @@
+## 1.5.5
+* Security: mark credential attributes (tokens, passwords, webhook URLs, Splunkbase auth/session) as Sensitive so Terraform plan and CLI output redact them
+
 ## 1.5.4
 * Fix: Splunk Cloud saved search updates that fail on `schedule_priority` — set `ignore_schedule_priority = true` on the resource and omit `schedule_priority` from your config. No change required for Splunk Enterprise.
 

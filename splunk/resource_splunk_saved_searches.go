@@ -101,9 +101,10 @@ func savedSearches() *schema.Resource {
 					"Value ignored on POST. Use actions to specify a list of enabled actions. Defaults to 0.",
 			},
 			"action_email_auth_password": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Computed:  true,
+				Sensitive: true,
 				Description: "The password to use when authenticating with the SMTP server. " +
 					"Normally this value is set when editing the email settings, however you can set a clear text password here and it is encrypted on the next platform restart." +
 					"Defaults to empty string.",
@@ -354,9 +355,10 @@ func savedSearches() *schema.Resource {
 				Description: "The PagerDuty custom details information.",
 			},
 			"action_pagerduty_integration_key": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Computed:  true,
+				Sensitive: true,
 				Description: "The PagerDuty integration Key." +
 					"NOTE: None.",
 			},
@@ -364,6 +366,7 @@ func savedSearches() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
+				Sensitive:   true,
 				Description: "The PagerDuty integration Key override.",
 			},
 			"action_pagerduty_integration_url": {
@@ -694,6 +697,7 @@ func savedSearches() *schema.Resource {
 			"action_slack_param_webhook_url_override": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Sensitive:   true,
 				Description: "You can override the Slack webhook URL here if you need to send the alert message to a different Slack team.",
 			},
 			"action_slack_app_alert_integration_param_auto_join_channel": {
@@ -788,8 +792,9 @@ func savedSearches() *schema.Resource {
 				Description: "Unique identifier for the alert record used in api key.",
 			},
 			"action_victorops_param_routing_key_override": {
-				Type:         schema.TypeString,
-				Optional:     true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
 				Description: "Routing key to override the default routing key configured in VictorOps.",
 			},
 			"action_victorops_param_enable_recovery": {
@@ -833,6 +838,7 @@ func savedSearches() *schema.Resource {
 			"action_webhook_param_url": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Sensitive:    true,
 				Description:  "URL to send the HTTP POST request to. Must be accessible from the Splunk server.",
 				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https?://[^\s]+$`), "Webhook URL is invalid"),
 			},

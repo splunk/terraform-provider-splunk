@@ -36,7 +36,7 @@ This resource block supports the following arguments:
 - `name` - (Required) A name for the search.
 - `search` - (Required) Required when creating a new search.
 - `action_email` - (Optional) The state of the email action. Read-only attribute. Value ignored on POST. Use actions to specify a list of enabled actions. Defaults to 0.
-- `action_email_auth_password` - (Optional) The password to use when authenticating with the SMTP server. Normally this value is set when editing the email settings, however you can set a clear text password here and it is encrypted on the next platform restart.Defaults to empty string.
+- `action_email_auth_password` - (Optional, Sensitive) The password to use when authenticating with the SMTP server. Normally this value is set when editing the email settings, however you can set a clear text password here and it is encrypted on the next platform restart.Defaults to empty string.
 - `action_email_auth_username` - (Optional) The username to use when authenticating with the SMTP server. If this is empty string, no authentication is attempted. Defaults to empty stringNOTE: Your SMTP server might reject unauthenticated emails.
 - `action_email_bcc` - (Optional) BCC email address to use if action.email is enabled.
 - `action_email_cc` - (Optional) CC email address to use if action.email is enabled.
@@ -74,8 +74,8 @@ This resource block supports the following arguments:
 - `action_email_use_tls` - (Optional) Indicates whether to use TLS (transport layer security) when communicating with the SMTP server (starttls).Defaults to false.
 - `action_email_width_sort_columns` - (Optional) Indicates whether columns should be sorted from least wide to most wide, left to right.Only valid if format=text.
 - `action_pagerduty_custom_details` - (Optional) The PagerDuty custom details information.
-- `action_pagerduty_integration_key` - (Optional) The PagerDuty integration Key.
-- `action_pagerduty_integration_key_override` - (Optional) The PagerDuty integration Key override.
+- `action_pagerduty_integration_key` - (Optional, Sensitive) The PagerDuty integration Key.
+- `action_pagerduty_integration_key_override` - (Optional, Sensitive) The PagerDuty integration Key override.
 - `action_pagerduty_integration_url` - (Optional) The pagerduty integration URL. This integration uses Splunk's native webhooks to send events to PagerDuty.
 - `action_pagerduty_integration_url_override` - (Optional) The pagerduty integration URL override. This integration uses Splunk's native webhooks to send events to PagerDuty.
 - `action_populate_lookup` - (Optional) The state of the populate lookup action. Read-only attribute. Value ignored on POST. Use actions to specify a list of enabled actions. Defaults to 0.
@@ -129,7 +129,7 @@ This resource block supports the following arguments:
 - `action_slack_param_fields` - (Optional) Show one or more fields from the search results below your Slack message. Comma-separated list of field names. Allows wildcards. eg. index,source\*
 - `action_slack_param_attachment` - (Optional) Include a message attachment. Valid values are message, none, or alert_link
 - `action_slack_param_message` - (Optional) Enter the chat message to send to the Slack channel. The message can include tokens that insert text based on the results of the search.
-- `action_slack_param_webhook_url_override` - (Optional) You can override the Slack webhook URL here if you need to send the alert message to a different Slack team
+- `action_slack_param_webhook_url_override` - (Optional, Sensitive) You can override the Slack webhook URL here if you need to send the alert message to a different Slack team
 - `action_slack_app_alert_integration_param_auto_join_channel` - (Optional) Automatically join the channel if the bot is not already a member (Should be 1 (Enabled) or 0 (Disabled))
 - `action_slack_app_alert_integration_param_bot_username` - (Optional) The bot username that will post the message
 - `action_slack_app_alert_integration_param_channel` - (Optional) Slack channel to send the message to (Should start with # or @)
@@ -149,7 +149,7 @@ This resource block supports the following arguments:
 * `action_victorops_param_entity_id` - (Optional) Unique identifier for the affected system or service
 * `action_victorops_param_state_message` - (Optional) Description of the alert condition
 * `action_victorops_param_record_id` - (Optional) Identifier used to correlate related alerts
-* `action_victorops_param_routing_key_override` - (Optional) You can override the VictorOps routing key here if you need to send the alert message to a different VictorOps team
+* `action_victorops_param_routing_key_override` - (Optional, Sensitive) You can override the VictorOps routing key here if you need to send the alert message to a different VictorOps team
 * `action_victorops_param_enable_recovery` - (Optional) Enable sending of recovery messages (Should be 1 (Enabled) or 0 (Disabled))
 * `action_victorops_param_poll_interval` - (Optional) Polling interval for checking the status of the alert (in minutes)
 * `action_victorops_param_inactive_polls` - (Optional) Number of inactive polls before sending a recovery message
@@ -158,7 +158,7 @@ This resource block supports the following arguments:
 - `action_better_webhook_param_body_format` - (Optional) Format of the body content. Valid values are json, xml, form-urlencoded, or raw
 - `action_better_webhook_param_credential` - (Optional) Name of the Splunk stored credential to use for authentication
 - `action_better_webhook_param_credentials` - (Optional) Use the credentials defined in the webhook URL
-- `action_webhook_param_url` - (Optional) URL to send the HTTP POST request to. Must be accessible from the Splunk server
+- `action_webhook_param_url` - (Optional, Sensitive) URL to send the HTTP POST request to. Must be accessible from the Splunk server
 - `actions` - (Optional) A comma-separated list of actions to enable. For example: rss,email
 - `alert_comparator` - (Optional) One of the following strings: greater than, less than, equal to, rises by, drops by, rises by perc, drops by percUsed with alert_threshold to trigger alert actions.
 - `alert_condition` - (Optional) Contains a conditional search that is evaluated against the results of the saved search. Defaults to an empty string.

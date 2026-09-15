@@ -14,7 +14,7 @@ For latest resource argument reference: https://docs.splunk.com/Documentation/Sp
 
 This resource block supports the following arguments:
 * `name` - (Required) Required. Name for the token to create.
-* `token` - (Optional) Optional. Token value to use. If unspecified, a token is generated automatically.
+* `token` - (Optional, Sensitive) Optional. Token value to use. If unspecified, a token is generated automatically.
 * `acl` - (Optional) The app/user context that is the namespace for the resource
 
 ## Attribute Reference
