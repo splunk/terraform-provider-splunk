@@ -428,6 +428,18 @@ resource "splunk_saved_searches" "test" {
   }
 `
 
+const newSavedSearchesRunAiagent = `
+resource "splunk_saved_searches" "test" {
+	name                                = "Test Run AI Agent Alert"
+	actions                             = "run_aiagent"
+	search                              = "index=main level=error"
+	action_run_aiagent_param_agent_name = "test_agent"
+	action_run_aiagent_param_prompt     = "Investigate the triggering events"
+	disabled                            = true
+	is_scheduled                        = false
+}
+`
+
 func TestAccSplunkSavedSearches(t *testing.T) {
 	resourceName := "splunk_saved_searches.test"
 	resource.Test(t, resource.TestCase{
@@ -780,6 +792,15 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "dispatch_earliest_time", "rt-15m"),
 					resource.TestCheckResourceAttr(resourceName, "dispatch_latest_time", "rt-0m"),
 					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/15 * * * *"),
+				),
+			},
+			{
+				Config: newSavedSearchesRunAiagent,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Run AI Agent Alert"),
+					resource.TestCheckResourceAttr(resourceName, "actions", "run_aiagent"),
+					resource.TestCheckResourceAttr(resourceName, "action_run_aiagent_param_agent_name", "test_agent"),
+					resource.TestCheckResourceAttr(resourceName, "action_run_aiagent_param_prompt", "Investigate the triggering events"),
 				),
 			},
 			{

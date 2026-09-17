@@ -842,6 +842,16 @@ func savedSearches() *schema.Resource {
 				Description:  "URL to send the HTTP POST request to. Must be accessible from the Splunk server.",
 				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https?://[^\s]+$`), "Webhook URL is invalid"),
 			},
+			"action_run_aiagent_param_agent_name": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Name of the AI agent to run, as configured in the Splunk AI Toolkit app.",
+			},
+			"action_run_aiagent_param_prompt": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Prompt passed to the AI agent.",
+			},
 			"alert_digest_mode": {
 				Type:     schema.TypeBool,
 				Optional: true,
@@ -1741,6 +1751,12 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_webhook_param_url", entry.Content.ActionWebhookParamUrl); err != nil {
 		return err
 	}
+	if err = d.Set("action_run_aiagent_param_agent_name", entry.Content.ActionRunAiagentParamAgentName); err != nil {
+		return err
+	}
+	if err = d.Set("action_run_aiagent_param_prompt", entry.Content.ActionRunAiagentParamPrompt); err != nil {
+		return err
+	}
 	if err = d.Set("alert_digest_mode", entry.Content.AlertDigestMode); err != nil {
 		return err
 	}
@@ -2115,6 +2131,8 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionBetterWebhookParamCredential:           d.Get("action_better_webhook_param_credential").(string),
 		ActionBetterWebhookParamCredentials:          d.Get("action_better_webhook_param_credentials").(string),
 		ActionWebhookParamUrl:                        d.Get("action_webhook_param_url").(string),
+		ActionRunAiagentParamAgentName:               d.Get("action_run_aiagent_param_agent_name").(string),
+		ActionRunAiagentParamPrompt:                  d.Get("action_run_aiagent_param_prompt").(string),
 		AlertComparator:                              d.Get("alert_comparator").(string),
 		AlertCondition:                               d.Get("alert_condition").(string),
 		AlertDigestMode:                              d.Get("alert_digest_mode").(bool),
