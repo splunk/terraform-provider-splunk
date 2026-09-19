@@ -111,6 +111,20 @@ func TestNamespacedResourceReadersEscapeFinalPathSegment(t *testing.T) {
 				return client.ReadDashboardObject("A/B+C D", "nobody", "app")
 			},
 		},
+		{
+			name: "federated provider",
+			want: "/services/data/federated/provider/A%2FB+C%20D",
+			call: func(client *Client) (*http.Response, error) {
+				return client.ReadFederatedProvider("A/B+C D")
+			},
+		},
+		{
+			name: "federated index",
+			want: "/services/data/federated/index/federated:remote-main",
+			call: func(client *Client) (*http.Response, error) {
+				return client.ReadFederatedIndex("federated:remote-main")
+			},
+		},
 	}
 
 	for _, tt := range tests {
