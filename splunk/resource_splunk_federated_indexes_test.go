@@ -12,6 +12,37 @@ import (
 	"github.com/splunk/terraform-provider-splunk/client"
 )
 
+// TestFederatedIndexEntry verifies missing, valid, ambiguous, and malformed responses.
+func TestFederatedIndexEntry(t *testing.T) {
+	for _, test := range []struct {
+		name     string
+		body     string
+		wantName string
+		wantErr  bool
+	}{
+		{name: "empty", body: `{"entry":[]}`},
+		{name: "single", body: `{"entry":[{"name":"federated:remote-main"}]}`, wantName: "federated:remote-main"},
+		{name: "multiple", body: `{"entry":[{"name":"federated:first"},{"name":"federated:second"}]}`, wantErr: true},
+		{name: "invalid JSON", body: `{"entry":`, wantErr: true},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			resp := &http.Response{Body: io.NopCloser(strings.NewReader(test.body))}
+			defer func() { _ = resp.Body.Close() }()
+			entry, err := federatedIndexEntry(resp)
+			if (err != nil) != test.wantErr {
+				t.Fatalf("error = %v, want error: %t", err, test.wantErr)
+			}
+			if test.wantName == "" {
+				if entry != nil {
+					t.Fatalf("expected no entry, got %+v", entry)
+				}
+			} else if entry == nil || entry.Name != test.wantName {
+				t.Fatalf("entry = %+v, want name %q", entry, test.wantName)
+			}
+		})
+	}
+}
+
 // TestFederatedIndexNameLifecycle verifies that configuration uses a short name,
 // while reads, updates, deletes, and imports address Splunk's prefixed name.
 func TestFederatedIndexNameLifecycle(t *testing.T) {

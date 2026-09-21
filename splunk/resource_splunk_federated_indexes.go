@@ -171,5 +171,8 @@ func federatedIndexEntry(resp *http.Response) (*models.FederatedIndexEntry, erro
 	if len(response.Entry) == 0 {
 		return nil, nil
 	}
+	if len(response.Entry) != 1 {
+		return nil, fmt.Errorf("expected one federated index response entry, got %d", len(response.Entry))
+	}
 	return &response.Entry[0], nil
 }
