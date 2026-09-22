@@ -108,6 +108,8 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_configs_conf":                configsConf(),
 		"splunk_data_ui_views":               splunkDashboards(),
 		"splunk_saved_event_types":           savedEventTypes(),
+		"splunk_federated_providers":         federatedProviders(),
+		"splunk_federated_indexes":           federatedIndexes(),
 	}
 }
 
