@@ -1,3 +1,6 @@
+## 1.5.6
+* Feature: Federated Search resources `splunk_federated_providers` and `splunk_federated_indexes`
+
 ## 1.5.5
 * Security: mark credential attributes (tokens, passwords, webhook URLs, Splunkbase auth/session) as Sensitive so Terraform plan and CLI output redact them
 

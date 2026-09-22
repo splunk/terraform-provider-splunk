@@ -32,7 +32,8 @@ func TestCredentialAttributesAreSensitive(t *testing.T) {
 		// Existing sensitive attributes should stay marked.
 		"splunk_authentication_users": {"password"},
 		"splunk_outputs_tcp_server":   {"ssl_password"},
-		"splunk_inputs_tcp_ssl":      {"password"},
+		"splunk_inputs_tcp_ssl":       {"password"},
+		"splunk_federated_providers":  {"password"},
 	}
 
 	for resourceName, attrs := range resourceAttrs {
