@@ -845,11 +845,13 @@ func savedSearches() *schema.Resource {
 			"action_run_aiagent_param_agent_name": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Name of the AI agent to run, as configured in the Splunk AI Toolkit app.",
 			},
 			"action_run_aiagent_param_prompt": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Computed:    true,
 				Description: "Prompt passed to the AI agent.",
 			},
 			"alert_digest_mode": {
