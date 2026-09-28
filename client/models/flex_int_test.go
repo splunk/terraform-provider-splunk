@@ -14,6 +14,10 @@ func TestFlexInt_UnmarshalJSON(t *testing.T) {
 	}{
 		{"string 1", `"1"`, 1, false},
 		{"string 0", `"0"`, 0, false},
+		{"string true", `"true"`, 1, false},
+		{"string false", `"false"`, 0, false},
+		{"string TRUE", `"TRUE"`, 1, false},
+		{"string False", `"False"`, 0, false},
 		{"bare int 1", `1`, 1, false},
 		{"bare int 0", `0`, 0, false},
 		{"bool true", `true`, 1, false},

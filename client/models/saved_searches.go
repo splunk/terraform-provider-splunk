@@ -3,12 +3,14 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 // FlexInt unmarshals JSON values that Splunk returns as either a
-// string-encoded integer ("0", "1"), a bare integer (0, 1), or a
-// boolean (false, true). Splunk Enterprise returns string-encoded
-// integers; Splunk Cloud returns booleans for the same fields.
+// string-encoded integer ("0", "1"), a boolean string ("true", "false"),
+// a bare integer (0, 1), or a boolean (false, true). Splunk Enterprise
+// returns string-encoded integers; Splunk Cloud returns booleans or
+// boolean strings for the same fields.
 // See: https://github.com/splunk/terraform-provider-splunk/issues/130
 type FlexInt int
 
@@ -21,6 +23,14 @@ func (f *FlexInt) UnmarshalJSON(data []byte) error {
 	case float64:
 		*f = FlexInt(int(v))
 	case string:
+		switch strings.ToLower(strings.TrimSpace(v)) {
+		case "true":
+			*f = 1
+			return nil
+		case "false":
+			*f = 0
+			return nil
+		}
 		var i int
 		if _, err := fmt.Sscanf(v, "%d", &i); err != nil {
 			return fmt.Errorf("cannot parse %q as int: %w", v, err)

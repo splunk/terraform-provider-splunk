@@ -239,7 +239,7 @@ func getHttpEventCollectorConfig(d *schema.ResourceData) (httpInputConfigObject 
 	httpInputConfigObject.Indexes = d.Get("indexes").([]interface{})
 	httpInputConfigObject.Source = d.Get("source").(string)
 	httpInputConfigObject.SourceType = d.Get("sourcetype").(string)
-	httpInputConfigObject.UseACK = models.SplunkBoolInt(d.Get("use_ack").(int))
+	httpInputConfigObject.UseACK = models.FlexInt(d.Get("use_ack").(int))
 	httpInputConfigObject.Disabled = d.Get("disabled").(bool)
 	return httpInputConfigObject
 }
