@@ -1,3 +1,20 @@
+## 1.5.6
+* Feature: Federated Search resources `splunk_federated_providers` and `splunk_federated_indexes`
+
+## 1.5.5
+* Security: mark credential attributes (tokens, passwords, webhook URLs, Splunkbase auth/session) as Sensitive so Terraform plan and CLI output redact them
+
+## 1.5.4
+* Fix: Splunk Cloud saved search updates that fail on `schedule_priority` — set `ignore_schedule_priority = true` on the resource and omit `schedule_priority` from your config. No change required for Splunk Enterprise.
+
+## 1.5.3
+* Fix: release pipeline pins provider binary and artifact names to `terraform-provider-splunk` so installs work with registry address `splunk/splunk` (v1.5.2 release artifacts used incorrect names after the GitHub repo rename)
+
+## 1.5.2
+* Fix: saved search `action_email_include_*`, `action_email_send_csv`, and `action_snow_event_param_severity` handle boolean JSON from Splunk Cloud API responses
+* Support for namespaced REST import of saved searches and data ui views
+* Fix: URL-encode saved search and dashboard names in read, update, delete, and ACL API calls
+
 ## 1.5.1
 * Fix: generic_acl app ACL updates on Splunk Cloud
 

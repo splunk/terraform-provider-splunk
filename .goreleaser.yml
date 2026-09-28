@@ -3,6 +3,11 @@
 
 version: 2
 
+# Pin release artifact names to the Terraform Registry provider address (splunk/splunk).
+# GoReleaser defaults ProjectName to the GitHub repository name, so a repo rename would
+# otherwise produce terraform-provider-splunk-enterprise binaries that Terraform cannot load.
+project_name: terraform-provider-splunk
+
 before:
   hooks:
     # this is just an example and not a requirement for provider building/publishing
@@ -31,12 +36,13 @@ builds:
     ignore:
       - goos: darwin
         goarch: '386'
-    binary: '{{ .ProjectName }}_v{{ .Version }}'
+    binary: terraform-provider-splunk_v{{ .Version }}
 archives:
-  - format: zip
-    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+  - formats:
+      - zip
+    name_template: terraform-provider-splunk_{{ .Version }}_{{ .Os }}_{{ .Arch }}
 checksum:
-  name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
+  name_template: terraform-provider-splunk_{{ .Version }}_SHA256SUMS
   algorithm: sha256
 signs:
   - artifacts: checksum

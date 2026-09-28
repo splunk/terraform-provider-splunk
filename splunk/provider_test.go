@@ -39,7 +39,6 @@ func getTestProviderURL(inputData map[string]interface{}, t *testing.T) url.URL 
 }
 
 func TestProviderConfigure(t *testing.T) {
-	// Define the input data for the ResourceData
 	inputData := map[string]interface{}{
 		"url":                  "localhost",
 		"timeout":              60,

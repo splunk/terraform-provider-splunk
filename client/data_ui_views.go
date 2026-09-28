@@ -24,7 +24,7 @@ func (client *Client) CreateDashboardObject(owner string, app string, splunkDash
 }
 
 func (client *Client) ReadDashboardObject(name, owner, app string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "ui", "views", name)
+	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, name, "servicesNS", owner, app, "data", "ui", "views")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (client *Client) UpdateDashboardObject(owner string, app string, name strin
 	if err != nil {
 		return err
 	}
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "ui", "views", name)
+	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, name, "servicesNS", owner, app, "data", "ui", "views")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -50,7 +50,7 @@ func (client *Client) UpdateDashboardObject(owner string, app string, name strin
 }
 
 func (client *Client) DeleteDashboardObject(owner string, app string, name string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "ui", "views", name)
+	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, name, "servicesNS", owner, app, "data", "ui", "views")
 	resp, err := client.Delete(endpoint)
 	if err != nil {
 		return nil, err

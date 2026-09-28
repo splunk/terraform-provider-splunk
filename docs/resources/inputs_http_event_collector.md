@@ -29,7 +29,7 @@ For latest resource argument reference: https://docs.splunk.com/Documentation/Sp
 
 This resource block supports the following arguments:
 * `name` - (Required) Token name (inputs.conf key)
-* `token` - (Optional) Token value for sending data to collector/event endpoint
+* `token` - (Optional, Sensitive) Token value for sending data to collector/event endpoint
 * `index` - (Optional) Index to store generated events
 * `indexes` - (Optional) Set of indexes allowed for events with this token
 * `host` - (Optional) Default host value for events with this token

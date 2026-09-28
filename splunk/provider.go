@@ -45,12 +45,14 @@ func providerSchema() map[string]*schema.Schema {
 		"password": {
 			Type:        schema.TypeString,
 			Optional:    true,
+			Sensitive:   true,
 			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_PASSWORD", nil),
 			Description: "Splunk instance password",
 		},
 		"auth_token": {
 			Type:        schema.TypeString,
 			Optional:    true,
+			Sensitive:   true,
 			DefaultFunc: schema.EnvDefaultFunc("SPLUNK_AUTH_TOKEN", nil),
 			Description: "Authentication tokens, also known as JSON Web Tokens (JWT), are a method for authenticating " +
 				"Splunk platform users into the Splunk platform",
@@ -106,6 +108,8 @@ func providerResources() map[string]*schema.Resource {
 		"splunk_configs_conf":                configsConf(),
 		"splunk_data_ui_views":               splunkDashboards(),
 		"splunk_saved_event_types":           savedEventTypes(),
+		"splunk_federated_providers":         federatedProviders(),
+		"splunk_federated_indexes":           federatedIndexes(),
 	}
 }
 

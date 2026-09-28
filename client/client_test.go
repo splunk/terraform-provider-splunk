@@ -73,6 +73,93 @@ func TestBuildSplunkURLSpecialCharactersInSearch(t *testing.T) {
 	}
 }
 
+func TestBuildSplunkURLWithEscapedPathPart(t *testing.T) {
+	client, err := NewDefaultSplunkdClient()
+	if err != nil {
+		t.Error(err)
+	}
+	url := client.BuildSplunkURLWithEscapedPathPart(nil, "A/B+C D", "servicesNS", "nobody", "app", "saved", "searches")
+
+	if got, want := url.Path, "servicesNS/nobody/app/saved/searches/A/B+C D"; got != want {
+		t.Errorf("path invalid, got %s, want %s", got, want)
+	}
+	if got, want := url.EscapedPath(), "servicesNS/nobody/app/saved/searches/A%2FB+C%20D"; got != want {
+		t.Errorf("escaped path invalid, got %s, want %s", got, want)
+	}
+}
+
+func TestNamespacedResourceReadersEscapeFinalPathSegment(t *testing.T) {
+	os.Setenv(envVarHTTPScheme, "http")
+	defer os.Unsetenv(envVarHTTPScheme)
+
+	tests := []struct {
+		name string
+		want string
+		call func(*Client) (*http.Response, error)
+	}{
+		{
+			name: "saved search",
+			want: "/servicesNS/nobody/app/saved/searches/A%2FB+C%20D",
+			call: func(client *Client) (*http.Response, error) {
+				return client.ReadSavedSearches("A/B+C D", "nobody", "app")
+			},
+		},
+		{
+			name: "dashboard view",
+			want: "/servicesNS/nobody/app/data/ui/views/A%2FB+C%20D",
+			call: func(client *Client) (*http.Response, error) {
+				return client.ReadDashboardObject("A/B+C D", "nobody", "app")
+			},
+		},
+		{
+			name: "federated provider",
+			want: "/services/data/federated/provider/A%2FB+C%20D",
+			call: func(client *Client) (*http.Response, error) {
+				return client.ReadFederatedProvider("A/B+C D")
+			},
+		},
+		{
+			name: "federated index",
+			want: "/services/data/federated/index/federated:remote-main",
+			call: func(client *Client) (*http.Response, error) {
+				return client.ReadFederatedIndex("federated:remote-main")
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got string
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				got = r.URL.EscapedPath()
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(`{}`))
+			}))
+			defer server.Close()
+
+			backend, err := url.Parse(server.URL)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			client, err := NewSplunkdClient("", defaultAuth, backend.Host, "", server.Client())
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			resp, err := tt.call(client)
+			if err != nil {
+				t.Fatalf("reader call failed: %s", err)
+			}
+			defer resp.Body.Close()
+
+			if got != tt.want {
+				t.Errorf("escaped path invalid, got %s, want %s", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestBuildSplunkURLNoHost(t *testing.T) {
 	client, err := NewDefaultSplunkdClient()
 	if err != nil {

@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+
+	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
 // TestGetAcl_CloudMode_QueryStringIncludesOwnerAndSharing verifies owner and sharing appear on the GET query when ACLGetMode is cloud.
@@ -93,5 +95,79 @@ func TestGetAcl_NonCloudMode_OmitsOwnerSharingFromQuery(t *testing.T) {
 	}
 	if q.Get("sharing") != "" {
 		t.Errorf("non-cloud mode should not set sharing query param, got %q", q.Get("sharing"))
+	}
+}
+
+func TestAclURLsEscapeResourceName(t *testing.T) {
+	t.Setenv(envVarHTTPScheme, "http")
+
+	acl := &models.ACLObject{
+		Sharing: "app",
+		Perms: models.Permissions{
+			Read:  []string{"*"},
+			Write: []string{"admin"},
+		},
+	}
+
+	tests := []struct {
+		name string
+		want string
+		call func(*Client) error
+	}{
+		{
+			name: "get saved search acl",
+			want: "/servicesNS/nobody/app/saved/searches/A%2FB+C%20D/acl",
+			call: func(c *Client) error {
+				resp, err := c.GetAcl("nobody", "app", "A/B+C D", "app", "saved", "searches")
+				if resp != nil {
+					defer resp.Body.Close()
+				}
+				return err
+			},
+		},
+		{
+			name: "update saved search acl",
+			want: "/servicesNS/nobody/app/saved/searches/A%2FB+C%20D/acl",
+			call: func(c *Client) error {
+				return c.UpdateAcl("nobody", "app", "A/B+C D", acl, "saved", "searches")
+			},
+		},
+		{
+			name: "update dashboard view acl",
+			want: "/servicesNS/nobody/app/data/ui/views/A%2FB+C%20D/acl",
+			call: func(c *Client) error {
+				return c.UpdateAcl("nobody", "app", "A/B+C D", acl, "data", "ui", "views")
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got string
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				got = r.URL.EscapedPath()
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(`{}`))
+			}))
+			defer server.Close()
+
+			backend, err := url.Parse(server.URL)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			client, err := NewSplunkdClient("", defaultAuth, backend.Host, "", server.Client())
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if err := tt.call(client); err != nil {
+				t.Fatalf("ACL call failed: %s", err)
+			}
+
+			if got != tt.want {
+				t.Errorf("escaped path invalid, got %s, want %s", got, tt.want)
+			}
+		})
 	}
 }

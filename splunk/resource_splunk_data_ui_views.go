@@ -36,9 +36,23 @@ func splunkDashboards() *schema.Resource {
 		Delete: splunkDashboardsDelete,
 		Update: splunkDashboardsUpdate,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			State: splunkDashboardsImportState,
 		},
 	}
+}
+
+func splunkDashboardsImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	imported, err := importNamespacedResourceState(d, "data", "ui", "views")
+	if err != nil {
+		return nil, err
+	}
+	if !imported {
+		if err := d.Set("name", d.Id()); err != nil {
+			return nil, err
+		}
+	}
+
+	return []*schema.ResourceData{d}, nil
 }
 
 // Functions

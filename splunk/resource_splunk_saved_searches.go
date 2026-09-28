@@ -101,9 +101,10 @@ func savedSearches() *schema.Resource {
 					"Value ignored on POST. Use actions to specify a list of enabled actions. Defaults to 0.",
 			},
 			"action_email_auth_password": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Computed:  true,
+				Sensitive: true,
 				Description: "The password to use when authenticating with the SMTP server. " +
 					"Normally this value is set when editing the email settings, however you can set a clear text password here and it is encrypted on the next platform restart." +
 					"Defaults to empty string.",
@@ -354,9 +355,10 @@ func savedSearches() *schema.Resource {
 				Description: "The PagerDuty custom details information.",
 			},
 			"action_pagerduty_integration_key": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:      schema.TypeString,
+				Optional:  true,
+				Computed:  true,
+				Sensitive: true,
 				Description: "The PagerDuty integration Key." +
 					"NOTE: None.",
 			},
@@ -364,6 +366,7 @@ func savedSearches() *schema.Resource {
 				Type:        schema.TypeString,
 				Optional:    true,
 				Computed:    true,
+				Sensitive:   true,
 				Description: "The PagerDuty integration Key override.",
 			},
 			"action_pagerduty_integration_url": {
@@ -694,6 +697,7 @@ func savedSearches() *schema.Resource {
 			"action_slack_param_webhook_url_override": {
 				Type:        schema.TypeString,
 				Optional:    true,
+				Sensitive:   true,
 				Description: "You can override the Slack webhook URL here if you need to send the alert message to a different Slack team.",
 			},
 			"action_slack_app_alert_integration_param_auto_join_channel": {
@@ -788,8 +792,9 @@ func savedSearches() *schema.Resource {
 				Description: "Unique identifier for the alert record used in api key.",
 			},
 			"action_victorops_param_routing_key_override": {
-				Type:         schema.TypeString,
-				Optional:     true,
+				Type:        schema.TypeString,
+				Optional:    true,
+				Sensitive:   true,
 				Description: "Routing key to override the default routing key configured in VictorOps.",
 			},
 			"action_victorops_param_enable_recovery": {
@@ -833,6 +838,7 @@ func savedSearches() *schema.Resource {
 			"action_webhook_param_url": {
 				Type:         schema.TypeString,
 				Optional:     true,
+				Sensitive:    true,
 				Description:  "URL to send the HTTP POST request to. Must be accessible from the Splunk server.",
 				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https?://[^\s]+$`), "Webhook URL is invalid"),
 			},
@@ -1231,6 +1237,12 @@ func savedSearches() *schema.Resource {
 				Computed:    true,
 				Description: "Raises the scheduling priority of the named search. Defaults to Default",
 			},
+			"ignore_schedule_priority": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				Default:     false,
+				Description: "When true, omit schedule_priority from create/update API calls and do not sync it on read. Defaults to false for Splunk Enterprise. Set to true on Splunk Cloud when updates fail with schedule_priority is not supported by this handler.",
+			},
 			"search": {
 				Type:        schema.TypeString,
 				Required:    true,
@@ -1263,10 +1275,24 @@ func savedSearches() *schema.Resource {
 		Update: savedSearchesUpdate,
 		Delete: savedSearchesDelete,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			State: savedSearchesImportState,
 		},
 	}
 
+}
+
+func savedSearchesImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	imported, err := importNamespacedResourceState(d, "saved", "searches")
+	if err != nil {
+		return nil, err
+	}
+	if !imported {
+		if err := d.Set("name", d.Id()); err != nil {
+			return nil, err
+		}
+	}
+
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceAlertTrackV0() *schema.Resource {
@@ -1881,7 +1907,12 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("schedule_window", entry.Content.ScheduleWindow); err != nil {
 		return err
 	}
-	if err = d.Set("schedule_priority", entry.Content.SchedulePriority); err != nil {
+	if !d.Get("ignore_schedule_priority").(bool) {
+		if err = d.Set("schedule_priority", entry.Content.SchedulePriority); err != nil {
+			return err
+		}
+	}
+	if err = d.Set("ignore_schedule_priority", d.Get("ignore_schedule_priority").(bool)); err != nil {
 		return err
 	}
 	if err = d.Set("search", entry.Content.Search); err != nil {
@@ -1951,6 +1982,11 @@ func savedSearchesDelete(d *schema.ResourceData, meta interface{}) error {
 }
 
 func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.SavedSearchObject) {
+	schedulePriority := d.Get("schedule_priority").(string)
+	if d.Get("ignore_schedule_priority").(bool) {
+		schedulePriority = ""
+	}
+
 	savedSearchesObj = &models.SavedSearchObject{
 		Actions:                                      d.Get("actions").(string),
 		ActionEmail:                                  d.Get("action_email").(bool),
@@ -1958,14 +1994,15 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionEmailAuthUsername:                      d.Get("action_email_auth_username").(string),
 		ActionEmailBCC:                               d.Get("action_email_bcc").(string),
 		ActionEmailCC:                                d.Get("action_email_cc").(string),
+		ActionEmailCommand:                           d.Get("action_email_command").(string),
 		ActionEmailFormat:                            d.Get("action_email_format").(string),
 		ActionEmailFrom:                              d.Get("action_email_from").(string),
 		ActionEmailHostname:                          d.Get("action_email_hostname").(string),
-		ActionEmailIncludeResultsLink:                d.Get("action_email_include_results_link").(int),
-		ActionEmailIncludeSearch:                     d.Get("action_email_include_search").(int),
-		ActionEmailIncludeTrigger:                    d.Get("action_email_include_trigger").(int),
-		ActionEmailIncludeTriggerTime:                d.Get("action_email_include_trigger_time").(int),
-		ActionEmailIncludeViewLink:                   d.Get("action_email_include_view_link").(int),
+		ActionEmailIncludeResultsLink:                models.FlexInt(d.Get("action_email_include_results_link").(int)),
+		ActionEmailIncludeSearch:                     models.FlexInt(d.Get("action_email_include_search").(int)),
+		ActionEmailIncludeTrigger:                    models.FlexInt(d.Get("action_email_include_trigger").(int)),
+		ActionEmailIncludeTriggerTime:                models.FlexInt(d.Get("action_email_include_trigger_time").(int)),
+		ActionEmailIncludeViewLink:                   models.FlexInt(d.Get("action_email_include_view_link").(int)),
 		ActionEmailInline:                            d.Get("action_email_inline").(bool),
 		ActionEmailMailserver:                        d.Get("action_email_mailserver").(string),
 		ActionEmailMaxResults:                        d.Get("action_email_max_results").(int),
@@ -1980,7 +2017,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionEmailReportPaperSize:                   d.Get("action_email_report_paper_size").(string),
 		ActionEmailReportServerEnabled:               d.Get("action_email_report_server_enabled").(bool),
 		ActionEmailReportServerURL:                   d.Get("action_email_report_server_url").(string),
-		ActionEmailSendCSV:                           d.Get("action_email_send_csv").(int),
+		ActionEmailSendCSV:                           models.FlexInt(d.Get("action_email_send_csv").(int)),
 		ActionEmailSendPDF:                           d.Get("action_email_send_pdf").(bool),
 		ActionEmailSendResults:                       d.Get("action_email_send_results").(bool),
 		ActionEmailSubject:                           d.Get("action_email_subject").(string),
@@ -2019,7 +2056,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionSnowEventParamNode:                     d.Get("action_snow_event_param_node").(string),
 		ActionSnowEventParamType:                     d.Get("action_snow_event_param_type").(string),
 		ActionSnowEventParamResource:                 d.Get("action_snow_event_param_resource").(string),
-		ActionSnowEventParamSeverity:                 d.Get("action_snow_event_param_severity").(int),
+		ActionSnowEventParamSeverity:                 models.FlexInt(d.Get("action_snow_event_param_severity").(int)),
 		ActionSnowEventParamDescription:              d.Get("action_snow_event_param_description").(string),
 		ActionSnowEventParamCiIdentifier:             d.Get("action_snow_event_param_ci_identifier").(string),
 		ActionSnowEventParamCustomFields:             d.Get("action_snow_event_param_custom_fields").(string),
@@ -2090,6 +2127,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		AlertThreshold:                               d.Get("alert_threshold").(string),
 		AlertTrack:                                   d.Get("alert_track").(bool),
 		AlertType:                                    d.Get("alert_type").(string),
+		AllowSkew:                                    d.Get("allow_skew").(string),
 		AutoSummarize:                                d.Get("auto_summarize").(bool),
 		AutoSummarizeCommand:                         d.Get("auto_summarize_command").(string),
 		AutoSummarizeCronSchedule:                    d.Get("auto_summarize_cron_schedule").(string),
@@ -2133,7 +2171,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		RestartOnSearchPeerAdd:                       d.Get("restart_on_searchpeer_add").(bool),
 		RunOnStartup:                                 d.Get("run_on_startup").(bool),
 		ScheduleWindow:                               d.Get("schedule_window").(string),
-		SchedulePriority:                             d.Get("schedule_priority").(string),
+		SchedulePriority:                             schedulePriority,
 		Search:                                       d.Get("search").(string),
 		VSID:                                         d.Get("vsid").(string),
 		WorkloadPool:                                 d.Get("workload_pool").(string),

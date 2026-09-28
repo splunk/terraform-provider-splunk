@@ -3,11 +3,13 @@ package splunk
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"reflect"
 	"strconv"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
@@ -65,6 +67,19 @@ resource "splunk_saved_searches" "test" {
       owner = "admin"
       sharing = "app"
       app = "launcher"
+    }
+}
+`
+
+const savedSearchesNamespacedImport = `
+resource "splunk_saved_searches" "test" {
+    name          = "Test Namespaced Import"
+    search        = "index=main"
+    cron_schedule = "*/5 * * * *"
+    acl {
+      owner   = "admin"
+      sharing = "app"
+      app     = "search"
     }
 }
 `
@@ -776,6 +791,38 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 	})
 }
 
+func TestAccSplunkSavedSearchesNamespacedImport(t *testing.T) {
+	resourceName := "splunk_saved_searches.test"
+	importID := "/servicesNS/admin/search/saved/searches/" + url.PathEscape("Test Namespaced Import")
+
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testAccSplunkSavedSearchesDestroyResources,
+		Steps: []resource.TestStep{
+			{
+				Config: savedSearchesNamespacedImport,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test Namespaced Import"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main"),
+					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/5 * * * *"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.owner", "admin"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.app", "search"),
+					resource.TestCheckResourceAttr(resourceName, "acl.0.sharing", "app"),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportState:       true,
+				ImportStateId:     importID,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 // TestAccSplunkSavedSearchesEmailIncludeLinksZero verifies that setting
 // action_email_include_results_link and action_email_include_view_link to 0
 // sends them to the API and they are returned on read (and appear in savedsearches.conf).
@@ -841,5 +888,57 @@ func TestResourceExampleInstanceStateUpgradeV0(t *testing.T) {
 
 	if !reflect.DeepEqual(expected, actual) {
 		t.Fatalf("\n\nexpected:\n\n%#v\n\ngot:\n\n%#v\n\n", expected, actual)
+	}
+}
+
+func TestGetSavedSearchesConfigSchedulePriority(t *testing.T) {
+	enterpriseData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"search":            "index=main",
+		"schedule_priority": "high",
+	})
+	enterpriseConfig := getSavedSearchesConfig(enterpriseData)
+	if got, want := enterpriseConfig.SchedulePriority, "high"; got != want {
+		t.Errorf("SchedulePriority with ignore=false: got %q, want %q", got, want)
+	}
+
+	cloudData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"search":                   "index=main",
+		"schedule_priority":        "high",
+		"ignore_schedule_priority": true,
+	})
+	cloudConfig := getSavedSearchesConfig(cloudData)
+	if got, want := cloudConfig.SchedulePriority, ""; got != want {
+		t.Errorf("SchedulePriority with ignore=true: got %q, want empty string", got)
+	}
+}
+
+func TestSavedSearchesSchemaIgnoreSchedulePriorityDefault(t *testing.T) {
+	resourceData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"search": "index=main",
+	})
+	if got, want := resourceData.Get("ignore_schedule_priority").(bool), false; got != want {
+		t.Errorf("ignore_schedule_priority default: got %v, want %v", got, want)
+	}
+}
+
+func TestGetSavedSearchesConfigAllowSkew(t *testing.T) {
+	resourceData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"search":     "index=main",
+		"allow_skew": "100%",
+	})
+	config := getSavedSearchesConfig(resourceData)
+	if got, want := config.AllowSkew, "100%"; got != want {
+		t.Errorf("AllowSkew: got %q, want %q", got, want)
+	}
+}
+
+func TestGetSavedSearchesConfigActionEmailCommand(t *testing.T) {
+	resourceData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"search":               "index=main",
+		"action_email_command": "$name$",
+	})
+	config := getSavedSearchesConfig(resourceData)
+	if got, want := config.ActionEmailCommand, "$name$"; got != want {
+		t.Errorf("ActionEmailCommand: got %q, want %q", got, want)
 	}
 }

@@ -25,6 +25,7 @@ func inputsHttpEventCollector() *schema.Resource {
 				Type:        schema.TypeString,
 				Computed:    true,
 				Optional:    true,
+				Sensitive:   true,
 				Description: "Token value for sending data to collector/event endpoint.",
 			},
 			"index": {

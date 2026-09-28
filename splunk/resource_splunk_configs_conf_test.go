@@ -2,10 +2,15 @@ package splunk
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	splunkclient "github.com/splunk/terraform-provider-splunk/client"
 )
 
 const newConfigsConf = `
@@ -27,6 +32,139 @@ resource "splunk_configs_conf" "tftest-stanza" {
 	}
 }
 `
+
+func TestConfigsConfReadUsesConfiguredNamespace(t *testing.T) {
+	t.Setenv("HTTPScheme", "http")
+
+	var requestPaths []string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestPaths = append(requestPaths, r.URL.EscapedPath())
+		w.WriteHeader(http.StatusOK)
+		_, _ = fmt.Fprint(w, `{
+			"entry": [{
+				"name": "httpevent",
+				"acl": {
+					"app": "search_app_dashweb",
+					"owner": "nobody",
+					"sharing": "app",
+					"perms": {"read": ["*"], "write": ["admin"]}
+				},
+				"content": {
+					"disabled": false,
+					"EXTRACT-environment": "environment=(?P<environment>[^ ]+)"
+				}
+			}],
+			"messages": []
+		}`)
+	}))
+	defer server.Close()
+
+	backend, err := url.Parse(server.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	client, err := splunkclient.NewSplunkdClient(
+		"",
+		[2]string{"admin", "password"},
+		backend.Host,
+		"",
+		server.Client(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	d := schema.TestResourceDataRaw(t, configsConf().Schema, map[string]interface{}{
+		"name": "props/httpevent",
+		"acl": []interface{}{map[string]interface{}{
+			"owner":   "nobody",
+			"app":     "search_app_dashweb",
+			"sharing": "app",
+		}},
+	})
+	d.SetId("props/httpevent")
+
+	if err := configsConfRead(d, &SplunkProvider{Client: client}); err != nil {
+		t.Fatalf("configsConfRead: %v", err)
+	}
+
+	const expectedPath = "/servicesNS/nobody/search_app_dashweb/configs/conf-props/httpevent"
+	if len(requestPaths) == 0 {
+		t.Fatal("expected at least one request")
+	}
+	for _, got := range requestPaths {
+		if got != expectedPath {
+			t.Errorf("request path = %q, want %q", got, expectedPath)
+		}
+	}
+
+	acl := getACLConfig(d.Get("acl").([]interface{}))
+	if got, want := acl.App, "search_app_dashweb"; got != want {
+		t.Errorf("acl app = %q, want %q", got, want)
+	}
+	if got, want := acl.Owner, "nobody"; got != want {
+		t.Errorf("acl owner = %q, want %q", got, want)
+	}
+}
+
+func TestGetResourceDataConfigsConfACL(t *testing.T) {
+	tests := []struct {
+		name        string
+		raw         map[string]interface{}
+		wantOwner   string
+		wantApp     string
+		wantSharing string
+	}{
+		{
+			name:        "default namespace",
+			wantOwner:   "nobody",
+			wantApp:     "search",
+			wantSharing: "app",
+		},
+		{
+			name: "app shared namespace uses nobody",
+			raw: map[string]interface{}{
+				"acl": []interface{}{map[string]interface{}{
+					"owner":   "admin",
+					"app":     "custom_app",
+					"sharing": "app",
+				}},
+			},
+			wantOwner:   "nobody",
+			wantApp:     "custom_app",
+			wantSharing: "app",
+		},
+		{
+			name: "user shared namespace keeps owner",
+			raw: map[string]interface{}{
+				"acl": []interface{}{map[string]interface{}{
+					"owner":   "alice",
+					"app":     "custom_app",
+					"sharing": "user",
+				}},
+			},
+			wantOwner:   "alice",
+			wantApp:     "custom_app",
+			wantSharing: "user",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := schema.TestResourceDataRaw(t, configsConf().Schema, tt.raw)
+			got := getResourceDataConfigsConfACL(d)
+			if got.Owner != tt.wantOwner {
+				t.Errorf("owner = %q, want %q", got.Owner, tt.wantOwner)
+			}
+			if got.App != tt.wantApp {
+				t.Errorf("app = %q, want %q", got.App, tt.wantApp)
+			}
+			if got.Sharing != tt.wantSharing {
+				t.Errorf("sharing = %q, want %q", got.Sharing, tt.wantSharing)
+			}
+		})
+	}
+}
 
 func TestAccCreateSplunkConfigsConf(t *testing.T) {
 	resourceName := "splunk_configs_conf.tftest-stanza"
@@ -111,7 +249,6 @@ func TestAccCreateSplunkConfigsConfSpecialChars(t *testing.T) {
 		},
 	})
 }
-
 
 func testAccSplunkConfigsConfDestroyResources(s *terraform.State) error {
 	client, err := newTestClient()

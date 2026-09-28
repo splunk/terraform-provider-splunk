@@ -23,10 +23,6 @@ func (client *Client) getAclHTTP(endpoint url.URL) (*http.Response, error) {
 
 // https://docs.splunk.com/Documentation/Splunk/8.0.4/RESTUM/RESTusing#Access_Control_List
 func (client *Client) GetAcl(owner, app, name, sharing string, resources ...string) (*http.Response, error) {
-	resourcePath := []string{"servicesNS", owner, app}
-	resourcePath = append(resourcePath, resources...)
-	resourcePath = append(resourcePath, name, "acl")
-
 	var q url.Values
 	if strings.EqualFold(strings.TrimSpace(client.ACLGetMode), ACLGetModeCloud) {
 		q = url.Values{}
@@ -37,7 +33,7 @@ func (client *Client) GetAcl(owner, app, name, sharing string, resources ...stri
 			q.Set("sharing", sharing)
 		}
 	}
-	endpoint := client.BuildSplunkURL(q, resourcePath...)
+	endpoint := client.buildAclEndpoint(q, owner, app, name, resources...)
 	resp, err := client.getAclHTTP(endpoint)
 	if err != nil {
 		return nil, fmt.Errorf("GET failed for endpoint %s: %s", endpoint.Path, err)
@@ -74,10 +70,7 @@ func (client *Client) ResourcesAndNameForPath(path string) (resources []string, 
 }
 
 func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, resources ...string) error {
-	resourcePath := []string{"servicesNS", owner, app}
-	resourcePath = append(resourcePath, resources...)
-	resourcePath = append(resourcePath, name, "acl")
-	endpoint := client.BuildSplunkURL(nil, resourcePath...)
+	endpoint := client.buildAclEndpoint(nil, owner, app, name, resources...)
 	isCloud := strings.EqualFold(strings.TrimSpace(client.ACLGetMode), ACLGetModeCloud)
 	readPerms := strings.Join(acl.Perms.Read, ",")
 	writePerms := strings.Join(acl.Perms.Write, ",")
@@ -130,6 +123,20 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 	}
 
 	return nil
+}
+
+func (client *Client) buildAclEndpoint(queryValues url.Values, owner, app, name string, resources ...string) url.URL {
+	resourcePath := []string{"servicesNS", owner, app}
+	resourcePath = append(resourcePath, resources...)
+	endpoint := client.BuildSplunkURLWithEscapedPathPart(queryValues, name, resourcePath...)
+	rawPath := endpoint.RawPath
+	if rawPath == "" {
+		rawPath = endpoint.EscapedPath()
+	}
+	endpoint.Path = appendURLPathPart(endpoint.Path, "acl")
+	endpoint.RawPath = appendURLPathPart(rawPath, "acl")
+
+	return endpoint
 }
 
 func (client *Client) Move(owner, app, name string, acl *models.ACLObject, resources ...string) error {

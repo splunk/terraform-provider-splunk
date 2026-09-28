@@ -100,6 +100,26 @@ func (c *Client) BuildSplunkURL(queryValues url.Values, urlPathParts ...string) 
 	}
 }
 
+func (c *Client) BuildSplunkURLWithEscapedPathPart(queryValues url.Values, pathPart string, urlPathParts ...string) url.URL {
+	endpoint := c.BuildSplunkURL(queryValues, urlPathParts...)
+	rawPath := endpoint.RawPath
+	if rawPath == "" {
+		rawPath = endpoint.EscapedPath()
+	}
+
+	endpoint.Path = appendURLPathPart(endpoint.Path, pathPart)
+	endpoint.RawPath = appendURLPathPart(rawPath, url.PathEscape(pathPart))
+
+	return endpoint
+}
+
+func appendURLPathPart(basePath, pathPart string) string {
+	if basePath == "" {
+		return pathPart
+	}
+	return strings.TrimRight(basePath, "/") + "/" + pathPart
+}
+
 // Do sends out request and returns HTTP response
 func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	response, err := c.httpClient.Do(req)

@@ -1,6 +1,6 @@
 module github.com/splunk/terraform-provider-splunk
 
-go 1.20
+go 1.22
 
 require (
 	github.com/avast/retry-go/v4 v4.6.0

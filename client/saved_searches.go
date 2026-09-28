@@ -33,7 +33,7 @@ func (client *Client) CreateSavedSearches(name, owner, app string, savedSearchOb
 }
 
 func (client *Client) ReadSavedSearches(name, owner, app string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "saved", "searches", name)
+	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, name, "servicesNS", owner, app, "saved", "searches")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (client *Client) UpdateSavedSearches(name string, owner string, app string,
 	if err != nil {
 		return err
 	}
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "saved", "searches", name)
+	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, name, "servicesNS", owner, app, "saved", "searches")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func (client *Client) UpdateSavedSearches(name string, owner string, app string,
 }
 
 func (client *Client) DeleteSavedSearches(name, owner, app string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "saved", "searches", name)
+	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, name, "servicesNS", owner, app, "saved", "searches")
 	resp, err := client.Delete(endpoint)
 	if err != nil {
 		return nil, err
