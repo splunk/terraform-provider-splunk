@@ -1,3 +1,6 @@
+## 1.5.7
+* Fix: `splunk_configs_conf` reads the stanza in its configured ACL namespace, so the same stanza name in another app no longer overwrites `acl.app` or `acl.sharing`
+
 ## 1.5.6
 * Feature: Federated Search resources `splunk_federated_providers` and `splunk_federated_indexes`
 * Fix: saved search create and update send `allow_skew` and `action_email_command`, so configured values persist and plans converge
