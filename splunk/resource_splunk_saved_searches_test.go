@@ -920,3 +920,25 @@ func TestSavedSearchesSchemaIgnoreSchedulePriorityDefault(t *testing.T) {
 		t.Errorf("ignore_schedule_priority default: got %v, want %v", got, want)
 	}
 }
+
+func TestGetSavedSearchesConfigAllowSkew(t *testing.T) {
+	resourceData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"search":     "index=main",
+		"allow_skew": "100%",
+	})
+	config := getSavedSearchesConfig(resourceData)
+	if got, want := config.AllowSkew, "100%"; got != want {
+		t.Errorf("AllowSkew: got %q, want %q", got, want)
+	}
+}
+
+func TestGetSavedSearchesConfigActionEmailCommand(t *testing.T) {
+	resourceData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"search":               "index=main",
+		"action_email_command": "$name$",
+	})
+	config := getSavedSearchesConfig(resourceData)
+	if got, want := config.ActionEmailCommand, "$name$"; got != want {
+		t.Errorf("ActionEmailCommand: got %q, want %q", got, want)
+	}
+}
