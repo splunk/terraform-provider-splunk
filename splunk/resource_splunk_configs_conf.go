@@ -44,9 +44,34 @@ func configsConf() *schema.Resource {
 		Delete: configsConfDelete,
 		Update: configsConfUpdate,
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			State: configsConfImportState,
 		},
 	}
+}
+
+func configsConfImportState(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+	parsed, matched, err := parseNamespacedConfigsConfImportID(d.Id())
+	if err != nil {
+		return nil, err
+	}
+	if matched {
+		d.SetId(parsed.Name)
+		if err := d.Set("name", parsed.Name); err != nil {
+			return nil, err
+		}
+		aclObject := &models.ACLObject{
+			Owner:   parsed.Owner,
+			App:     parsed.App,
+			Sharing: inferredNamespacedImportSharing(parsed.Owner),
+		}
+		if err := d.Set("acl", flattenACL(aclObject)); err != nil {
+			return nil, err
+		}
+	} else if err := d.Set("name", d.Id()); err != nil {
+		return nil, err
+	}
+
+	return []*schema.ResourceData{d}, nil
 }
 
 // Functions
@@ -90,15 +115,20 @@ func configsConfCreate(d *schema.ResourceData, meta interface{}) error {
 
 func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
-	name := d.Id()
+	name := d.Get("name").(string)
+	if name == "" {
+		name = d.Id()
+	}
 	_, stanza := (*provider.Client).SplitConfStanza(name)
+	aclObject := getResourceDataConfigsConfACL(d)
 
-	// We first get list of stanzas in a conf file to get owner and app name for the specific stanza
-	resp, err := (*provider.Client).ReadAllConfigsConfObject(name)
+	// Read through the resource's namespace. A conf file can contain the same
+	// stanza name in multiple app and owner namespaces.
+	resp, err := (*provider.Client).ReadConfigsConfObject(name, aclObject.Owner, aclObject.App)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	entry, err := getConfigsConfConfigByName(stanza, resp)
 	if err != nil {
@@ -109,18 +139,11 @@ func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
-	// Now we read the input configuration with proper owner and app
-	resp, err = (*provider.Client).ReadConfigsConfObject(name, entry.ACL.Owner, entry.ACL.App)
+	contentResp, err := (*provider.Client).ReadConfigsConfObject(name, aclObject.Owner, aclObject.App)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
-
-	contentResp, err := (*provider.Client).ReadConfigsConfObject(name, entry.ACL.Owner, entry.ACL.App)
-	if err != nil {
-		return err
-	}
-	defer contentResp.Body.Close()
+	defer func() { _ = contentResp.Body.Close() }()
 
 	var result map[string]interface{}
 	b, _ := io.ReadAll(contentResp.Body)
@@ -142,12 +165,7 @@ func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 	// Override value to convert bool Type to string
 	content["disabled"] = strconv.FormatBool(content["disabled"].(bool))
 
-	entry, err = getConfigsConfConfigByName(stanza, resp)
-	if err != nil {
-		return err
-	}
-
-	if err = d.Set("name", d.Id()); err != nil {
+	if err = d.Set("name", name); err != nil {
 		return err
 	}
 
@@ -227,6 +245,21 @@ func getConfigsConfConfig(d *schema.ResourceData) (configsConfConfigObject *mode
 	configsConfConfigObject.Variables = mapString
 
 	return configsConfConfigObject
+}
+
+func getResourceDataConfigsConfACL(d *schema.ResourceData) *models.ACLObject {
+	aclObject := &models.ACLObject{
+		Owner:   "nobody",
+		App:     "search",
+		Sharing: "app",
+	}
+	if r, ok := d.GetOk("acl"); ok {
+		aclObject = getACLConfig(r.([]interface{}))
+	}
+	if aclObject.Sharing != "user" {
+		aclObject.Owner = "nobody"
+	}
+	return aclObject
 }
 
 func getConfigsConfConfigByName(name string, httpResponse *http.Response) (configsConfEntry *models.ConfigsConfEntry, err error) {
