@@ -1,5 +1,6 @@
 ## 1.5.6
 * Feature: Federated Search resources `splunk_federated_providers` and `splunk_federated_indexes`
+* Fix: saved search create and update send `allow_skew` and `action_email_command`, so configured values persist and plans converge
 
 ## 1.5.5
 * Security: mark credential attributes (tokens, passwords, webhook URLs, Splunkbase auth/session) as Sensitive so Terraform plan and CLI output redact them
