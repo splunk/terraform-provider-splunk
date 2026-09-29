@@ -1,9 +1,12 @@
 ## 1.5.7
+* Feature: saved searches can configure the Splunk AI Toolkit `run_aiagent` alert action with `action_run_aiagent_param_agent_name` and `action_run_aiagent_param_prompt`
 * Fix: `splunk_configs_conf` reads the stanza in its configured ACL namespace, so the same stanza name in another app no longer overwrites `acl.app` or `acl.sharing`
+* Fix: saved search create and update send `allow_skew` and `action_email_command`, so configured values persist and plans converge
+* Fix: HTTP Event Collector `use_ack` reads Splunk Cloud values returned as a boolean or as `"true"` / `"false"`
+* Fix: SAML group names are URL-encoded once, so names with special characters work on read, update, and delete
 
 ## 1.5.6
 * Feature: Federated Search resources `splunk_federated_providers` and `splunk_federated_indexes`
-* Fix: saved search create and update send `allow_skew` and `action_email_command`, so configured values persist and plans converge
 
 ## 1.5.5
 * Security: mark credential attributes (tokens, passwords, webhook URLs, Splunkbase auth/session) as Sensitive so Terraform plan and CLI output redact them
