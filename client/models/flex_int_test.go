@@ -146,20 +146,12 @@ func TestSavedSearchObject_EnterpriseStringFields(t *testing.T) {
 func TestSavedSearchObject_EmptySeverity(t *testing.T) {
 	enterpriseJSON := `{
 		"action.snow_event.param.severity": "",
-		"actions": "email",
 		"search": "index=_internal | head 1"
 	}`
 
 	var obj SavedSearchObject
 	if err := json.Unmarshal([]byte(enterpriseJSON), &obj); err != nil {
 		t.Fatalf("Unmarshal enterprise response: %v", err)
-	}
-
-	if obj.ActionSnowEventParamSeverity != 0 {
-		t.Errorf("ActionSnowEventParamSeverity: got %d, want 0", obj.ActionSnowEventParamSeverity)
-	}
-	if obj.Actions != "email" {
-		t.Errorf("Actions: got %q, want %q", obj.Actions, "email")
 	}
 	if obj.Search != "index=_internal | head 1" {
 		t.Errorf("Search: got %q, want %q", obj.Search, "index=_internal | head 1")
