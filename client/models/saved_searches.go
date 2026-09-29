@@ -191,6 +191,8 @@ type SavedSearchObject struct {
 	ActionBetterWebhookParamCredential           string  `json:"action.better_webhook.param.credential,omitempty" url:"action.better_webhook.param.credential"`
 	ActionBetterWebhookParamCredentials          string  `json:"action.better_webhook.param.credentials,omitempty" url:"action.better_webhook.param.credentials"`
 	ActionWebhookParamUrl                        string  `json:"action.webhook.param.url,omitempty" url:"action.webhook.param.url"`
+	ActionRunAiagentParamAgentName               string  `json:"action.run_aiagent.param.agent_name,omitempty" url:"action.run_aiagent.param.agent_name"`
+	ActionRunAiagentParamPrompt                  string  `json:"action.run_aiagent.param.prompt,omitempty" url:"action.run_aiagent.param.prompt"`
 	AlertDigestMode                              bool    `json:"alert.digest_mode" url:"alert.digest_mode"`
 	AlertExpires                                 string  `json:"alert.expires,omitempty" url:"alert.expires,omitempty"`
 	AlertSeverity                                int     `json:"alert.severity,omitempty" url:"alert.severity,omitempty"`

@@ -159,6 +159,8 @@ This resource block supports the following arguments:
 - `action_better_webhook_param_credential` - (Optional) Name of the Splunk stored credential to use for authentication
 - `action_better_webhook_param_credentials` - (Optional) Use the credentials defined in the webhook URL
 - `action_webhook_param_url` - (Optional, Sensitive) URL to send the HTTP POST request to. Must be accessible from the Splunk server
+- `action_run_aiagent_param_agent_name` - (Optional) Name of the AI agent to run, as configured in the Splunk AI Toolkit app
+- `action_run_aiagent_param_prompt` - (Optional) Prompt passed to the AI agent
 - `actions` - (Optional) A comma-separated list of actions to enable. For example: rss,email
 - `alert_comparator` - (Optional) One of the following strings: greater than, less than, equal to, rises by, drops by, rises by perc, drops by percUsed with alert_threshold to trigger alert actions.
 - `alert_condition` - (Optional) Contains a conditional search that is evaluated against the results of the saved search. Defaults to an empty string.
