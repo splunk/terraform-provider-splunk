@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
 func authorizationRoles() *schema.Resource {
@@ -19,6 +20,9 @@ func authorizationRoles() *schema.Resource {
 				Required:    true,
 				ForceNew:    true,
 				Description: "Required. The name of the user role to create.",
+				StateFunc: func(val interface{}) string {
+					return strings.ToLower(val.(string))
+				},
 			},
 			"capabilities": {
 				Type:     schema.TypeSet,
@@ -154,7 +158,8 @@ func authorizationRolesCreate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	d.SetId(name)
+	// Splunk server lowercases role names, so we store the lowercased version
+	d.SetId(strings.ToLower(name))
 	return authorizationRolesRead(d, meta)
 }
 
@@ -321,7 +326,7 @@ func getAuthorizationRolesByName(name string, httpResponse *http.Response) (Auth
 		_ = json.NewDecoder(httpResponse.Body).Decode(&response)
 		re := regexp.MustCompile(`(.*)`)
 		for _, entry := range response.Entry {
-			if name == re.FindStringSubmatch(entry.Name)[1] {
+			if strings.EqualFold(name, re.FindStringSubmatch(entry.Name)[1]) {
 				return &entry, nil
 			}
 		}
