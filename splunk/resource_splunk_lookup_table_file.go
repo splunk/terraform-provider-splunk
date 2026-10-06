@@ -1,11 +1,17 @@
 package splunk
 
 import (
+	"crypto/sha256"
+	"encoding/csv"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
+	"os"
+
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/splunk/terraform-provider-splunk/client/models"
-	"io"
 )
 
 func lookupTableFile() *schema.Resource {
@@ -30,8 +36,9 @@ func lookupTableFile() *schema.Resource {
 				Description: "A file name for the lookup.",
 			},
 			"file_contents": {
-				Type:     schema.TypeList,
-				Required: true,
+				Type:         schema.TypeList,
+				Optional:     true,
+				ExactlyOneOf: []string{"file_contents", "file_path"},
 				Elem: &schema.Schema{
 					Type: schema.TypeList,
 					Elem: &schema.Schema{
@@ -40,19 +47,35 @@ func lookupTableFile() *schema.Resource {
 				},
 				Description: "The contents of the lookup.",
 			},
+			"file_path": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ExactlyOneOf: []string{"file_contents", "file_path"},
+				Description:  "Path to a local CSV file. Use this for large files to avoid sending the contents through Terraform's provider RPC.",
+			},
+			"file_contents_hash": {
+				Type:        schema.TypeString,
+				Computed:    true,
+				Description: "Hash of the CSV contents when file_path is used.",
+			},
 		},
-		Create: lookupTableFileCreate,
-		Read:   lookupTableFileRead,
-		Update: lookupTableFileUpdate,
-		Delete: lookupTableFileDelete,
+		CustomizeDiff: lookupTableFileCustomizeDiff,
+		Create:        lookupTableFileCreate,
+		Read:          lookupTableFileRead,
+		Update:        lookupTableFileUpdate,
+		Delete:        lookupTableFileDelete,
 	}
 }
 
 func lookupTableFileCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	lookupTableFile := getLookupTableFile(d)
+	contents, err := lookupTableFileContents(d)
+	if err != nil {
+		return err
+	}
 
-	err := (*provider.Client).CreateLookupTableFile(lookupTableFile.FileName, lookupTableFile.Owner, lookupTableFile.App, lookupTableFile.FileContents)
+	err = (*provider.Client).CreateLookupTableFile(lookupTableFile.FileName, lookupTableFile.Owner, lookupTableFile.App, contents)
 	if err != nil {
 		return err
 	}
@@ -70,6 +93,22 @@ func lookupTableFileRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	defer resp.Body.Close()
+	if d.Get("file_path").(string) != "" {
+		bodyBytes, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+		var fileContents [][]string
+		if err := json.Unmarshal(bodyBytes, &fileContents); err != nil {
+			return err
+		}
+		contents, err := json.Marshal(fileContents)
+		if err != nil {
+			return err
+		}
+		hash := sha256.Sum256(contents)
+		return d.Set("file_contents_hash", hex.EncodeToString(hash[:]))
+	}
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -91,13 +130,56 @@ func lookupTableFileRead(d *schema.ResourceData, meta interface{}) error {
 func lookupTableFileUpdate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	lookupTableFile := getLookupTableFile(d)
+	contents, err := lookupTableFileContents(d)
+	if err != nil {
+		return err
+	}
 
-	err := (*provider.Client).UpdateLookupTableFile(lookupTableFile.FileName, lookupTableFile.Owner, lookupTableFile.App, lookupTableFile.FileContents)
+	err = (*provider.Client).UpdateLookupTableFile(lookupTableFile.FileName, lookupTableFile.Owner, lookupTableFile.App, contents)
 	if err != nil {
 		return err
 	}
 
 	return lookupTableFileRead(d, meta)
+}
+
+func lookupTableFileCustomizeDiff(d *schema.ResourceDiff, _ interface{}) error {
+	filePath := d.Get("file_path").(string)
+	if filePath == "" {
+		return d.SetNew("file_contents_hash", "")
+	}
+
+	contents, err := lookupTableFileContentsFromPath(filePath)
+	if err != nil {
+		return fmt.Errorf("reading lookup CSV %q: %w", filePath, err)
+	}
+	hash := sha256.Sum256([]byte(contents))
+	return d.SetNew("file_contents_hash", hex.EncodeToString(hash[:]))
+}
+
+func lookupTableFileContents(d *schema.ResourceData) (string, error) {
+	if filePath := d.Get("file_path").(string); filePath != "" {
+		return lookupTableFileContentsFromPath(filePath)
+	}
+	return getLookupTableFile(d).FileContents, nil
+}
+
+func lookupTableFileContentsFromPath(filePath string) (string, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return "", fmt.Errorf("opening lookup CSV %q: %w", filePath, err)
+	}
+	defer file.Close()
+
+	rows, err := csv.NewReader(file).ReadAll()
+	if err != nil {
+		return "", fmt.Errorf("reading lookup CSV %q: %w", filePath, err)
+	}
+	contents, err := json.Marshal(rows)
+	if err != nil {
+		return "", err
+	}
+	return string(contents), nil
 }
 
 func lookupTableFileDelete(d *schema.ResourceData, meta interface{}) error {

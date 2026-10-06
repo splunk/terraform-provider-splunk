@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
@@ -36,6 +38,28 @@ resource "splunk_lookup_table_file" "test" {
 	]
 }
 `
+
+func TestLookupTableFileContentsFromPath(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "lookup.csv")
+	if err := os.WriteFile(path, []byte("id,message\n1,\"hello, world\"\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+
+	d := schema.TestResourceDataRaw(t, lookupTableFile().Schema, map[string]interface{}{
+		"app":       "search",
+		"owner":     "nobody",
+		"file_name": "lookup.csv",
+		"file_path": path,
+	})
+
+	got, err := lookupTableFileContents(d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := `[["id","message"],["1","hello, world"]]`; got != want {
+		t.Fatalf("lookupTableFileContents() = %s, want %s", got, want)
+	}
+}
 
 func TestAccSplunkLookupTableFile(t *testing.T) {
 	// The splunk_lookup_table_file resource uses the lookup_edit API (e.g. from the
