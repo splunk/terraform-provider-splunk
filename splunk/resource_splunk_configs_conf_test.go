@@ -124,6 +124,7 @@ func TestConfigsConfReadStanzaWithSlashes(t *testing.T) {
 					"perms": {"read": ["*"], "write": ["admin"]}
 				},
 				"content": {
+					"_rcvbuf": 1572864,
 					"disabled": false,
 					"index": "main"
 				}
@@ -175,8 +176,11 @@ func TestConfigsConfReadStanzaWithSlashes(t *testing.T) {
 	if got, want := d.Get("name").(string), "inputs/monitor:///data/syslog/"; got != want {
 		t.Errorf("name = %q, want %q", got, want)
 	}
-	if got, want := d.Get("variables").(map[string]interface{})["index"], "main"; got != want {
-		t.Errorf("variables.index = %v, want %q", got, want)
+	variables := d.Get("variables").(map[string]interface{})
+	for key, want := range map[string]string{"index": "main", "disabled": "false", "_rcvbuf": "1572864"} {
+		if got := variables[key]; got != want {
+			t.Errorf("variables.%s = %v, want %q", key, got, want)
+		}
 	}
 }
 

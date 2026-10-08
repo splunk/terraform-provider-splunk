@@ -162,8 +162,16 @@ func configsConfRead(d *schema.ResourceData, meta interface{}) error {
 		}
 	}
 
-	// Override value to convert bool Type to string
-	content["disabled"] = strconv.FormatBool(content["disabled"].(bool))
+	// variables is a map of strings, but Splunk returns some values typed: disabled as a bool, and
+	// numeric settings such as inputs.conf _rcvbuf (inherited by every input stanza) as numbers.
+	for key, value := range content {
+		switch v := value.(type) {
+		case bool:
+			content[key] = strconv.FormatBool(v)
+		case float64:
+			content[key] = strconv.FormatFloat(v, 'f', -1, 64)
+		}
+	}
 
 	if err = d.Set("name", name); err != nil {
 		return err
