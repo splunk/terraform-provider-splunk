@@ -1,4 +1,5 @@
 ## 1.5.8
+* Feature: `splunk_lookup_table_file` accepts `file_path` for large CSVs. The provider reads the file where Terraform runs and stores a SHA-256 hash of the parsed rows instead of the CSV. `file_contents` remains supported
 * Fix: `splunk_configs_conf` keeps `/` in stanza names, so stanzas such as `monitor:///var/log/`, `splunktcp://9997`, and `source::/var/log/...` can be created, imported, updated, and deleted
 * Fix: `splunk_configs_conf` reads numeric and boolean values as strings, so `inputs.conf` stanzas no longer fail on `_rcvbuf`. A refresh still lists inherited settings such as `_rcvbuf` for removal; Splunk does not delete those defaults
 * Fix: ACL updates escape resource names that end with `/`

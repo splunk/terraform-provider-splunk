@@ -51,12 +51,12 @@ func lookupTableFile() *schema.Resource {
 				Type:         schema.TypeString,
 				Optional:     true,
 				ExactlyOneOf: []string{"file_contents", "file_path"},
-				Description:  "Path to a local CSV file. Use this for large files to avoid sending the contents through Terraform's provider RPC.",
+				Description:  "Absolute path, or a path.module path, to a local CSV file. The provider reads it during plan and apply. A change to the file contents triggers an update. Use this for large files so the CSV is not sent through Terraform's provider RPC.",
 			},
 			"file_contents_hash": {
 				Type:        schema.TypeString,
 				Computed:    true,
-				Description: "Hash of the CSV contents when file_path is used.",
+				Description: "SHA-256 hex digest of the JSON encoding of the parsed CSV rows when file_path is set. Empty when file_contents is used. This is not a digest of the raw file bytes.",
 			},
 		},
 		CustomizeDiff: lookupTableFileCustomizeDiff,
@@ -93,29 +93,26 @@ func lookupTableFileRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	defer resp.Body.Close()
-	if d.Get("file_path").(string) != "" {
-		bodyBytes, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		var fileContents [][]string
-		if err := json.Unmarshal(bodyBytes, &fileContents); err != nil {
-			return err
-		}
-		contents, err := json.Marshal(fileContents)
-		if err != nil {
-			return err
-		}
-		hash := sha256.Sum256(contents)
-		if err := d.Set("file_contents", nil); err != nil {
-			return err
-		}
-		return d.Set("file_contents_hash", hex.EncodeToString(hash[:]))
-	}
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
+	}
+
+	if filePath := d.Get("file_path").(string); filePath != "" {
+		// Confirm the lookup still exists. The stored hash is of the local file,
+		// so a Splunk-side rewrite does not change the plan.
+		if err := json.Unmarshal(bodyBytes, new([][]string)); err != nil {
+			return fmt.Errorf("reading lookup %q: response is not a CSV row array: %w", lookupTableFile.FileName, err)
+		}
+		contents, err := lookupTableFileContentsFromPath(filePath)
+		if err != nil {
+			return err
+		}
+		if err := d.Set("file_contents", nil); err != nil {
+			return err
+		}
+		return d.Set("file_contents_hash", lookupTableFileContentHash(contents))
 	}
 
 	var fileContents [][]string
@@ -153,10 +150,14 @@ func lookupTableFileCustomizeDiff(d *schema.ResourceDiff, _ interface{}) error {
 
 	contents, err := lookupTableFileContentsFromPath(filePath)
 	if err != nil {
-		return fmt.Errorf("reading lookup CSV %q: %w", filePath, err)
+		return err
 	}
-	hash := sha256.Sum256([]byte(contents))
-	return d.SetNew("file_contents_hash", hex.EncodeToString(hash[:]))
+	return d.SetNew("file_contents_hash", lookupTableFileContentHash(contents))
+}
+
+func lookupTableFileContentHash(contents string) string {
+	sum := sha256.Sum256([]byte(contents))
+	return hex.EncodeToString(sum[:])
 }
 
 func lookupTableFileContents(d *schema.ResourceData) (string, error) {

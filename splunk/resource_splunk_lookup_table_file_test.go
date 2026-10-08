@@ -68,7 +68,8 @@ func TestLookupTableFileReadClearsInactiveState(t *testing.T) {
 	t.Setenv("HTTPScheme", "http")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		_, _ = fmt.Fprint(w, `[["id","value"],["1","hello"]]`)
+		// Different from the local CSV so a hash of the response would not match.
+		_, _ = fmt.Fprint(w, `[["id","value"],["9","remote-only"]]`)
 	}))
 	defer server.Close()
 
@@ -100,8 +101,12 @@ func TestLookupTableFileReadClearsInactiveState(t *testing.T) {
 		if got := len(d.Get("file_contents").([]interface{})); got != 0 {
 			t.Errorf("file_contents still has %d rows, want it cleared", got)
 		}
-		if got := d.Get("file_contents_hash").(string); got == "" {
-			t.Error("file_contents_hash is empty, want hash of remote contents")
+		local, err := lookupTableFileContentsFromPath(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got, want := d.Get("file_contents_hash").(string), lookupTableFileContentHash(local); got != want {
+			t.Errorf("file_contents_hash = %q, want local file hash %q", got, want)
 		}
 	})
 
@@ -125,6 +130,60 @@ func TestLookupTableFileReadClearsInactiveState(t *testing.T) {
 			t.Errorf("file_contents_hash = %q, want empty", got)
 		}
 	})
+}
+
+func TestLookupTableFilePathDiffFollowsLocalFile(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "lookup.csv")
+	if err := os.WriteFile(path, []byte("id,message\n1,alpha\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	contents, err := lookupTableFileContentsFromPath(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	hash := lookupTableFileContentHash(contents)
+
+	res := lookupTableFile()
+	state := &terraform.InstanceState{
+		ID: "lookup.csv",
+		Attributes: map[string]string{
+			"id":                 "lookup.csv",
+			"app":                "search",
+			"owner":              "nobody",
+			"file_name":          "lookup.csv",
+			"file_path":          path,
+			"file_contents_hash": hash,
+		},
+	}
+	config := terraform.NewResourceConfigRaw(map[string]interface{}{
+		"app":       "search",
+		"owner":     "nobody",
+		"file_name": "lookup.csv",
+		"file_path": path,
+	})
+
+	diff, err := res.Diff(state, config, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !diff.Empty() {
+		t.Fatalf("unchanged file produced a diff: %#v", diff.Attributes)
+	}
+
+	if err := os.WriteFile(path, []byte("id,message\n1,beta\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	diff, err = res.Diff(state, config, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff.Empty() {
+		t.Fatal("edited file produced an empty diff")
+	}
+	attr := diff.Attributes["file_contents_hash"]
+	if attr == nil || attr.New == "" || attr.New == hash {
+		t.Fatalf("file_contents_hash diff = %#v, want a new hash", attr)
+	}
 }
 
 func TestAccSplunkLookupTableFile(t *testing.T) {

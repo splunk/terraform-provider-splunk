@@ -30,7 +30,9 @@ resource "splunk_lookup_table_file" "large_lookup" {
 }
 ```
 
-The file must be available to the provider process during plan and apply. Terraform stores a hash for change detection instead of the full CSV contents in state.
+The provider reads `file_path` during plan and apply on the machine where Terraform is running, including a remote agent. A relative path is resolved from the provider process working directory; use `path.module` or an absolute path, and keep the file in the configuration that the runner receives. Switching an existing resource from `file_contents` to `file_path` is an in-place update. `app`, `owner`, and `file_name` still force a new resource.
+
+State stores `file_contents_hash` and does not store the CSV. That hash is the SHA-256 hex digest of the JSON encoding of the parsed rows, not a digest of the raw file bytes. The provider uploads those rows in one request, so Splunk's form-post size is the remaining limit. An edit made to the lookup in Splunk is left as-is until the local file changes.
 
 ## Argument Reference
 For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/Knowledge/LookupexampleinSplunkWeb
@@ -40,10 +42,10 @@ This resource block supports the following arguments:
 * `owner` - (Required) User name of resource owner. Defaults to the resource creator. Required for updating any knowledge object ACL properties. nobody = All users may access the resource, but write access to the resource might be restricted.
 * `file_name` - (Required) A name for the lookup table file. Generally ends with ".csv"
 * `file_contents` - (Optional) The column header and row value contents for the lookup table file. Specify exactly one of `file_contents` or `file_path`.
-* `file_path` - (Optional) Path to a local CSV file. Changes to its contents trigger an update.
+* `file_path` - (Optional) Path to a local CSV file. Use an absolute path or `path.module`. The provider reads this path during plan and apply. A change to the file contents triggers an update. Specify exactly one of `file_contents` or `file_path`.
 
 ## Attribute Reference
 In addition to all arguments above, This resource block exports the following arguments:
 
 * `id` - The ID of the lookup table file resource
-* `file_contents_hash` - Hash used to detect changes to a CSV provided through `file_path`.
+* `file_contents_hash` - SHA-256 hex digest of the JSON encoding of the parsed CSV rows when `file_path` is set. This is not the SHA-256 of the raw file. Empty when `file_contents` is used.
