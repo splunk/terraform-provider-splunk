@@ -107,6 +107,9 @@ func lookupTableFileRead(d *schema.ResourceData, meta interface{}) error {
 			return err
 		}
 		hash := sha256.Sum256(contents)
+		if err := d.Set("file_contents", nil); err != nil {
+			return err
+		}
 		return d.Set("file_contents_hash", hex.EncodeToString(hash[:]))
 	}
 
@@ -123,8 +126,7 @@ func lookupTableFileRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("file_contents", fileContents); err != nil {
 		return err
 	}
-
-	return nil
+	return d.Set("file_contents_hash", "")
 }
 
 func lookupTableFileUpdate(d *schema.ResourceData, meta interface{}) error {
