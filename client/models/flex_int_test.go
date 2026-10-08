@@ -153,6 +153,9 @@ func TestSavedSearchObject_EmptySeverity(t *testing.T) {
 	if err := json.Unmarshal([]byte(enterpriseJSON), &obj); err != nil {
 		t.Fatalf("Unmarshal enterprise response: %v", err)
 	}
+	if obj.ActionSnowEventParamSeverity != 0 {
+		t.Errorf("ActionSnowEventParamSeverity: got %d, want 0", obj.ActionSnowEventParamSeverity)
+	}
 	if obj.Search != "index=_internal | head 1" {
 		t.Errorf("Search: got %q, want %q", obj.Search, "index=_internal | head 1")
 	}

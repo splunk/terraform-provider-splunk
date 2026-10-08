@@ -2,10 +2,12 @@ package splunk
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"reflect"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -950,6 +952,60 @@ func TestGetSavedSearchesConfigAllowSkew(t *testing.T) {
 	config := getSavedSearchesConfig(resourceData)
 	if got, want := config.AllowSkew, "100%"; got != want {
 		t.Errorf("AllowSkew: got %q, want %q", got, want)
+	}
+}
+
+func TestGetSavedSearchesConfigByNameEmptySeverity(t *testing.T) {
+	body := `{
+		"entry": [{
+			"name": "test_alert",
+			"content": {
+				"action.snow_event.param.severity": "",
+				"search": "index=_internal | head 1"
+			}
+		}]
+	}`
+	resp := &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       io.NopCloser(strings.NewReader(body)),
+	}
+
+	entry, err := getSavedSearchesConfigByName("test_alert", resp)
+	if err != nil {
+		t.Fatalf("getSavedSearchesConfigByName: %v", err)
+	}
+	if entry == nil {
+		t.Fatal("getSavedSearchesConfigByName returned a nil entry")
+	}
+	if got, want := entry.Content.Search, "index=_internal | head 1"; got != want {
+		t.Errorf("Search: got %q, want %q", got, want)
+	}
+	if got := entry.Content.ActionSnowEventParamSeverity; got != 0 {
+		t.Errorf("ActionSnowEventParamSeverity: got %d, want 0", got)
+	}
+}
+
+func TestGetSavedSearchesConfigByNameDecodeError(t *testing.T) {
+	body := `{
+		"entry": [{
+			"name": "test_alert",
+			"content": {
+				"action.snow_event.param.severity": "abc",
+				"search": "index=_internal | head 1"
+			}
+		}]
+	}`
+	resp := &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       io.NopCloser(strings.NewReader(body)),
+	}
+
+	entry, err := getSavedSearchesConfigByName("test_alert", resp)
+	if err == nil {
+		t.Fatal("getSavedSearchesConfigByName error = nil, want a decode error")
+	}
+	if entry != nil {
+		t.Fatalf("getSavedSearchesConfigByName entry = %#v, want nil", entry)
 	}
 }
 
