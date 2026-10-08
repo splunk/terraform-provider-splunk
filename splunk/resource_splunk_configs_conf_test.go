@@ -337,7 +337,8 @@ func testAccSplunkConfigsConfDestroyResources(s *terraform.State) error {
 		switch rs.Type {
 		case "splunk_configs_conf":
 			conf, stanza := client.SplitConfStanza(rs.Primary.ID)
-			endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, stanza, "servicesNS", "nobody", "search", "configs", "conf-"+conf)
+			owner, app := configsConfAcceptanceNamespace(rs)
+			endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, stanza, "servicesNS", owner, app, "configs", "conf-"+conf)
 			resp, err := client.Get(endpoint)
 			if resp != nil {
 				_ = resp.Body.Close()
@@ -367,7 +368,8 @@ func testAccCheckConfigsConfStanzaExists(resourceName, wantStanza string) resour
 			return err
 		}
 		conf, _ := client.SplitConfStanza(rs.Primary.ID)
-		endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, wantStanza, "servicesNS", "nobody", "search", "configs", "conf-"+conf)
+		owner, app := configsConfAcceptanceNamespace(rs)
+		endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, wantStanza, "servicesNS", owner, app, "configs", "conf-"+conf)
 		resp, err := client.Get(endpoint)
 		if err != nil {
 			return err
@@ -377,5 +379,69 @@ func testAccCheckConfigsConfStanzaExists(resourceName, wantStanza string) resour
 			return fmt.Errorf("stanza %q not found in conf-%s: status %d", wantStanza, conf, resp.StatusCode)
 		}
 		return nil
+	}
+}
+
+// configsConfAcceptanceNamespace returns the owner and app the resource was
+// managed in. Delete uses those values from state. Missing attributes fall
+// back to the provider default of nobody/search.
+func configsConfAcceptanceNamespace(rs *terraform.ResourceState) (owner, app string) {
+	owner, app = "nobody", "search"
+	if rs == nil || rs.Primary == nil || rs.Primary.Attributes == nil {
+		return owner, app
+	}
+	if v := rs.Primary.Attributes["acl.0.owner"]; v != "" {
+		owner = v
+	}
+	if v := rs.Primary.Attributes["acl.0.app"]; v != "" {
+		app = v
+	}
+	return owner, app
+}
+
+func TestConfigsConfAcceptanceNamespace(t *testing.T) {
+	tests := []struct {
+		name      string
+		attrs     map[string]string
+		wantOwner string
+		wantApp   string
+	}{
+		{
+			name:      "missing acl falls back to nobody/search",
+			wantOwner: "nobody",
+			wantApp:   "search",
+		},
+		{
+			name: "state acl",
+			attrs: map[string]string{
+				"acl.0.owner": "alice",
+				"acl.0.app":   "custom_app",
+			},
+			wantOwner: "alice",
+			wantApp:   "custom_app",
+		},
+		{
+			name: "app only keeps default owner",
+			attrs: map[string]string{
+				"acl.0.app": "system",
+			},
+			wantOwner: "nobody",
+			wantApp:   "system",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rs := &terraform.ResourceState{
+				Primary: &terraform.InstanceState{Attributes: tt.attrs},
+			}
+			owner, app := configsConfAcceptanceNamespace(rs)
+			if owner != tt.wantOwner {
+				t.Errorf("owner = %q, want %q", owner, tt.wantOwner)
+			}
+			if app != tt.wantApp {
+				t.Errorf("app = %q, want %q", app, tt.wantApp)
+			}
+		})
 	}
 }

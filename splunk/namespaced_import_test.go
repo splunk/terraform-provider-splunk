@@ -163,6 +163,14 @@ func TestParseNamespacedConfigsConfImportID(t *testing.T) {
 			wantName:    "inputs/sqs:queue",
 		},
 		{
+			name:        "configs conf encoded stanza with slashes",
+			id:          "/servicesNS/nobody/system/configs/conf-inputs/monitor:%2F%2F%2Fvar%2Flog%2F",
+			wantMatched: true,
+			wantOwner:   "nobody",
+			wantApp:     "system",
+			wantName:    "inputs/monitor:///var/log/",
+		},
+		{
 			name:        "bare name falls back to default namespace import",
 			id:          "props/httpevent",
 			wantMatched: false,

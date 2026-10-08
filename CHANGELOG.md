@@ -1,3 +1,8 @@
+## 1.5.8
+* Fix: `splunk_configs_conf` keeps `/` in stanza names, so stanzas such as `monitor:///var/log/`, `splunktcp://9997`, and `source::/var/log/...` can be created, imported, updated, and deleted
+* Fix: `splunk_configs_conf` reads numeric and boolean values as strings, so `inputs.conf` stanzas no longer fail on `_rcvbuf`. A refresh still lists inherited settings such as `_rcvbuf` for removal; Splunk does not delete those defaults
+* Fix: ACL updates escape resource names that end with `/`
+
 ## 1.5.7
 * Feature: saved searches can configure the Splunk AI Toolkit `run_aiagent` alert action with `action_run_aiagent_param_agent_name` and `action_run_aiagent_param_prompt`
 * Fix: `splunk_configs_conf` reads the stanza in its configured ACL namespace, so the same stanza name in another app no longer overwrites `acl.app` or `acl.sharing`
