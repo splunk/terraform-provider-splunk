@@ -22,8 +22,10 @@ func TestFlexInt_UnmarshalJSON(t *testing.T) {
 		{"bare int 0", `0`, 0, false},
 		{"bool true", `true`, 1, false},
 		{"bool false", `false`, 0, false},
+		{"empty string", `""`, 0, false},
+		{"blank string", `" "`, 0, false},
 		{"invalid string", `"abc"`, 0, true},
-		{"null", `null`, 0, true},
+		{"null", `null`, 0, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -36,6 +38,20 @@ func TestFlexInt_UnmarshalJSON(t *testing.T) {
 				t.Errorf("UnmarshalJSON(%s) = %d, want %d", tt.input, f, tt.want)
 			}
 		})
+	}
+}
+
+// TestFlexInt_UnmarshalJSONExistingValue verifies that null keeps the current
+// value while an empty string sets it to 0.
+func TestFlexInt_UnmarshalJSONExistingValue(t *testing.T) {
+	for input, want := range map[string]FlexInt{`null`: 3, `""`: 0} {
+		f := FlexInt(3)
+		if err := json.Unmarshal([]byte(input), &f); err != nil {
+			t.Fatalf("UnmarshalJSON(%s) error = %v", input, err)
+		}
+		if f != want {
+			t.Errorf("UnmarshalJSON(%s) = %d, want %d", input, f, want)
+		}
 	}
 }
 
@@ -121,5 +137,23 @@ func TestSavedSearchObject_EnterpriseStringFields(t *testing.T) {
 	}
 	if obj.ActionSnowEventParamSeverity != 3 {
 		t.Errorf("ActionSnowEventParamSeverity: got %d, want 3", obj.ActionSnowEventParamSeverity)
+	}
+}
+
+// TestSavedSearchObject_EmptySeverity verifies that an empty severity, which
+// Splunk returns for saved searches when the ServiceNow add-on is installed,
+// does not stop decoding of the fields that follow it in the response.
+func TestSavedSearchObject_EmptySeverity(t *testing.T) {
+	enterpriseJSON := `{
+		"action.snow_event.param.severity": "",
+		"search": "index=_internal | head 1"
+	}`
+
+	var obj SavedSearchObject
+	if err := json.Unmarshal([]byte(enterpriseJSON), &obj); err != nil {
+		t.Fatalf("Unmarshal enterprise response: %v", err)
+	}
+	if obj.Search != "index=_internal | head 1" {
+		t.Errorf("Search: got %q, want %q", obj.Search, "index=_internal | head 1")
 	}
 }

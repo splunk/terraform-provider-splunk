@@ -10,7 +10,8 @@ import (
 // string-encoded integer ("0", "1"), a boolean string ("true", "false"),
 // a bare integer (0, 1), or a boolean (false, true). Splunk Enterprise
 // returns string-encoded integers; Splunk Cloud returns booleans or
-// boolean strings for the same fields.
+// boolean strings for the same fields. An empty or blank string decodes
+// as 0, and null leaves the value unchanged.
 // See: https://github.com/splunk/terraform-provider-splunk/issues/130
 type FlexInt int
 
@@ -20,6 +21,8 @@ func (f *FlexInt) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	switch v := raw.(type) {
+	case nil:
+		// Leave the value unchanged, as encoding/json does for a plain int.
 	case float64:
 		*f = FlexInt(int(v))
 	case string:
@@ -27,7 +30,7 @@ func (f *FlexInt) UnmarshalJSON(data []byte) error {
 		case "true":
 			*f = 1
 			return nil
-		case "false":
+		case "", "false":
 			*f = 0
 			return nil
 		}
