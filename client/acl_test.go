@@ -139,6 +139,13 @@ func TestAclURLsEscapeResourceName(t *testing.T) {
 				return c.UpdateAcl("nobody", "app", "A/B+C D", acl, "data", "ui", "views")
 			},
 		},
+		{
+			name: "update conf stanza acl with trailing slash",
+			want: "/servicesNS/nobody/system/configs/conf-inputs/monitor:%2F%2F%2Fvar%2Flog%2F/acl",
+			call: func(c *Client) error {
+				return c.UpdateAcl("nobody", "system", "monitor:///var/log/", acl, "configs", "conf-inputs")
+			},
+		},
 	}
 
 	for _, tt := range tests {

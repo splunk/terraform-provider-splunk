@@ -35,7 +35,7 @@ func (client *Client) CreateConfigsConfObject(name string, owner string, app str
 func (client *Client) ReadConfigsConfObject(name, owner, app string) (*http.Response, error) {
 	conf, stanza := client.SplitConfStanza(name)
 
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-"+conf, stanza)
+	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, stanza, "servicesNS", owner, app, "configs", "conf-"+conf)
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func (client *Client) UpdateConfigsConfObject(name string, owner string, app str
 	conf, stanza := client.SplitConfStanza(name)
 	values.Del("Variables")
 
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-"+conf, stanza)
+	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, stanza, "servicesNS", owner, app, "configs", "conf-"+conf)
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -70,7 +70,7 @@ func (client *Client) UpdateConfigsConfObject(name string, owner string, app str
 func (client *Client) DeleteConfigsConfObject(name, owner, app string) (*http.Response, error) {
 	conf, stanza := client.SplitConfStanza(name)
 
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "configs", "conf-"+conf, stanza)
+	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, stanza, "servicesNS", owner, app, "configs", "conf-"+conf)
 
 	resp, err := client.Delete(endpoint)
 	if err != nil {
@@ -93,8 +93,9 @@ func (client *Client) ReadAllConfigsConfObject(name string) (*http.Response, err
 	return resp, nil
 }
 
-// Takes a '/' separated string and returns the 0, 1 indexed strings from the split
+// Takes a '/' separated string and returns the conf file name and the stanza name.
+// Only the first '/' separates them: stanza names such as monitor:///var/log keep their slashes.
 func (client *Client) SplitConfStanza(name string) (conf string, stanza string) {
-	split := strings.Split(name, "/")
+	split := strings.SplitN(name, "/", 2)
 	return split[0], split[1]
 }
