@@ -3,11 +3,16 @@ package splunk
 import (
 	"fmt"
 	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	splunkclient "github.com/splunk/terraform-provider-splunk/client"
 )
 
 const newLookupTableFile = `
@@ -36,6 +41,91 @@ resource "splunk_lookup_table_file" "test" {
 	]
 }
 `
+
+func TestLookupTableFileContentsFromPath(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "lookup.csv")
+	if err := os.WriteFile(path, []byte("id,message\n1,\"hello, world\"\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+
+	d := schema.TestResourceDataRaw(t, lookupTableFile().Schema, map[string]interface{}{
+		"app":       "search",
+		"owner":     "nobody",
+		"file_name": "lookup.csv",
+		"file_path": path,
+	})
+
+	got, err := lookupTableFileContents(d)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := `[["id","message"],["1","hello, world"]]`; got != want {
+		t.Fatalf("lookupTableFileContents() = %s, want %s", got, want)
+	}
+}
+
+func TestLookupTableFileReadClearsInactiveState(t *testing.T) {
+	t.Setenv("HTTPScheme", "http")
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = fmt.Fprint(w, `[["id","value"],["1","hello"]]`)
+	}))
+	defer server.Close()
+
+	backend, err := url.Parse(server.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	client, err := splunkclient.NewSplunkdClient("", [2]string{"admin", "password"}, backend.Host, "", server.Client())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Run("path clears contents", func(t *testing.T) {
+		path := filepath.Join(t.TempDir(), "lookup.csv")
+		if err := os.WriteFile(path, []byte("id,value\n1,hello\n"), 0600); err != nil {
+			t.Fatal(err)
+		}
+		d := schema.TestResourceDataRaw(t, lookupTableFile().Schema, map[string]interface{}{
+			"app": "search", "owner": "nobody", "file_name": "lookup.csv", "file_path": path,
+		})
+		if err := d.Set("file_contents", [][]string{{"old", "state"}}); err != nil {
+			t.Fatal(err)
+		}
+		d.SetId("lookup.csv")
+
+		if err := lookupTableFileRead(d, &SplunkProvider{Client: client}); err != nil {
+			t.Fatal(err)
+		}
+		if got := len(d.Get("file_contents").([]interface{})); got != 0 {
+			t.Errorf("file_contents still has %d rows, want it cleared", got)
+		}
+		if got := d.Get("file_contents_hash").(string); got == "" {
+			t.Error("file_contents_hash is empty, want hash of remote contents")
+		}
+	})
+
+	t.Run("inline contents clears hash", func(t *testing.T) {
+		d := schema.TestResourceDataRaw(t, lookupTableFile().Schema, map[string]interface{}{
+			"app": "search", "owner": "nobody", "file_name": "lookup.csv",
+			"file_contents": []interface{}{
+				[]interface{}{"id", "value"},
+				[]interface{}{"1", "hello"},
+			},
+		})
+		if err := d.Set("file_contents_hash", "stale-hash"); err != nil {
+			t.Fatal(err)
+		}
+		d.SetId("lookup.csv")
+
+		if err := lookupTableFileRead(d, &SplunkProvider{Client: client}); err != nil {
+			t.Fatal(err)
+		}
+		if got := d.Get("file_contents_hash").(string); got != "" {
+			t.Errorf("file_contents_hash = %q, want empty", got)
+		}
+	})
+}
 
 func TestAccSplunkLookupTableFile(t *testing.T) {
 	// The splunk_lookup_table_file resource uses the lookup_edit API (e.g. from the
