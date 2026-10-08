@@ -107,6 +107,79 @@ func TestConfigsConfReadUsesConfiguredNamespace(t *testing.T) {
 	}
 }
 
+func TestConfigsConfReadStanzaWithSlashes(t *testing.T) {
+	t.Setenv("HTTPScheme", "http")
+
+	var requestPaths []string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requestPaths = append(requestPaths, r.URL.EscapedPath())
+		w.WriteHeader(http.StatusOK)
+		_, _ = fmt.Fprint(w, `{
+			"entry": [{
+				"name": "monitor:///data/syslog/",
+				"acl": {
+					"app": "system",
+					"owner": "nobody",
+					"sharing": "system",
+					"perms": {"read": ["*"], "write": ["admin"]}
+				},
+				"content": {
+					"disabled": false,
+					"index": "main"
+				}
+			}],
+			"messages": []
+		}`)
+	}))
+	defer server.Close()
+
+	backend, err := url.Parse(server.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	client, err := splunkclient.NewSplunkdClient(
+		"",
+		[2]string{"admin", "password"},
+		backend.Host,
+		"",
+		server.Client(),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	d := schema.TestResourceDataRaw(t, configsConf().Schema, map[string]interface{}{
+		"name": "inputs/monitor:///data/syslog/",
+		"acl": []interface{}{map[string]interface{}{
+			"owner":   "nobody",
+			"app":     "system",
+			"sharing": "system",
+		}},
+	})
+	d.SetId("inputs/monitor:///data/syslog/")
+
+	if err := configsConfRead(d, &SplunkProvider{Client: client}); err != nil {
+		t.Fatalf("configsConfRead: %v", err)
+	}
+
+	const expectedPath = "/servicesNS/nobody/system/configs/conf-inputs/monitor:%2F%2F%2Fdata%2Fsyslog%2F"
+	if len(requestPaths) == 0 {
+		t.Fatal("expected at least one request")
+	}
+	for _, got := range requestPaths {
+		if got != expectedPath {
+			t.Errorf("request path = %q, want %q", got, expectedPath)
+		}
+	}
+
+	if got, want := d.Get("name").(string), "inputs/monitor:///data/syslog/"; got != want {
+		t.Errorf("name = %q, want %q", got, want)
+	}
+	if got, want := d.Get("variables").(map[string]interface{})["index"], "main"; got != want {
+		t.Errorf("variables.index = %v, want %q", got, want)
+	}
+}
+
 func TestGetResourceDataConfigsConfACL(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -230,6 +303,7 @@ func TestAccCreateSplunkConfigsConfSpecialChars(t *testing.T) {
 			{
 				Config: newConfigsConfSpecialChars,
 				Check: resource.ComposeTestCheckFunc(
+					testAccCheckConfigsConfStanzaExists(resourceName, "sqs://tftest_stanza_special_chars"),
 					resource.TestCheckResourceAttr(resourceName, "variables.%", "2"),
 					resource.TestCheckResourceAttr(resourceName, "variables.key", "value"),
 				),
@@ -258,12 +332,46 @@ func testAccSplunkConfigsConfDestroyResources(s *terraform.State) error {
 	for _, rs := range s.RootModule().Resources {
 		switch rs.Type {
 		case "splunk_configs_conf":
-			endpoint := client.BuildSplunkURL(nil, "services", "configs", "conf", rs.Primary.ID)
+			conf, stanza := client.SplitConfStanza(rs.Primary.ID)
+			endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, stanza, "servicesNS", "nobody", "search", "configs", "conf-"+conf)
 			resp, err := client.Get(endpoint)
-			if resp.StatusCode != http.StatusNotFound {
-				return fmt.Errorf("error: %s: %s", rs.Primary.ID, err)
+			if resp != nil {
+				_ = resp.Body.Close()
+				if resp.StatusCode == http.StatusNotFound {
+					continue
+				}
 			}
+			if err != nil {
+				return fmt.Errorf("verify deletion of %s: %w", rs.Primary.ID, err)
+			}
+			return fmt.Errorf("splunk_configs_conf %q still exists after destroy", rs.Primary.ID)
 		}
 	}
 	return nil
+}
+
+// testAccCheckConfigsConfStanzaExists reads the stanza back from Splunk under its full name, so a
+// provider that creates a different (e.g. truncated) stanza than the one configured fails the test.
+func testAccCheckConfigsConfStanzaExists(resourceName, wantStanza string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rs, ok := s.RootModule().Resources[resourceName]
+		if !ok {
+			return fmt.Errorf("resource not found: %s", resourceName)
+		}
+		client, err := newTestClient()
+		if err != nil {
+			return err
+		}
+		conf, _ := client.SplitConfStanza(rs.Primary.ID)
+		endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, wantStanza, "servicesNS", "nobody", "search", "configs", "conf-"+conf)
+		resp, err := client.Get(endpoint)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode != http.StatusOK {
+			return fmt.Errorf("stanza %q not found in conf-%s: status %d", wantStanza, conf, resp.StatusCode)
+		}
+		return nil
+	}
 }

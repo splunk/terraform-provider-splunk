@@ -119,6 +119,20 @@ func TestNamespacedResourceReadersEscapeFinalPathSegment(t *testing.T) {
 			},
 		},
 		{
+			name: "configs conf stanza with slashes",
+			want: "/servicesNS/nobody/system/configs/conf-inputs/monitor:%2F%2F%2Fdata%2Fsyslog%2F",
+			call: func(client *Client) (*http.Response, error) {
+				return client.ReadConfigsConfObject("inputs/monitor:///data/syslog/", "nobody", "system")
+			},
+		},
+		{
+			name: "configs conf delete stanza with slashes",
+			want: "/servicesNS/nobody/system/configs/conf-props/source::%2Fdata%2Fjson%2F...",
+			call: func(client *Client) (*http.Response, error) {
+				return client.DeleteConfigsConfObject("props/source::/data/json/...", "nobody", "system")
+			},
+		},
+		{
 			name: "federated index",
 			want: "/services/data/federated/index/federated:remote-main",
 			call: func(client *Client) (*http.Response, error) {
