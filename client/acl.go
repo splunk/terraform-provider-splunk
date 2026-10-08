@@ -133,8 +133,15 @@ func (client *Client) buildAclEndpoint(queryValues url.Values, owner, app, name 
 	if rawPath == "" {
 		rawPath = endpoint.EscapedPath()
 	}
-	endpoint.Path = appendURLPathPart(endpoint.Path, "acl")
 	endpoint.RawPath = appendURLPathPart(rawPath, "acl")
+	// Derive Path from RawPath instead of appending to it separately: appendURLPathPart trims a
+	// trailing "/" from a decoded name (monitor:///var/log/), which would make Path and RawPath
+	// disagree and url.URL fall back to escaping Path, sending the name's slashes unescaped.
+	if decodedPath, err := url.PathUnescape(endpoint.RawPath); err == nil {
+		endpoint.Path = decodedPath
+	} else {
+		endpoint.Path = appendURLPathPart(endpoint.Path, "acl")
+	}
 
 	return endpoint
 }
