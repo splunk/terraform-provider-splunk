@@ -279,6 +279,7 @@ type SavedSearchObject struct {
 	ActionJiraServiceDeskParamJiraSummary              string       `json:"action.jira_service_desk.param.jira_summary,omitempty" url:"action.jira_service_desk.param.jira_summary"`
 	ActionJiraServiceDeskParamJiraPriority             string       `json:"action.jira_service_desk.param.jira_priority,omitempty" url:"action.jira_service_desk.param.jira_priority"`
 	ActionJiraServiceDeskParamJiraDescription          string       `json:"action.jira_service_desk.param.jira_description,omitempty" url:"action.jira_service_desk.param.jira_description"`
+	ActionJiraServiceDeskParamJiraDedup                string       `json:"action.jira_service_desk.param.jira_dedup,omitempty" url:"action.jira_service_desk.param.jira_dedup"`
 	ActionJiraServiceDeskParamJiraCustomfields         string       `json:"action.jira_service_desk.param.jira_customfields,omitempty" url:"action.jira_service_desk.param.jira_customfields"`
 	ActionVictoropsParamMessageType                    string       `json:"action.victorops.param.message_type,omitempty" url:"action.victorops.param.message_type"`
 	ActionVictoropsParamMonitoringTool                 string       `json:"action.victorops.param.monitoring_tool,omitempty" url:"action.victorops.param.monitoring_tool"`

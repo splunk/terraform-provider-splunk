@@ -142,6 +142,7 @@ This resource block supports the following arguments:
 - `action_jira_service_desk_param_jira_summary` - (Optional) Jira issue title/summary
 - `action_jira_service_desk_param_jira_priority` - (Optional) Jira priority of issue
 - `action_jira_service_desk_param_jira_description` - (Optional) Jira issue description
+- `action_jira_service_desk_param_jira_dedup` - (Optional) Enables Jira ticket deduplication
 - `action_jira_service_desk_param_jira_customfields` - (Optional) Jira custom fields data (see https://ta-jira-service-desk-simple-addon.readthedocs.io/en/latest/userguide.html)
 
 * `action_victorops_param_message_type` - (Optional) Type of VictorOps message. Valid values are info, warning, critical, recovery, ack

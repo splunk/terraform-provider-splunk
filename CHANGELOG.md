@@ -1,4 +1,5 @@
 ## 1.5.9
+* Feature: saved searches can configure Jira Service Desk ticket deduplication with `action_jira_service_desk_param_jira_dedup`
 * Fix: `splunk_authorization_roles` lowercases role names in API calls and state. A refresh rewrites a mixed-case id to the role name Splunk stored, so later reads, updates, and deletes find the role
 
 ## 1.5.8

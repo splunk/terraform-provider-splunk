@@ -757,6 +757,11 @@ func savedSearches() *schema.Resource {
 				Description:      "Enter the description of issue created",
 				DiffSuppressFunc: suppressDefault("The alert condition for '$name$' was triggered."),
 			},
+			"action_jira_service_desk_param_jira_dedup": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Enables Jira ticket deduplication",
+			},
 			"action_jira_service_desk_param_jira_customfields": {
 				Type:        schema.TypeString,
 				Optional:    true,
@@ -1707,6 +1712,9 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 			return err
 		}
 	}
+	if err = d.Set("action_jira_service_desk_param_jira_dedup", entry.Content.ActionJiraServiceDeskParamJiraDedup); err != nil {
+		return err
+	}
 	if err = d.Set("action_jira_service_desk_param_jira_customfields", entry.Content.ActionJiraServiceDeskParamJiraCustomfields); err != nil {
 		return err
 	}
@@ -2118,6 +2126,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionJiraServiceDeskParamJiraSummary:              d.Get("action_jira_service_desk_param_jira_summary").(string),
 		ActionJiraServiceDeskParamJiraPriority:             d.Get("action_jira_service_desk_param_jira_priority").(string),
 		ActionJiraServiceDeskParamJiraDescription:          d.Get("action_jira_service_desk_param_jira_description").(string),
+		ActionJiraServiceDeskParamJiraDedup:                d.Get("action_jira_service_desk_param_jira_dedup").(string),
 		ActionJiraServiceDeskParamJiraCustomfields:         d.Get("action_jira_service_desk_param_jira_customfields").(string),
 		ActionVictoropsParamMessageType:                    d.Get("action_victorops_param_message_type").(string),
 		ActionVictoropsParamMonitoringTool:                 d.Get("action_victorops_param_monitoring_tool").(string),
