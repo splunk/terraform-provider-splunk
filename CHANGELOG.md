@@ -1,3 +1,6 @@
+## 1.5.9
+* Fix: `splunk_authorization_roles` lowercases role names in API calls and state. A refresh rewrites a mixed-case id to the role name Splunk stored, so later reads, updates, and deletes find the role
+
 ## 1.5.8
 * Fix: saved search reads accept Splunk 10 values that are no longer JSON booleans or integers: `action.email.reportIncludeSplunkLogo` (`"1"` / `"0"`), action `maxtime` durations such as `5m`, `auto_summarize.max_time`, and empty `dispatch.indexedRealtimeOffset` / `dispatch.indexedRealtimeMinSpan`
 * Fix: saved search reads accept an empty `action.snow_event.param.severity` from the ServiceNow add-on, decoding it as 0 so later fields such as `search` stay in state. A response that still fails to decode is returned as an error

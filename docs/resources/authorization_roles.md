@@ -17,7 +17,7 @@ resource "splunk_authorization_roles" "role01" {
 For latest resource argument reference: https://docs.splunk.com/Documentation/Splunk/latest/RESTREF/RESTaccess#authorization.2Froles
 
 This resource block supports the following arguments:
-* `name` - (Required) The name of the user role to create.
+* `name` - (Required) The name of the user role to create. Splunk stores role names in lowercase. The provider lowercases this value in API calls and in state.
 * `capabilities` - (Optional) List of capabilities assigned to role.
 * `cumulative_realtime_search_jobs_quota` - (Optional) Maximum number of concurrently running real-time searches that all members of this role can have.
 * `cumulative_search_jobs_quota` - (Optional) Maximum number of concurrently running searches for all role members. Warning message logged when limit is reached.

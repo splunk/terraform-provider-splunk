@@ -16,12 +16,13 @@ func authorizationRoles() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "Required. The name of the user role to create.",
+				Type:     schema.TypeString,
+				Required: true,
+				ForceNew: true,
+				Description: "Required. The name of the user role to create. Splunk stores role names in lowercase. " +
+					"The provider lowercases this value in API calls and in state, so a name such as MyRole is stored as myrole.",
 				StateFunc: func(val interface{}) string {
-					return strings.ToLower(val.(string))
+					return canonicalAuthorizationRoleName(val.(string))
 				},
 			},
 			"capabilities": {
@@ -151,15 +152,15 @@ func authorizationRoles() *schema.Resource {
 // Functions
 func authorizationRolesCreate(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
-	name := d.Get("name").(string)
+	// SDK v1 d.Get returns the config value from before StateFunc.
+	name := canonicalAuthorizationRoleName(d.Get("name").(string))
 	authenticationUserObj := getAuthorizationRolesConfig(d)
 	err := (*provider.Client).CreateAuthorizationRoles(name, authenticationUserObj)
 	if err != nil {
 		return err
 	}
 
-	// Splunk server lowercases role names, so we store the lowercased version
-	d.SetId(strings.ToLower(name))
+	d.SetId(name)
 	return authorizationRolesRead(d, meta)
 }
 
@@ -182,21 +183,34 @@ func authorizationRolesRead(d *schema.ResourceData, meta interface{}) error {
 		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
+	// The list match is case-insensitive. The direct read, and later update and
+	// delete, must use the name Splunk stored. That heals state whose id still
+	// has the case from the configuration.
+	canonicalName := entry.Name
+	if canonicalName == "" {
+		canonicalName = canonicalAuthorizationRoleName(name)
+	}
+
 	// Now we read the input configuration with proper owner and app
-	resp, err = (*provider.Client).ReadAuthorizationRoles(name, entry.ACL.Owner, entry.ACL.App)
+	resp, err = (*provider.Client).ReadAuthorizationRoles(canonicalName, entry.ACL.Owner, entry.ACL.App)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
-	entry, err = getAuthorizationRolesByName(name, resp)
+	entry, err = getAuthorizationRolesByName(canonicalName, resp)
 	if err != nil {
 		return err
 	}
 
 	if entry == nil {
-		return fmt.Errorf("Unable to find resource: %v", name)
+		return fmt.Errorf("Unable to find resource: %v", canonicalName)
 	}
+
+	if entry.Name != "" {
+		canonicalName = entry.Name
+	}
+	d.SetId(canonicalName)
 
 	if err = d.Set("capabilities", entry.Content.Capabilities); err != nil {
 		return err
@@ -218,7 +232,7 @@ func authorizationRolesRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if err = d.Set("name", entry.Name); err != nil {
+	if err = d.Set("name", canonicalAuthorizationRoleName(canonicalName)); err != nil {
 		return err
 	}
 
@@ -300,7 +314,7 @@ func getAuthorizationRolesConfig(d *schema.ResourceData) (authenticationUserObje
 			authenticationUserObject.ImportedRoles = append(authenticationUserObject.ImportedRoles, v.(string))
 		}
 	}
-	authenticationUserObject.Name = d.Get("name").(string)
+	authenticationUserObject.Name = canonicalAuthorizationRoleName(d.Get("name").(string))
 	authenticationUserObject.RtSrchJobsQuota = d.Get("realtime_search_jobs_quota").(int)
 	authenticationUserObject.SrchDiskQuota = d.Get("search_disk_quota").(int)
 	authenticationUserObject.SrchFilter = d.Get("search_filter").(string)
@@ -317,6 +331,10 @@ func getAuthorizationRolesConfig(d *schema.ResourceData) (authenticationUserObje
 	authenticationUserObject.SrchJobsQuota = d.Get("search_jobs_quota").(int)
 	authenticationUserObject.SrchTimeWin = d.Get("search_time_win").(int)
 	return authenticationUserObject
+}
+
+func canonicalAuthorizationRoleName(name string) string {
+	return strings.ToLower(name)
 }
 
 func getAuthorizationRolesByName(name string, httpResponse *http.Response) (AuthorizationRolesEntry *models.AuthorizationRolesEntry, err error) {
