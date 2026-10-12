@@ -25,6 +25,8 @@ func adminProxyssoGroups() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+				// hashes a serialized value and stores a different state key.
+				Set:         schema.HashString,
 				Description: "Required. Set of internal Splunk roles assigned to the group. Order does not matter.",
 			},
 		},

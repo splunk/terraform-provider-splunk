@@ -39,6 +39,9 @@ func TestAdminProxyssoGroupsSchema(t *testing.T) {
 	if !roles.Required || roles.Optional || roles.Computed || roles.Type != schema.TypeSet {
 		t.Fatalf("roles schema = required %v optional %v computed %v type %v", roles.Required, roles.Optional, roles.Computed, roles.Type)
 	}
+	if roles.Set == nil || roles.Set("admin") != schema.HashString("admin") {
+		t.Fatal("roles must use schema.HashString so acceptance checks find roles.<hash>")
+	}
 
 	p := Provider().(*schema.Provider)
 	if _, ok := p.ResourcesMap["splunk_admin_proxysso_groups"]; !ok {
