@@ -74,7 +74,7 @@ func providerSchema() map[string]*schema.Schema {
 			Optional:     true,
 			DefaultFunc:  schema.EnvDefaultFunc("SPLUNK_ACL_GET_MODE", "enterprise"),
 			ValidateFunc: validation.StringInSlice([]string{client.ACLGetModeCloud, "enterprise"}, false),
-			Description: "For splunk_generic_acl GET .../acl: \"enterprise\" (default) omits owner/sharing query parameters; \"cloud\" includes them.",
+			Description:  "For splunk_generic_acl GET .../acl: \"enterprise\" (default) omits owner/sharing query parameters; \"cloud\" includes them.",
 		},
 	}
 }
@@ -82,6 +82,7 @@ func providerSchema() map[string]*schema.Schema {
 // Returns a map of splunk resources for configuration
 func providerResources() map[string]*schema.Resource {
 	return map[string]*schema.Resource{
+		"splunk_admin_proxysso_groups":       adminProxyssoGroups(),
 		"splunk_admin_saml_groups":           adminSAMLGroups(),
 		"splunk_apps_local":                  appsLocal(),
 		"splunk_authentication_users":        authenticationUsers(),
