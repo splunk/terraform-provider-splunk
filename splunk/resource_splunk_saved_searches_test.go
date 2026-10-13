@@ -482,13 +482,14 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 			},
 			{
 				// Recreate a saved search deleted outside Terraform, then keep the in-place update below.
+				// The fixture ACL places the object in admin/launcher; nobody/search does not contain it.
 				PreConfig: func() {
 					deleteAndWaitForNotFound(t,
 						func(c *client.Client) (*http.Response, error) {
-							return c.DeleteSavedSearches("Test New Alert", "nobody", "search")
+							return c.DeleteSavedSearches("Test New Alert", "admin", "launcher")
 						},
 						func(c *client.Client) url.URL {
-							return c.BuildSplunkURLWithEscapedPathPart(nil, "Test New Alert", "servicesNS", "nobody", "search", "saved", "searches")
+							return c.BuildSplunkURLWithEscapedPathPart(nil, "Test New Alert", "servicesNS", "admin", "launcher", "saved", "searches")
 						},
 					)
 				},
