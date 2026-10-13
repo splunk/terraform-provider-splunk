@@ -230,6 +230,43 @@ func TestBuildSplunkURLHTTPScheme(t *testing.T) {
 	}
 }
 
+func TestBuildSplunkURLCount(t *testing.T) {
+	client, err := NewDefaultSplunkdClient()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		name   string
+		values url.Values
+		count  string
+	}{
+		{name: "nil values", values: nil, count: "-1"},
+		{name: "missing count", values: url.Values{"datatype": {"all"}}, count: "-1"},
+		{name: "explicit count", values: url.Values{"count": {"10"}}, count: "10"},
+		{name: "count zero", values: url.Values{"count": {"0"}}, count: "0"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := client.BuildSplunkURL(tt.values, "services", "data", "indexes")
+			q, err := url.ParseQuery(got.RawQuery)
+			if err != nil {
+				t.Fatalf("parse query: %v", err)
+			}
+			if q.Get("output_mode") != "json" {
+				t.Errorf("output_mode = %q, want json", q.Get("output_mode"))
+			}
+			if q.Get("count") != tt.count {
+				t.Errorf("count = %q, want %q", q.Get("count"), tt.count)
+			}
+			if tt.name == "missing count" && q.Get("datatype") != "all" {
+				t.Errorf("datatype = %q, want all", q.Get("datatype"))
+			}
+		})
+	}
+}
+
 func TestNewSplunkdHTTPClient(t *testing.T) {
 	timeout := time.Second * 10
 	skipValidateTLS := true
