@@ -25,6 +25,10 @@ In addition to all arguments above, This resource block exports the following ar
 
 * `id` - The ID of the dashboard
 
+## Timeouts
+
+* `create` - (Default `1m`) How long to retry while a new dashboard is not yet visible on every search head cluster member: a create that returns 409 for a dashboard just deleted by a replace, or a read back that returns 404.
+
 ## Import
 
 Dashboards/views in the default namespace can be imported by name:

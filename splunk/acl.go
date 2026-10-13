@@ -203,3 +203,11 @@ func flattenACL(acl *models.ACLObject) []interface{} {
 
 	return []interface{}{m}
 }
+
+// sharedObjectOwner uses nobody for app and global objects, so objects owned by other users can be read
+func sharedObjectOwner(aclObject *models.ACLObject) string {
+	if aclObject.Sharing == "app" || aclObject.Sharing == "global" {
+		return "nobody"
+	}
+	return aclObject.Owner
+}

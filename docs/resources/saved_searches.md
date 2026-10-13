@@ -230,6 +230,10 @@ In addition to all arguments above, This resource block exports the following ar
 
 - `id` - The ID of the saved search resource
 
+## Timeouts
+
+- `create` - (Default `1m`) How long to retry while a new saved search is not yet visible on every search head cluster member: a create that returns 409 for a saved search just deleted by a replace, or an ACL update or read back that returns 404.
+
 ## Import
 
 Saved searches in the default namespace can be imported by name:

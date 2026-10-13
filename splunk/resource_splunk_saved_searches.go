@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/splunk/terraform-provider-splunk/client/models"
@@ -1293,6 +1295,9 @@ func savedSearches() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: savedSearchesImportState,
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(defaultReplicationTimeout),
+		},
 	}
 
 }
@@ -1336,13 +1341,19 @@ func savedSearchesCreate(d *schema.ResourceData, meta interface{}) error {
 	name := d.Get("name").(string)
 	savedSearchesConfig := getSavedSearchesConfig(d)
 	aclObject := getResourceDataSearchACL(d)
-	err := (*provider.Client).CreateSavedSearches(name, aclObject.Owner, aclObject.App, savedSearchesConfig)
+	// retry 409 as a saved search deleted by replace may still exist on other cluster members
+	_, err := retryOnStatus(d.Timeout(schema.TimeoutCreate), http.StatusConflict, func() (*http.Response, error) {
+		return (*provider.Client).CreateSavedSearches(name, aclObject.Owner, aclObject.App, savedSearchesConfig)
+	})
 	if err != nil {
 		return err
 	}
 
 	if _, ok := d.GetOk("acl"); ok {
-		if err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "saved", "searches"); err != nil {
+		err := resource.Retry(d.Timeout(schema.TimeoutCreate), func() *resource.RetryError {
+			return resource.RetryableError((*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "saved", "searches"))
+		})
+		if err != nil {
 			return fmt.Errorf("savedSearchesCreate: updateacl: %s\n%#v", err, aclObject)
 		}
 	}
@@ -1357,8 +1368,15 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 
 	aclObject := getResourceDataSearchACL(d)
 
-	resp, err := (*provider.Client).ReadSavedSearches(name, aclObject.Owner, aclObject.App)
+	resp, err := readKnowledgeObject(d, func() (*http.Response, error) {
+		return (*provider.Client).ReadSavedSearches(name, sharedObjectOwner(aclObject), aclObject.App)
+	})
 	if err != nil {
+		if hasStatus(resp, http.StatusNotFound) && !d.IsNewResource() {
+			log.Printf("[WARN] Saved search %s not found, removing from state", name)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 	defer resp.Body.Close()
@@ -1976,10 +1994,12 @@ func savedSearchesUpdate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	// Update ACL
-	err = (*provider.Client).UpdateAcl(owner, aclObject.App, d.Id(), aclObject, "saved", "searches")
-	if err != nil {
-		return err
+	// changing acl needs owner or admin rights, so only send it when it changed
+	if d.HasChange("acl") {
+		err = (*provider.Client).UpdateAcl(owner, aclObject.App, d.Id(), aclObject, "saved", "searches")
+		if err != nil {
+			return err
+		}
 	}
 
 	return savedSearchesRead(d, meta)
@@ -1988,7 +2008,10 @@ func savedSearchesUpdate(d *schema.ResourceData, meta interface{}) error {
 func savedSearchesDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	aclObject := getACLConfig(d.Get("acl").([]interface{}))
-	resp, err := (*provider.Client).DeleteSavedSearches(d.Id(), aclObject.Owner, aclObject.App)
+	resp, err := (*provider.Client).DeleteSavedSearches(d.Id(), sharedObjectOwner(aclObject), aclObject.App)
+	if hasStatus(resp, http.StatusNotFound) {
+		return nil
+	}
 	if err != nil {
 		return err
 	}

@@ -38,6 +38,9 @@ func splunkDashboards() *schema.Resource {
 		Importer: &schema.ResourceImporter{
 			State: splunkDashboardsImportState,
 		},
+		Timeouts: &schema.ResourceTimeout{
+			Create: schema.DefaultTimeout(defaultReplicationTimeout),
+		},
 	}
 }
 
@@ -62,7 +65,10 @@ func splunkDashboardsCreate(d *schema.ResourceData, meta interface{}) error {
 	splunkDashboardsObj := getSplunkDashboardsConfig(d)
 	aclObject := getResourceDataViewACL(d)
 
-	err := (*provider.Client).CreateDashboardObject(aclObject.Owner, aclObject.App, splunkDashboardsObj)
+	// retry 409 as a dashboard deleted by replace may still exist on other cluster members
+	_, err := retryOnStatus(d.Timeout(schema.TimeoutCreate), http.StatusConflict, func() (*http.Response, error) {
+		return (*provider.Client).CreateDashboardObject(aclObject.Owner, aclObject.App, splunkDashboardsObj)
+	})
 	if err != nil {
 		return err
 	}
@@ -101,8 +107,15 @@ func splunkDashboardsRead(d *schema.ResourceData, meta interface{}) error {
 		readUser = aclObject.Owner
 	}
 
-	resp, err := (*provider.Client).ReadDashboardObject(name, readUser, aclObject.App)
+	resp, err := readKnowledgeObject(d, func() (*http.Response, error) {
+		return (*provider.Client).ReadDashboardObject(name, readUser, aclObject.App)
+	})
 	if err != nil {
+		if hasStatus(resp, http.StatusNotFound) && !d.IsNewResource() {
+			log.Printf("[WARN] Dashboard %s not found, removing from state", name)
+			d.SetId("")
+			return nil
+		}
 		return err
 	}
 	defer resp.Body.Close()
@@ -149,8 +162,11 @@ func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if err := (*provider.Client).UpdateAcl(updateUser, aclObject.App, name, aclObject, "data", "ui", "views"); err != nil {
-		return err
+	// changing acl needs owner or admin rights, so only send it when it changed
+	if d.HasChange("acl") {
+		if err := (*provider.Client).UpdateAcl(updateUser, aclObject.App, name, aclObject, "data", "ui", "views"); err != nil {
+			return err
+		}
 	}
 
 	return splunkDashboardsRead(d, meta)
@@ -164,6 +180,9 @@ func splunkDashboardsDelete(d *schema.ResourceData, meta interface{}) error {
 		aclObject.Owner = "nobody"
 	}
 	resp, err := (*provider.Client).DeleteDashboardObject(aclObject.Owner, aclObject.App, name)
+	if hasStatus(resp, http.StatusNotFound) {
+		return nil
+	}
 	if err != nil {
 		return err
 	}
