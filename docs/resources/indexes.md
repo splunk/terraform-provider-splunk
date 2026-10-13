@@ -26,7 +26,7 @@ This resource block supports the following arguments:
                                                 less than 2GB RAM = 67108864 (64MB) tsidx
                                                 2GB to 8GB RAM = 134217728 (128MB) tsidx
                                                 more than 8GB RAM = 268435456 (256MB) tsidx<br>
-                                            Values other than "auto" must be 16MB-1GB. Highest legal value (of the numerical part) is 4294967295 You can specify the value using a size suffix: "16777216" or "16MB" are equivalent.
+                                            Values other than "auto" must be 16MB-1GB. Highest legal value (of the numerical part) is 4294967295 You can specify the value using a size suffix: "16777216" or "16MB" are equivalent. A refresh treats a size suffix and the same byte count as equal.
 * `cold_path` - (Optional) An absolute path that contains the colddbs for the index. The path must be readable and writable. Cold databases are opened as needed when searching.
 * `cold_to_frozen_dir` - (Optional) Destination path for the frozen archive. Use as an alternative to a coldToFrozenScript. Splunk software automatically puts frozen buckets in this directory.
                                     <br>
@@ -57,6 +57,7 @@ This number should be increased if instructed by Splunk Support. Typically the d
 Use "auto_high_volume" for high volume indexes (such as the main index); otherwise, use "auto". A "high volume index" would typically be considered one that gets over 10GB of data per day.
 * `max_hot_buckets` - (Optional) Maximum hot buckets that can exist per index. Defaults to 3.
 <br>When maxHotBuckets is exceeded, Splunk software rolls the least recently used (LRU) hot bucket to warm. Both normal hot buckets and quarantined hot buckets count towards this total. This setting operates independently of maxHotIdleSecs, which can also cause hot buckets to roll.
+<br>Splunk 8.2 and later can return this as a numeric string or as `"auto"`. `"auto"` means 3. This argument stays a number, so `max_hot_buckets = 6` remains valid.
 * `max_hot_idle_secs` - (Optional) Maximum life, in seconds, of a hot bucket. Defaults to 0. If a hot bucket exceeds maxHotIdleSecs, Splunk software rolls it to warm. This setting operates independently of maxHotBuckets, which can also cause hot buckets to roll. A value of 0 turns off the idle check (equivalent to INFINITE idle time).
 * `max_hot_span_secs` - (Optional) Upper bound of target maximum timespan of hot/warm buckets in seconds. Defaults to 7776000 seconds (90 days).
 * `max_mem_mb` - (Optional) The amount of memory, expressed in MB, to allocate for buffering a single tsidx file into memory before flushing to disk. Defaults to 5. The default is recommended for all environments.
@@ -90,6 +91,7 @@ To disable, set to 0, but this is NOT recommended. Highest legal value is 214748
 * `rep_factor` - (Optional) Index replication control. This parameter applies to only clustering slaves.
                             auto = Use the master index replication configuration value.
                             0 = Turn off replication for this index.
+                            Splunk returns 0 for both values. Terraform sends the value you set, and a later refresh does not plan a change between `0` and `auto`.
 * `rotate_period_in_secs` - (Optional) How frequently (in seconds) to check if a new hot bucket needs to be created. Also, how frequently to check if there are any warm/cold buckets that should be rolled/frozen.
 * `service_meta_period` - (Optional) Defines how frequently metadata is synced to disk, in seconds. Defaults to 25 (seconds).
                                      You may want to set this to a higher value if the sum of your metadata file sizes is larger than many tens of megabytes, to avoid the hit on I/O in the indexing fast path.
