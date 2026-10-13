@@ -152,7 +152,7 @@ func testAccSplunkDashboardDestroyResources(s *terraform.State) error {
 const dashboardEntry = `{"entry":[{"name":"terraform","acl":{"app":"search","owner":"admin","sharing":"app"},"content":{"eai:data":"<dashboard/>"}}]}`
 
 func TestSplunkDashboardsCreateWaitsForReplication(t *testing.T) {
-	var creates, reads int
+	var creates, acls, reads int
 	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
 		switch {
 		case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/data/ui/views":
@@ -161,7 +161,11 @@ func TestSplunkDashboardsCreateWaitsForReplication(t *testing.T) {
 				return jsonResponse(http.StatusConflict, `{"messages":[{"type":"ERROR","text":"An object with name=terraform already exists"}]}`), nil
 			}
 			return jsonResponse(http.StatusCreated, "{}"), nil
-		case r.Method == http.MethodPost && strings.HasSuffix(r.URL.Path, "/acl"):
+		case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/nobody/search/data/ui/views/terraform/acl":
+			acls++
+			if acls == 1 {
+				return notFoundResponse(), nil
+			}
 			return jsonResponse(http.StatusOK, "{}"), nil
 		case r.Method == http.MethodGet && r.URL.Path == "/servicesNS/nobody/search/data/ui/views/terraform":
 			reads++
@@ -191,8 +195,8 @@ func TestSplunkDashboardsCreateWaitsForReplication(t *testing.T) {
 	if state.ID != "terraform" || state.Attributes["eai_data"] != "<dashboard/>" {
 		t.Errorf("state = %v", state)
 	}
-	if creates != 2 || reads != 2 {
-		t.Errorf("creates = %d, reads = %d, want 2 and 2", creates, reads)
+	if creates != 2 || acls != 2 || reads != 2 {
+		t.Errorf("creates = %d, acls = %d, reads = %d, want 2 each", creates, acls, reads)
 	}
 }
 
@@ -326,6 +330,7 @@ func TestSplunkDashboardsTimeoutsKeepExistingStateUnchanged(t *testing.T) {
 func TestSplunkDashboardsUpdateSendsACLOnlyWhenChanged(t *testing.T) {
 	eaiData, write := "<dashboard/>", "admin"
 	var aclRequests int
+	var aclPath string
 	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
 		if r.Method == http.MethodPost {
 			body, err := io.ReadAll(r.Body)
@@ -338,6 +343,7 @@ func TestSplunkDashboardsUpdateSendsACLOnlyWhenChanged(t *testing.T) {
 			}
 			if strings.HasSuffix(r.URL.Path, "/acl") {
 				aclRequests++
+				aclPath = r.URL.Path
 				write = form.Get("perms.write")
 			} else if form.Has("eai:data") {
 				eaiData = form.Get("eai:data")
@@ -377,5 +383,8 @@ func TestSplunkDashboardsUpdateSendsACLOnlyWhenChanged(t *testing.T) {
 	apply(state, "<form/>", "power")
 	if aclRequests != 1 {
 		t.Errorf("acl requests = %d after an acl change, want 1", aclRequests)
+	}
+	if aclPath != "/servicesNS/nobody/search/data/ui/views/terraform/acl" {
+		t.Errorf("acl path = %q, want the nobody namespace", aclPath)
 	}
 }

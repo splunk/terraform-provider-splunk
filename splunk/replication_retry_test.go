@@ -9,7 +9,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/splunk/terraform-provider-splunk/client"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
 type roundTripFunc func(*http.Request) (*http.Response, error)
@@ -116,6 +118,58 @@ func TestRetryUpdateAclRetriesNotFound(t *testing.T) {
 	}
 	if calls != 2 {
 		t.Fatalf("calls = %d, want 2", calls)
+	}
+}
+
+func TestReplicationTimeoutUsesRemainingCreateBudget(t *testing.T) {
+	d := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"name":   "alert",
+		"search": "index=main",
+	})
+	d.MarkNewResource()
+	if got := replicationTimeout(d); got != 20*time.Minute {
+		t.Fatalf("timeout without a deadline = %s, want the provider default", got)
+	}
+
+	createDeadlines.Store(d, time.Now().Add(2*time.Second))
+	t.Cleanup(func() { createDeadlines.Delete(d) })
+	if got := replicationTimeout(d); got <= 0 || got > 2*time.Second {
+		t.Fatalf("timeout = %s, want the remaining create budget", got)
+	}
+
+	createDeadlines.Store(d, time.Now().Add(-time.Second))
+	if got := replicationTimeout(d); got != 0 {
+		t.Fatalf("expired timeout = %s, want 0", got)
+	}
+
+	refresh := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"name":   "alert",
+		"search": "index=main",
+	})
+	refresh.SetId("alert")
+	createDeadlines.Store(refresh, time.Now().Add(time.Minute))
+	t.Cleanup(func() { createDeadlines.Delete(refresh) })
+	if got := replicationTimeout(refresh); got != replicationRefreshTimeout {
+		t.Fatalf("refresh timeout = %s, want %s", got, replicationRefreshTimeout)
+	}
+}
+
+func TestSharedObjectOwner(t *testing.T) {
+	tests := []struct {
+		sharing string
+		owner   string
+		want    string
+	}{
+		{"user", "jdoe", "jdoe"},
+		{"app", "jdoe", "nobody"},
+		{"global", "jdoe", "nobody"},
+		{"", "admin", "nobody"},
+	}
+	for _, tt := range tests {
+		got := sharedObjectOwner(&models.ACLObject{Sharing: tt.sharing, Owner: tt.owner})
+		if got != tt.want {
+			t.Errorf("sharing %q owner %q = %q, want %q", tt.sharing, tt.owner, got, tt.want)
+		}
 	}
 }
 
