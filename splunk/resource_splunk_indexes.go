@@ -2,14 +2,15 @@ package splunk
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
 	"regexp"
+	"strconv"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
 func index() *schema.Resource {
@@ -24,9 +25,10 @@ func index() *schema.Resource {
 				A recommended value is 100.`,
 			},
 			"bucket_rebuild_memory_hint": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:             schema.TypeString,
+				Optional:         true,
+				Computed:         true,
+				DiffSuppressFunc: suppressBucketRebuildMemoryHintDiff,
 				Description: `Suggestion for the bucket rebuild process for the size of the time-series (tsidx) file to make.
 				Caution: This is an advanced parameter. Inappropriate use of this parameter causes splunkd to not start if rebuild is required. Do not set this parameter unless instructed by Splunk Support.
 
@@ -38,7 +40,8 @@ func index() *schema.Resource {
 
 				Values other than "auto" must be 16MB-1GB. Highest legal value (of the numerical part) is 4294967295
 
-				You can specify the value using a size suffix: "16777216" or "16MB" are equivalent.`,
+				You can specify the value using a size suffix: "16777216" or "16MB" are equivalent.
+				Splunk may return this value as a string or as an integer byte count. A refresh treats those spellings as the same value.`,
 			},
 			"cold_path": {
 				Type:     schema.TypeString,
@@ -150,7 +153,8 @@ func index() *schema.Resource {
 				Optional: true,
 				Computed: true,
 				Description: `Maximum hot buckets that can exist per index. Defaults to 3.
-				When maxHotBuckets is exceeded, Splunk software rolls the least recently used (LRU) hot bucket to warm. Both normal hot buckets and quarantined hot buckets count towards this total. This setting operates independently of maxHotIdleSecs, which can also cause hot buckets to roll.`,
+				When maxHotBuckets is exceeded, Splunk software rolls the least recently used (LRU) hot bucket to warm. Both normal hot buckets and quarantined hot buckets count towards this total. This setting operates independently of maxHotIdleSecs, which can also cause hot buckets to roll.
+				Splunk 8.2 and later can return this as a numeric string or as "auto". "auto" means 3. This argument stays an integer, so max_hot_buckets = 6 remains valid.`,
 			},
 			"max_hot_idle_secs": {
 				Type:     schema.TypeInt,
@@ -284,13 +288,16 @@ func index() *schema.Resource {
 				WARNING: This is an advanced parameter. Only change it if you are instructed to do so by Splunk Support.`,
 			},
 			"rep_factor": {
-				Type:     schema.TypeString,
-				Optional: true,
-				Computed: true,
+				Type:             schema.TypeString,
+				Optional:         true,
+				Computed:         true,
+				DiffSuppressFunc: suppressRepFactorDiff,
 				Description: `Index replication control. This parameter applies to only clustering slaves.
 				auto = Use the master index replication configuration value.
 
-				0 = Turn off replication for this index.`,
+				0 = Turn off replication for this index.
+
+				Splunk returns 0 for both configured values. Terraform sends the value you set, and a later refresh does not plan a change between 0 and auto.`,
 			},
 			"rotate_period_in_secs": {
 				Type:        schema.TypeInt,
@@ -438,7 +445,7 @@ func indexRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if err = d.Set("bucket_rebuild_memory_hint", entry.Content.BucketRebuildMemoryHint); err != nil {
+	if err = d.Set("bucket_rebuild_memory_hint", bucketRebuildForState(string(entry.Content.BucketRebuildMemoryHint), d.Get("bucket_rebuild_memory_hint").(string))); err != nil {
 		return err
 	}
 
@@ -486,7 +493,7 @@ func indexRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if err = d.Set("max_hot_buckets", entry.Content.MaxHotBuckets); err != nil {
+	if err = d.Set("max_hot_buckets", int(entry.Content.MaxHotBuckets)); err != nil {
 		return err
 	}
 
@@ -554,7 +561,7 @@ func indexRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	if err = d.Set("rep_factor", entry.Content.RepFactor); err != nil {
+	if err = d.Set("rep_factor", repFactorForState(string(entry.Content.RepFactor), d.Get("rep_factor").(string))); err != nil {
 		return err
 	}
 
@@ -631,9 +638,8 @@ func indexDelete(d *schema.ResourceData, meta interface{}) error {
 
 	default:
 		errorResponse := &models.IndexResponse{}
-		_ = json.NewDecoder(resp.Body).Decode(errorResponse)
-		err := errors.New(errorResponse.Messages[0].Text)
-		return err
+		decodeErr := json.NewDecoder(resp.Body).Decode(errorResponse)
+		return indexAPIError("deleting index "+d.Id(), resp.StatusCode, errorResponse.Messages, decodeErr)
 	}
 }
 
@@ -641,7 +647,7 @@ func indexDelete(d *schema.ResourceData, meta interface{}) error {
 func getIndexConfig(d *schema.ResourceData) (indexConfigObject *models.IndexObject) {
 	indexConfigObject = &models.IndexObject{}
 	indexConfigObject.BlockSignSize = d.Get("block_sign_size").(int)
-	indexConfigObject.BucketRebuildMemoryHint = d.Get("bucket_rebuild_memory_hint").(string)
+	indexConfigObject.BucketRebuildMemoryHint = models.FlexString(d.Get("bucket_rebuild_memory_hint").(string))
 	indexConfigObject.ColdPath = d.Get("cold_path").(string)
 	indexConfigObject.ColdToFrozenDir = d.Get("cold_to_frozen_dir").(string)
 	indexConfigObject.ColdToFrozenScript = d.Get("cold_to_frozen_script").(string)
@@ -653,7 +659,7 @@ func getIndexConfig(d *schema.ResourceData) (indexConfigObject *models.IndexObje
 	indexConfigObject.MaxBloomBackfillBucketAge = d.Get("max_bloom_backfill_bucket_age").(string)
 	indexConfigObject.MaxConcurrentOptimizes = d.Get("max_concurrent_optimizes").(int)
 	indexConfigObject.MaxDataSize = d.Get("max_data_size").(string)
-	indexConfigObject.MaxHotBuckets = d.Get("max_hot_buckets").(int)
+	indexConfigObject.MaxHotBuckets = models.FlexHotBuckets(d.Get("max_hot_buckets").(int))
 	indexConfigObject.MaxHotIdleSecs = d.Get("max_hot_idle_secs").(int)
 	indexConfigObject.MaxHotSpanSecs = d.Get("max_hot_span_secs").(int)
 	indexConfigObject.MaxMemMB = d.Get("max_mem_mb").(int)
@@ -669,7 +675,7 @@ func getIndexConfig(d *schema.ResourceData) (indexConfigObject *models.IndexObje
 	indexConfigObject.QuarantineFutureSecs = d.Get("quarantine_future_secs").(int)
 	indexConfigObject.QuarantinePastSecs = d.Get("quarantine_past_secs").(int)
 	indexConfigObject.RawChunkSizeBytes = d.Get("raw_chunk_size_bytes").(int)
-	indexConfigObject.RepFactor = d.Get("rep_factor").(string)
+	indexConfigObject.RepFactor = models.FlexString(d.Get("rep_factor").(string))
 	indexConfigObject.RotatePeriodInSecs = d.Get("rotate_period_in_secs").(int)
 	indexConfigObject.ServiceMetaPeriod = d.Get("service_meta_period").(int)
 	indexConfigObject.SyncMeta = d.Get("sync_meta").(bool)
@@ -684,7 +690,9 @@ func getIndexConfigByName(name string, httpResponse *http.Response) (indexEntry 
 	response := &models.IndexResponse{}
 	switch httpResponse.StatusCode {
 	case 200, 201:
-		_ = json.NewDecoder(httpResponse.Body).Decode(&response)
+		if err := json.NewDecoder(httpResponse.Body).Decode(response); err != nil {
+			return nil, fmt.Errorf("decoding index %s: %w", name, err)
+		}
 		re := regexp.MustCompile(`(.*)`)
 		for _, entry := range response.Entry {
 			if name == re.FindStringSubmatch(entry.Name)[1] {
@@ -693,12 +701,99 @@ func getIndexConfigByName(name string, httpResponse *http.Response) (indexEntry 
 		}
 
 	default:
-		_ = json.NewDecoder(httpResponse.Body).Decode(response)
-		err := errors.New(response.Messages[0].Text)
-		return indexEntry, err
+		decodeErr := json.NewDecoder(httpResponse.Body).Decode(response)
+		return nil, indexAPIError("reading index "+name, httpResponse.StatusCode, response.Messages, decodeErr)
 	}
 
 	return indexEntry, nil
+}
+
+// indexAPIError reports a Splunk error response. A decode failure names the
+// HTTP status. An empty messages array is returned as the status as well,
+// because indexing Messages[0] panics when Splunk sends no message.
+func indexAPIError(action string, status int, messages []models.ErrorMessage, decodeErr error) error {
+	if decodeErr != nil {
+		return fmt.Errorf("%s: HTTP %d: decoding response: %w", action, status, decodeErr)
+	}
+	if len(messages) == 0 || messages[0].Text == "" {
+		return fmt.Errorf("%s: HTTP %d", action, status)
+	}
+	return fmt.Errorf("%s: %s", action, messages[0].Text)
+}
+
+// suppressRepFactorDiff hides the read-back ambiguity between repFactor 0 and
+// auto. Splunk returns 0 for both. An empty value still plans, so the first
+// apply sends whichever one is configured.
+func suppressRepFactorDiff(k, old, new string, d *schema.ResourceData) bool {
+	if strings.TrimSpace(old) == "" || strings.TrimSpace(new) == "" {
+		return false
+	}
+	return repFactorAmbiguous(old) && repFactorAmbiguous(new)
+}
+
+func repFactorAmbiguous(value string) bool {
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "0", "auto":
+		return true
+	default:
+		return false
+	}
+}
+
+// repFactorForState keeps a configured 0 or auto when Splunk answers with the
+// other spelling of the same ambiguous value.
+func repFactorForState(apiValue, stateValue string) string {
+	if repFactorAmbiguous(apiValue) && repFactorAmbiguous(stateValue) {
+		return stateValue
+	}
+	return apiValue
+}
+
+// suppressBucketRebuildMemoryHintDiff treats a size suffix and its byte count
+// as the same value, so "16MB" and "16777216" do not plan forever.
+func suppressBucketRebuildMemoryHintDiff(k, old, new string, d *schema.ResourceData) bool {
+	oldN, oldOK := bucketRebuildBytes(old)
+	newN, newOK := bucketRebuildBytes(new)
+	if !oldOK || !newOK {
+		return false
+	}
+	return oldN == newN
+}
+
+// bucketRebuildForState keeps the configured spelling when Splunk returns the
+// same size as an integer byte count.
+func bucketRebuildForState(apiValue, stateValue string) string {
+	apiN, apiOK := bucketRebuildBytes(apiValue)
+	stateN, stateOK := bucketRebuildBytes(stateValue)
+	if apiOK && stateOK && apiN == stateN {
+		return stateValue
+	}
+	return apiValue
+}
+
+func bucketRebuildBytes(value string) (int64, bool) {
+	value = strings.TrimSpace(value)
+	if value == "" || strings.EqualFold(value, "auto") {
+		return 0, false
+	}
+	mult := int64(1)
+	upper := strings.ToUpper(value)
+	switch {
+	case strings.HasSuffix(upper, "KB"):
+		mult = 1024
+		value = strings.TrimSpace(value[:len(value)-2])
+	case strings.HasSuffix(upper, "MB"):
+		mult = 1024 * 1024
+		value = strings.TrimSpace(value[:len(value)-2])
+	case strings.HasSuffix(upper, "GB"):
+		mult = 1024 * 1024 * 1024
+		value = strings.TrimSpace(value[:len(value)-2])
+	}
+	n, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return 0, false
+	}
+	return n * mult, true
 }
 
 // dropDeletedResource removes an existing object from state when Splunk no longer
