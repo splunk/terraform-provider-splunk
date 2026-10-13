@@ -402,20 +402,36 @@ func indexRead(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
+	// BuildSplunkURL requests every index (count=-1). A name missing from that
+	// list was deleted outside Terraform, so drop it and let the next apply recreate it.
 	if entry == nil {
+		if dropDeletedResource(d) {
+			return nil
+		}
 		return fmt.Errorf("Unable to find resource: %s", name)
 	}
 
 	// Now we read the input configuration with proper owner and app
-	resp, err = (*provider.Client).ReadIndexObject(name, entry.ACL.Owner, entry.ACL.App)
+	detail, err := (*provider.Client).ReadIndexObject(name, entry.ACL.Owner, entry.ACL.App)
+	if detail != nil {
+		defer detail.Body.Close()
+	}
+	if err != nil {
+		if detail != nil && detail.StatusCode == http.StatusNotFound && dropDeletedResource(d) {
+			return nil
+		}
+		return err
+	}
+
+	entry, err = getIndexConfigByName(name, detail)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
-
-	entry, err = getIndexConfigByName(name, resp)
-	if err != nil {
-		return err
+	if entry == nil {
+		if dropDeletedResource(d) {
+			return nil
+		}
+		return fmt.Errorf("Unable to find resource: %s", name)
 	}
 
 	if err = d.Set("block_sign_size", entry.Content.BlockSignSize); err != nil {
@@ -683,4 +699,15 @@ func getIndexConfigByName(name string, httpResponse *http.Response) (indexEntry 
 	}
 
 	return indexEntry, nil
+}
+
+// dropDeletedResource removes an existing object from state when Splunk no longer
+// has it, so the next apply recreates it. A create whose read cannot see the
+// new object still fails.
+func dropDeletedResource(d *schema.ResourceData) bool {
+	if d.IsNewResource() {
+		return false
+	}
+	d.SetId("")
+	return true
 }
