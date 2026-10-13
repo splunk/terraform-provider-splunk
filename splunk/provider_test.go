@@ -1,6 +1,7 @@
 package splunk
 
 import (
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"testing"
@@ -103,6 +104,19 @@ func newTestClient() (*client.Client, error) {
 		host,
 		"",
 		http)
+}
+
+func httpTestProvider(t *testing.T, server *httptest.Server) *SplunkProvider {
+	t.Helper()
+	backend, err := url.Parse(server.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	api, err := client.NewSplunkdClient("", [2]string{}, backend.Host, "", server.Client())
+	if err != nil {
+		t.Fatal(err)
+	}
+	return &SplunkProvider{Client: api}
 }
 
 func testAccPreCheck(t *testing.T) {

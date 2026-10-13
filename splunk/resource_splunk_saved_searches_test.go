@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"reflect"
 	"strconv"
@@ -1014,6 +1015,79 @@ func TestGetSavedSearchesConfigByNameDecodeError(t *testing.T) {
 	if entry != nil {
 		t.Fatalf("getSavedSearchesConfigByName entry = %#v, want nil", entry)
 	}
+}
+
+func TestSavedSearchesDeleteReturnsClientError(t *testing.T) {
+	t.Setenv("HTTPScheme", "http")
+
+	tests := []struct {
+		name string
+		body string
+	}{
+		{
+			name: "splunk message",
+			body: `{"messages":[{"type":"ERROR","text":"Could not find object id=alert"}]}`,
+		},
+		{
+			name: "empty messages",
+			body: `{"messages":[]}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got string
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				got = r.Method + " " + r.URL.EscapedPath()
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusBadRequest)
+				_, _ = io.WriteString(w, tt.body)
+			}))
+			defer server.Close()
+
+			d := savedSearchDeleteResourceData(t)
+			err := savedSearchesDelete(d, httpTestProvider(t, server))
+			if err == nil {
+				t.Fatal("savedSearchesDelete error = nil, want the client status error")
+			}
+			if !strings.Contains(err.Error(), "400 Bad Request") || !strings.Contains(err.Error(), tt.body) {
+				t.Fatalf("savedSearchesDelete error = %q, want status and response body", err)
+			}
+			const want = "DELETE /servicesNS/admin/search/saved/searches/alert"
+			if got != want {
+				t.Fatalf("request = %q, want %q", got, want)
+			}
+		})
+	}
+}
+
+func TestSavedSearchesDeleteSucceeds(t *testing.T) {
+	t.Setenv("HTTPScheme", "http")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = io.WriteString(w, `{}`)
+	}))
+	defer server.Close()
+
+	if err := savedSearchesDelete(savedSearchDeleteResourceData(t), httpTestProvider(t, server)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func savedSearchDeleteResourceData(t *testing.T) *schema.ResourceData {
+	t.Helper()
+	d := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"name":   "alert",
+		"search": "index=main",
+		"acl": []interface{}{map[string]interface{}{
+			"owner":   "admin",
+			"app":     "search",
+			"sharing": "app",
+		}},
+	})
+	d.SetId("alert")
+	return d
 }
 
 func TestGetSavedSearchesConfigActionEmailCommand(t *testing.T) {
