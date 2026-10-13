@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -1038,6 +1039,7 @@ func TestSavedSearchesNamespaceForOtherOwners(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.sharing, func(t *testing.T) {
+			useRefreshTimeout(t, 200*time.Millisecond)
 			var paths []string
 			meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
 				paths = append(paths, r.Method+" "+r.URL.Path)
@@ -1079,7 +1081,7 @@ func TestSavedSearchesCreateWaitsForReplication(t *testing.T) {
 				return jsonResponse(http.StatusConflict, `{"messages":[{"type":"ERROR","text":"An object with name=alert already exists"}]}`), nil
 			}
 			return jsonResponse(http.StatusCreated, "{}"), nil
-		case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/saved/searches/alert/acl":
+		case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/nobody/search/saved/searches/alert/acl":
 			acls++
 			if acls == 1 {
 				return notFoundResponse(), nil

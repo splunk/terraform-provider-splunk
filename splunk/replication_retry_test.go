@@ -2,6 +2,7 @@ package splunk
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -29,7 +30,7 @@ func newRoundTripProvider(t *testing.T, transport roundTripFunc) *SplunkProvider
 func jsonResponse(statusCode int, body string) *http.Response {
 	return &http.Response{
 		StatusCode: statusCode,
-		Status:     http.StatusText(statusCode),
+		Status:     fmt.Sprintf("%d %s", statusCode, http.StatusText(statusCode)),
 		Body:       io.NopCloser(strings.NewReader(body)),
 		Header:     make(http.Header),
 	}
@@ -68,19 +69,59 @@ func TestRetryOnStatus(t *testing.T) {
 			if requests != tt.wantRequests {
 				t.Errorf("requests = %d, want %d", requests, tt.wantRequests)
 			}
-			if (resp == nil) != tt.wantErr {
-				t.Errorf("resp = %v, want a response only on success", resp)
+			if resp == nil {
+				t.Fatal("resp = nil, want the last response")
 			}
+			resp.Body.Close()
 		})
 	}
 }
 
 func TestRetryOnStatusGivesUpAfterTimeout(t *testing.T) {
-	_, err := retryOnStatus(time.Second, http.StatusNotFound, func() (*http.Response, error) {
+	resp, err := retryOnStatus(time.Second, http.StatusNotFound, func() (*http.Response, error) {
 		resp := notFoundResponse()
 		return resp, errors.New(resp.Status)
 	})
-	if err == nil || err.Error() != "Not Found" {
+	if err == nil || err.Error() != "404 Not Found" {
 		t.Errorf("err = %v, want the last request error", err)
 	}
+	if resp == nil || resp.StatusCode != http.StatusNotFound {
+		t.Fatalf("resp = %v, want the last 404", resp)
+	}
+	resp.Body.Close()
+}
+
+func TestRetryUpdateAclDoesNotRetryForbidden(t *testing.T) {
+	calls := 0
+	err := retryUpdateAcl(time.Second, func() error {
+		calls++
+		return errors.New("POST failed for endpoint /servicesNS/admin/search/saved/searches/alert/acl: 403 Forbidden: denied")
+	})
+	if err == nil || calls != 1 {
+		t.Fatalf("err = %v, calls = %d, want one 403 and no retry", err, calls)
+	}
+}
+
+func TestRetryUpdateAclRetriesNotFound(t *testing.T) {
+	calls := 0
+	err := retryUpdateAcl(time.Second, func() error {
+		calls++
+		if calls == 1 {
+			return errors.New("POST failed for endpoint /acl: 404 Not Found: missing")
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if calls != 2 {
+		t.Fatalf("calls = %d, want 2", calls)
+	}
+}
+
+func useRefreshTimeout(t *testing.T, timeout time.Duration) {
+	t.Helper()
+	previous := replicationRefreshTimeout
+	replicationRefreshTimeout = timeout
+	t.Cleanup(func() { replicationRefreshTimeout = previous })
 }

@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/avast/retry-go/v4"
-
 	"github.com/splunk/terraform-provider-splunk/client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -60,32 +58,27 @@ func splunkDashboardsImportState(d *schema.ResourceData, meta interface{}) ([]*s
 
 // Functions
 func splunkDashboardsCreate(d *schema.ResourceData, meta interface{}) error {
+	remaining := startCreateDeadline(d)
+	defer stopCreateDeadline(d)
+
 	provider := meta.(*SplunkProvider)
 	name := d.Get("name").(string)
 	splunkDashboardsObj := getSplunkDashboardsConfig(d)
 	aclObject := getResourceDataViewACL(d)
 
 	// retry 409 as a dashboard deleted by replace may still exist on other cluster members
-	_, err := retryOnStatus(d.Timeout(schema.TimeoutCreate), http.StatusConflict, func() (*http.Response, error) {
+	resp, err := retryOnStatus(remaining(), http.StatusConflict, func() (*http.Response, error) {
 		return (*provider.Client).CreateDashboardObject(aclObject.Owner, aclObject.App, splunkDashboardsObj)
 	})
+	closeBody(resp)
 	if err != nil {
 		return err
 	}
 
-	// add retry as sometimes dashboard object is not yet propagated and acl endpoint return 404
-	err = retry.Do(
-		func() error {
-			err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views")
-			if err != nil {
-				return err
-			}
-			return nil
-		}, retry.Attempts(10), retry.OnRetry(func(n uint, err error) {
-			log.Printf("#%d: %s. Retrying...\n", n, err)
-		}), retry.DelayType(retry.BackOffDelay),
-	)
-
+	// a shared dashboard is not visible on the ACL endpoint until replication finishes
+	err = retryUpdateAcl(remaining(), func() error {
+		return (*provider.Client).UpdateAcl(sharedObjectOwner(aclObject), aclObject.App, name, aclObject, "data", "ui", "views")
+	})
 	if err != nil {
 		return err
 	}
@@ -100,22 +93,17 @@ func splunkDashboardsRead(d *schema.ResourceData, meta interface{}) error {
 
 	aclObject := getResourceDataViewACL(d)
 
-	readUser := "nobody"
-
-	if aclObject.Sharing == "user" {
-		// If we have a private dashboard we can only query it using the owner
-		readUser = aclObject.Owner
-	}
-
 	resp, err := readKnowledgeObject(d, func() (*http.Response, error) {
-		return (*provider.Client).ReadDashboardObject(name, readUser, aclObject.App)
+		return (*provider.Client).ReadDashboardObject(name, sharedObjectOwner(aclObject), aclObject.App)
 	})
 	if err != nil {
 		if hasStatus(resp, http.StatusNotFound) && !d.IsNewResource() {
 			log.Printf("[WARN] Dashboard %s not found, removing from state", name)
+			closeBody(resp)
 			d.SetId("")
 			return nil
 		}
+		closeBody(resp)
 		return err
 	}
 	defer resp.Body.Close()
@@ -151,12 +139,8 @@ func splunkDashboardsUpdate(d *schema.ResourceData, meta interface{}) error {
 	splunkDashboardsObj := getSplunkDashboardsConfig(d)
 	aclObject := getResourceDataViewACL(d)
 
-	updateUser := "nobody"
-
-	if aclObject.Sharing == "user" {
-		// If we have a private dashboard we can only update it using the owner
-		updateUser = aclObject.Owner
-	}
+	// Updating a shared dashboard in the owner's namespace creates a private copy.
+	updateUser := sharedObjectOwner(aclObject)
 
 	if err := (*provider.Client).UpdateDashboardObject(updateUser, aclObject.App, name, splunkDashboardsObj); err != nil {
 		return err
@@ -176,14 +160,15 @@ func splunkDashboardsDelete(d *schema.ResourceData, meta interface{}) error {
 	provider := meta.(*SplunkProvider)
 	name := d.Id()
 	aclObject := getResourceDataViewACL(d)
-	if aclObject.Sharing != "user" {
-		aclObject.Owner = "nobody"
-	}
-	resp, err := (*provider.Client).DeleteDashboardObject(aclObject.Owner, aclObject.App, name)
+	resp, err := retryOnStatus(replicationRefreshTimeout, http.StatusNotFound, func() (*http.Response, error) {
+		return (*provider.Client).DeleteDashboardObject(sharedObjectOwner(aclObject), aclObject.App, name)
+	})
 	if hasStatus(resp, http.StatusNotFound) {
+		closeBody(resp)
 		return nil
 	}
 	if err != nil {
+		closeBody(resp)
 		return err
 	}
 	defer resp.Body.Close()

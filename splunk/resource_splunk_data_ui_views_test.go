@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
@@ -196,6 +197,7 @@ func TestSplunkDashboardsCreateWaitsForReplication(t *testing.T) {
 }
 
 func TestSplunkDashboardsReadRemovesDeletedDashboard(t *testing.T) {
+	useRefreshTimeout(t, 200*time.Millisecond)
 	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
 		return notFoundResponse(), nil
 	})
@@ -216,6 +218,7 @@ func TestSplunkDashboardsReadRemovesDeletedDashboard(t *testing.T) {
 }
 
 func TestSplunkDashboardsDeleteIgnoresDeletedDashboard(t *testing.T) {
+	useRefreshTimeout(t, 200*time.Millisecond)
 	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
 		return notFoundResponse(), nil
 	})
@@ -229,6 +232,57 @@ func TestSplunkDashboardsDeleteIgnoresDeletedDashboard(t *testing.T) {
 
 	if err := splunkDashboardsDelete(d, meta); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestSplunkDashboardsReadRetriesNotFound(t *testing.T) {
+	reads := 0
+	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+		reads++
+		if reads == 1 {
+			return notFoundResponse(), nil
+		}
+		return jsonResponse(http.StatusOK, dashboardEntry), nil
+	})
+	d := schema.TestResourceDataRaw(t, splunkDashboards().Schema, map[string]interface{}{
+		"name":     "terraform",
+		"eai_data": "<dashboard/>",
+		"acl":      []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
+	})
+	d.SetId("terraform")
+
+	if err := splunkDashboardsRead(d, meta); err != nil {
+		t.Fatal(err)
+	}
+	if d.Id() != "terraform" {
+		t.Fatalf("id = %q, want the dashboard kept after a retried 404", d.Id())
+	}
+	if reads < 2 {
+		t.Fatalf("reads = %d, want a retry after the first 404", reads)
+	}
+}
+
+func TestSplunkDashboardsDeleteRetriesNotFound(t *testing.T) {
+	deletes := 0
+	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+		deletes++
+		if deletes == 1 {
+			return notFoundResponse(), nil
+		}
+		return jsonResponse(http.StatusOK, "{}"), nil
+	})
+	d := schema.TestResourceDataRaw(t, splunkDashboards().Schema, map[string]interface{}{
+		"name":     "terraform",
+		"eai_data": "<dashboard/>",
+		"acl":      []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
+	})
+	d.SetId("terraform")
+
+	if err := splunkDashboardsDelete(d, meta); err != nil {
+		t.Fatal(err)
+	}
+	if deletes < 2 {
+		t.Fatalf("deletes = %d, want a retry after the first 404", deletes)
 	}
 }
 

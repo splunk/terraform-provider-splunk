@@ -2,9 +2,9 @@
 * Feature: `splunk_admin_proxysso_groups` manages Splunk Enterprise Proxy SSO group-to-role mappings (`admin/ProxySSO-groups`)
 * Feature: saved searches can configure Jira Service Desk ticket deduplication with `action_jira_service_desk_param_jira_dedup`
 * Fix: `splunk_authorization_roles` lowercases role names in API calls and state. A refresh rewrites a mixed-case id to the role name Splunk stored, so later reads, updates, and deletes find the role
-* Fix: `splunk_data_ui_views` and `splunk_saved_searches` creates on a search head cluster retry while the read back returns 404 or the create returns 409 (an object deleted by a replace still exists on another member), so the apply no longer fails and taints the resource (#243). Saved search ACL updates after create are retried the same way. The wait is set with `timeouts { create = "..." }` and defaults to `1m`
-* Fix: `splunk_data_ui_views` and `splunk_saved_searches` deleted outside Terraform are removed from state on refresh, so the next plan recreates them instead of failing with 404. A delete that returns 404 succeeds
-* Fix: `splunk_saved_searches` with `app` or `global` sharing are read and deleted through the `nobody` namespace, as dashboards already are, so saved searches owned by other users no longer fail with 403
+* Fix: `splunk_data_ui_views` and `splunk_saved_searches` creates on a search head cluster retry while the read back returns 404 or the create returns 409 (an object deleted by a replace still exists on another member), so the apply no longer fails and taints the resource (#243). ACL updates after create retry only a 404. `timeouts { create = "..." }` is one budget for the create, the ACL update, and the read back, and defaults to `1m`. A 400 or 403 fails on the first response
+* Fix: `splunk_data_ui_views` and `splunk_saved_searches` deleted outside Terraform are removed from state on refresh after a 404 persists for 15s, so one lagged search head during plan does not drop the resource. A delete that still returns 404 after that same wait succeeds
+* Fix: `splunk_saved_searches` with sharing other than `user` are read, deleted, and ACL-updated through the `nobody` namespace, as dashboards already are, so saved searches owned by other users no longer fail with 403
 * Fix: `splunk_data_ui_views` and `splunk_saved_searches` updates send the ACL only when `acl` changes. Changing an ACL needs the owner or an admin, so users with write access can now update dashboards and saved searches owned by others
 
 ## 1.5.8
