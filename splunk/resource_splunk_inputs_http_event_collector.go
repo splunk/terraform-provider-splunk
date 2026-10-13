@@ -14,64 +14,14 @@ import (
 
 func inputsHttpEventCollector() *schema.Resource {
 	return &schema.Resource{
-		Schema: map[string]*schema.Schema{
-			"name": {
-				Type:        schema.TypeString,
-				Required:    true,
-				ForceNew:    true,
-				Description: "Required. Token name (inputs.conf key)",
+		Schema:        httpEventCollectorSchema(),
+		SchemaVersion: 1,
+		StateUpgraders: []schema.StateUpgrader{
+			{
+				Type:    inputsHttpEventCollectorResourceV0().CoreConfigSchema().ImpliedType(),
+				Upgrade: httpEventCollectorStateUpgradeV0,
+				Version: 0,
 			},
-			"token": {
-				Type:        schema.TypeString,
-				Computed:    true,
-				Optional:    true,
-				Sensitive:   true,
-				Description: "Token value for sending data to collector/event endpoint.",
-			},
-			"index": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Index to store generated events",
-			},
-			"indexes": {
-				Type:        schema.TypeList,
-				Optional:    true,
-				Computed:    true,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "Set of indexes allowed for events with this token.",
-			},
-			"host": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Default host value for events with this token",
-			},
-			"source": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Default source for events with this token",
-			},
-			"sourcetype": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Computed:    true,
-				Description: "Default sourcetype for events with this token",
-			},
-			"disabled": {
-				Type:        schema.TypeBool,
-				Optional:    true,
-				Computed:    true,
-				Description: "Input disabled indicator: 0 = Input Not disabled, 1 = Input disabled",
-			},
-			"use_ack": {
-				Type:        schema.TypeInt,
-				Optional:    true,
-				Computed:    true,
-				Description: "Indexer acknowledgement for this token: 0 = disabled, 1 = enabled",
-			},
-			"acl": aclSchema(),
 		},
 		Read:   httpEventCollectorInputRead,
 		Create: httpEventCollectorInputCreate,
@@ -81,6 +31,112 @@ func inputsHttpEventCollector() *schema.Resource {
 			State: schema.ImportStatePassthrough,
 		},
 	}
+}
+
+func httpEventCollectorSchema() map[string]*schema.Schema {
+	return map[string]*schema.Schema{
+		"name": {
+			Type:        schema.TypeString,
+			Required:    true,
+			ForceNew:    true,
+			Description: "Required. Token name (inputs.conf key)",
+		},
+		"token": {
+			Type:        schema.TypeString,
+			Computed:    true,
+			Optional:    true,
+			Sensitive:   true,
+			Description: "Token value for sending data to collector/event endpoint.",
+		},
+		"index": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+			Description: "Index to store generated events",
+		},
+		"indexes": {
+			Type:     schema.TypeSet,
+			Optional: true,
+			Computed: true,
+			Elem:     &schema.Schema{Type: schema.TypeString},
+			// HashString stores each index at indexes.<hash> so order is ignored.
+			Set:         schema.HashString,
+			Description: "Set of indexes allowed for events with this token. Order does not matter.",
+		},
+		"host": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+			Description: "Default host value for events with this token",
+		},
+		"source": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+			Description: "Default source for events with this token",
+		},
+		"sourcetype": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Computed:    true,
+			Description: "Default sourcetype for events with this token",
+		},
+		"disabled": {
+			Type:        schema.TypeBool,
+			Optional:    true,
+			Computed:    true,
+			Description: "Input disabled indicator: 0 = Input Not disabled, 1 = Input disabled",
+		},
+		"use_ack": {
+			Type:        schema.TypeInt,
+			Optional:    true,
+			Computed:    true,
+			Description: "Indexer acknowledgement for this token: 0 = disabled, 1 = enabled",
+		},
+		"acl": aclSchema(),
+	}
+}
+
+// inputsHttpEventCollectorResourceV0 is the schema stored before indexes became a set.
+// The upgrader decodes existing flatmap state with this type, so every attribute has to stay.
+func inputsHttpEventCollectorResourceV0() *schema.Resource {
+	attrs := httpEventCollectorSchema()
+	indexes := *attrs["indexes"]
+	indexes.Type = schema.TypeList
+	indexes.Set = nil
+	attrs["indexes"] = &indexes
+	return &schema.Resource{Schema: attrs}
+}
+
+// httpEventCollectorStateUpgradeV0 keeps the allow-list and drops duplicate names.
+// A JSON array is valid for the new set, so the attribute name stays indexes.
+func httpEventCollectorStateUpgradeV0(rawState map[string]interface{}, _ interface{}) (map[string]interface{}, error) {
+	rawState["indexes"] = normalizeHTTPEventCollectorIndexes(rawState["indexes"])
+	return rawState, nil
+}
+
+func normalizeHTTPEventCollectorIndexes(raw interface{}) interface{} {
+	if raw == nil {
+		return nil
+	}
+	items, ok := raw.([]interface{})
+	if !ok {
+		return raw
+	}
+	seen := make(map[string]struct{}, len(items))
+	out := make([]interface{}, 0, len(items))
+	for _, item := range items {
+		name, ok := item.(string)
+		if !ok {
+			continue
+		}
+		if _, dup := seen[name]; dup {
+			continue
+		}
+		seen[name] = struct{}{}
+		out = append(out, name)
+	}
+	return out
 }
 
 // Functions
@@ -236,12 +292,20 @@ func getHttpEventCollectorConfig(d *schema.ResourceData) (httpInputConfigObject 
 	httpInputConfigObject.Host = d.Get("host").(string)
 	httpInputConfigObject.Index = d.Get("index").(string)
 	httpInputConfigObject.Token = d.Get("token").(string)
-	httpInputConfigObject.Indexes = d.Get("indexes").([]interface{})
+	httpInputConfigObject.Indexes = httpEventCollectorIndexList(d)
 	httpInputConfigObject.Source = d.Get("source").(string)
 	httpInputConfigObject.SourceType = d.Get("sourcetype").(string)
 	httpInputConfigObject.UseACK = models.FlexInt(d.Get("use_ack").(int))
 	httpInputConfigObject.Disabled = d.Get("disabled").(bool)
 	return httpInputConfigObject
+}
+
+func httpEventCollectorIndexList(d *schema.ResourceData) []interface{} {
+	v, ok := d.GetOk("indexes")
+	if !ok {
+		return nil
+	}
+	return v.(*schema.Set).List()
 }
 
 func getHECConfigByName(name string, httpResponse *http.Response) (hecEntry *models.HECEntry, err error) {
