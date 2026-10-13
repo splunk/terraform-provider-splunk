@@ -1,4 +1,5 @@
 ## 1.5.9
+* Fix: `splunk_indexes` and `splunk_saved_searches` drop state when Splunk no longer has the object, so the next apply recreates an index or saved search deleted outside Terraform
 * Fix: HTTP Event Collector `indexes` is stored as a set, so plans ignore order and show only added or removed index names. Existing state is migrated
 * Feature: `splunk_admin_proxysso_groups` manages Splunk Enterprise Proxy SSO group-to-role mappings (`admin/ProxySSO-groups`)
 * Feature: saved searches can configure Jira Service Desk ticket deduplication with `action_jira_service_desk_param_jira_dedup`

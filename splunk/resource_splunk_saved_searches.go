@@ -1358,10 +1358,16 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	aclObject := getResourceDataSearchACL(d)
 
 	resp, err := (*provider.Client).ReadSavedSearches(name, aclObject.Owner, aclObject.App)
+	if resp != nil {
+		defer resp.Body.Close()
+	}
+	// DoRequest reports a deleted saved search as a 404 error and keeps the response.
 	if err != nil {
+		if resp != nil && resp.StatusCode == http.StatusNotFound && dropDeletedResource(d) {
+			return nil
+		}
 		return err
 	}
-	defer resp.Body.Close()
 
 	entry, err := getSavedSearchesConfigByName(name, resp)
 	if err != nil {
@@ -1369,6 +1375,9 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
+		if dropDeletedResource(d) {
+			return nil
+		}
 		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 

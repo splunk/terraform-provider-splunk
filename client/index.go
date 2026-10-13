@@ -24,17 +24,14 @@ func (client *Client) CreateIndexObject(name string, owner string, app string, i
 	return nil
 }
 
+// ReadIndexObject fetches one index. The response is returned together with any
+// status error so the caller can tell a 404 from other failures.
 func (client *Client) ReadIndexObject(name, owner, app string) (*http.Response, error) {
 	queryValues := url.Values{}
 	queryValues.Add("datatype", "all")
 
 	endpoint := client.BuildSplunkURL(queryValues, "servicesNS", owner, app, "data", "indexes", name)
-	resp, err := client.Get(endpoint)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+	return client.Get(endpoint)
 }
 
 func (client *Client) UpdateIndexObject(name string, owner string, app string, indexConfigObj *models.IndexObject) error {
