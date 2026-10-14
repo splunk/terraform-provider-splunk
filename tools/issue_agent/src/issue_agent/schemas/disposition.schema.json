@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Disposition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "validity",
+    "confidence",
+    "compatibility",
+    "breaking",
+    "evidence",
+    "affected_users",
+    "summary",
+    "model_decision",
+    "implementation_contract"
+  ],
+  "properties": {
+    "validity": {
+      "type": "string",
+      "enum": [
+        "confirmed_defect",
+        "user_error",
+        "docs_mismatch",
+        "unsupported_request",
+        "already_fixed",
+        "duplicate",
+        "insufficient_evidence"
+      ]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "compatibility": {
+      "type": "string",
+      "enum": ["compatible", "breaking", "unknown"]
+    },
+    "breaking": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changes_attribute_type",
+        "changes_required_optional_computed",
+        "changes_default",
+        "changes_force_new",
+        "tightens_validation",
+        "changes_resource_identity",
+        "changes_import_format",
+        "requires_state_migration",
+        "changes_update_vs_recreate",
+        "changes_request_payload_or_splunk_defaults",
+        "changes_older_splunk_behavior",
+        "changes_successful_apply"
+      ],
+      "properties": {
+        "changes_attribute_type": {"type": "boolean"},
+        "changes_required_optional_computed": {"type": "boolean"},
+        "changes_default": {"type": "boolean"},
+        "changes_force_new": {"type": "boolean"},
+        "tightens_validation": {"type": "boolean"},
+        "changes_resource_identity": {"type": "boolean"},
+        "changes_import_format": {"type": "boolean"},
+        "requires_state_migration": {"type": "boolean"},
+        "changes_update_vs_recreate": {"type": "boolean"},
+        "changes_request_payload_or_splunk_defaults": {"type": "boolean"},
+        "changes_older_splunk_behavior": {"type": "boolean"},
+        "changes_successful_apply": {"type": "boolean"}
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "ref", "note"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": ["code", "docs", "history", "issue"]
+          },
+          "ref": {"type": "string"},
+          "note": {"type": "string"}
+        }
+      }
+    },
+    "affected_users": {"type": "string"},
+    "summary": {"type": "string"},
+    "model_decision": {
+      "type": "string",
+      "enum": ["proceed", "decline"]
+    },
+    "implementation_contract": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "allowed_paths",
+        "expected_files",
+        "expected_lines",
+        "tests_required",
+        "acceptance_criteria"
+      ],
+      "properties": {
+        "summary": {"type": "string"},
+        "allowed_paths": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "expected_files": {"type": "integer"},
+        "expected_lines": {"type": "integer"},
+        "tests_required": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    }
+  }
+}

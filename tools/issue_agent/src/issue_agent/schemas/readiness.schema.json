@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Readiness",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ready", "label", "merge", "blocking_checks"],
+  "properties": {
+    "ready": {"type": "boolean"},
+    "label": {"type": ["string", "null"]},
+    "merge": {"type": "boolean"},
+    "blocking_checks": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  }
+}

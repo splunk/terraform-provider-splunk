@@ -2,61 +2,82 @@ name: test
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-
-  build:
-    name: Build and test
+  unit:
+    name: unit
     runs-on: ubuntu-latest
-
-    services:
-      splunk:
-        image: splunk/splunk:latest
-        env:
-          SPLUNK_START_ARGS: --accept-license
-          SPLUNK_GENERAL_TERMS: --accept-sgt-current-at-splunk-com
-          SPLUNK_PASSWORD: password
-        ports:
-          - 8000:8000
-          - 8089:8089
-        volumes:
-          - ${{ github.workspace }}:/workspace
-
+    timeout-minutes: 20
     steps:
-    - name: Set up Go 1.x
-      uses: actions/setup-go@v5.1.0
-      with:
-        go-version: ^1.22
-      id: go
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Build
+        run: go build -o terraform-provider-splunk .
+      - name: Unit tests
+        run: TF_ACC= go test ./...
 
-    - name: Check out code into the Go module directory
-      uses: actions/checkout@v3
-
-    - name: Get dependencies
-      run: |
-        go get -v -t -d ./...
-        if [ -f Gopkg.toml ]; then
-            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-            dep ensure
-        fi
-
-    - name: Build
-      run: go build -v .
-
-    - name: Set up Terraform 1.1.7
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: "1.1.7"
-
-    - name: Terraform init
-      run: terraform -chdir=terraform init
-
-    - name: Terraform apply
-      run: terraform -chdir=terraform apply --auto-approve
-
-    - name: Test
-      run: TF_ACC=1 SPLUNK_HOME=/opt/splunk SPLUNK_URL=localhost:8089 SPLUNK_USERNAME=admin SPLUNK_PASSWORD=password go test ./... -v
+  acceptance:
+    name: acceptance
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Generate disposable Splunk password
+        run: |
+          password="$(openssl rand -base64 48 | tr -dc 'A-Za-z0-9' | head -c 24)"
+          echo "::add-mask::${password}"
+          echo "SPLUNK_PASSWORD=${password}" >> "$GITHUB_ENV"
+      - name: Start Splunk
+        run: |
+          docker run -d --name splunk \
+            -p 8000:8000 \
+            -p 8089:8089 \
+            -v "${GITHUB_WORKSPACE}:/workspace" \
+            -e SPLUNK_START_ARGS=--accept-license \
+            -e SPLUNK_GENERAL_TERMS=--accept-sgt-current-at-splunk-com \
+            -e "SPLUNK_PASSWORD=${SPLUNK_PASSWORD}" \
+            splunk/splunk:9.4.14
+      - name: Wait until Splunk answers
+        run: |
+          for _ in $(seq 1 60); do
+            if curl -sfk --user "admin:${SPLUNK_PASSWORD}" \
+              "https://127.0.0.1:8089/services/server/info?output_mode=json" >/dev/null; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Splunk did not become ready" >&2
+          exit 1
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.1.7"
+      - name: Terraform init
+        run: terraform -chdir=terraform init
+      - name: Terraform apply
+        env:
+          SPLUNK_URL: localhost:8089
+          SPLUNK_USERNAME: admin
+        run: terraform -chdir=terraform apply --auto-approve
+      - name: Acceptance tests
+        run: |
+          TF_ACC=1 \
+            SPLUNK_HOME=/opt/splunk \
+            SPLUNK_URL=localhost:8089 \
+            SPLUNK_USERNAME=admin \
+            SPLUNK_PASSWORD="${SPLUNK_PASSWORD}" \
+            go test ./... -v
+      - name: Stop Splunk
+        if: always()
+        run: docker rm -f splunk

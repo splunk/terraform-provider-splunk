@@ -1,0 +1,38 @@
+name: Bug report
+description: Report a defect in the Splunk Enterprise provider
+title: "[Bug]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This repository is the Splunk Enterprise provider. Splunk Cloud issues belong in terraform-provider-scp.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What failed, and what you expected instead?
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Terraform, provider, and Splunk Enterprise versions.
+      placeholder: Terraform 1.x, provider 1.x, Splunk Enterprise 9.x
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Minimal configuration and the commands you ran. Remove passwords, tokens, and certificates before submitting.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What should be true after a fix, including existing configurations that must keep working?
+    validations:
+      required: true
