@@ -285,7 +285,7 @@ def test_runner_retries_startup_errors_and_closes(tmp_path, monkeypatch):
     assert state["agent"].closed is True
     assert seen["cloud"] is None
     assert "idempotency_key" not in seen["create_keys"]
-    assert seen["send_idempotency_key"] == "issue-1"
+    assert seen["send_idempotency_key"] is None
     assert seen["local"].cwd == str(tmp_path)
     assert seen["local"].setting_sources == []
     assert os.environ["CURSOR_API_KEY"] == "cursor_test_key"
