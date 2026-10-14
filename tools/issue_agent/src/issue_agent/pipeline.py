@@ -79,22 +79,23 @@ class Pipeline:
             runtime=self.disposition_runtime,
             idempotency_key=f"{self.repository}:{issue['number']}:disposition",
         )
-        if outcome.exit_code != 0:
+        disposition, parse_error = _parse_disposition(outcome.result_text, self.secrets)
+        if disposition is None:
             self.metrics.record(int(issue["number"]), "errors")
+            if outcome.exit_code != 0 and parse_error is None:
+                error = outcome.status
+            else:
+                error = str(parse_error or outcome.status)
             return {
                 "issue_number": issue["number"],
-                "error": outcome.status,
+                "error": error,
                 "detail": outcome.result_text,
-                "exit_code": outcome.exit_code,
+                "exit_code": outcome.exit_code or 2,
                 "agent_id": outcome.agent_id,
                 "run_id": outcome.run_id,
             }
-
-        try:
-            disposition = normalize_disposition(extract_json(redact(outcome.result_text, self.secrets)))
-        except (PolicyError, json.JSONDecodeError) as exc:
-            self.metrics.record(int(issue["number"]), "errors")
-            return {"issue_number": issue["number"], "error": str(exc), "exit_code": 2}
+        if outcome.exit_code != 0:
+            _keep_decline_only(disposition, outcome.status)
 
         kind = _metric_kind(disposition, self.mode, implemented=False)
         result: dict[str, Any] = {
@@ -106,6 +107,8 @@ class Pipeline:
             "agent_id": outcome.agent_id,
             "run_id": outcome.run_id,
         }
+        if outcome.exit_code != 0:
+            result["runner_status"] = outcome.status
         if self.mode == "dry-run":
             self.metrics.record(int(issue["number"]), kind)
             return result
@@ -241,6 +244,28 @@ def issue_text(issue: dict[str, Any], secrets: tuple[str, ...] = ()) -> str:
     if len(text) > MAX_ISSUE_TEXT_CHARS:
         raise PolicyError("issue text exceeds the input cap")
     return text
+
+
+def _parse_disposition(
+    text: str, secrets: tuple[str, ...]
+) -> tuple[dict[str, Any] | None, Exception | None]:
+    try:
+        return normalize_disposition(extract_json(redact(text, secrets))), None
+    except (PolicyError, json.JSONDecodeError) as exc:
+        return None, exc
+
+
+def _keep_decline_only(disposition: dict[str, Any], status: str) -> None:
+    """A complete answer can be posted. Implementation stays off until a clean run."""
+    disposition["reasons"].append(f"disposition run status: {status}")
+    if disposition["decision"] != "proceed":
+        return
+    disposition["decision"] = "decline"
+    disposition["label"] = "agent:declined"
+    disposition["implementation_contract"] = None
+    disposition["reasons"].append(
+        "implementation skipped because the disposition run did not finish cleanly"
+    )
 
 
 def extract_json(text: str) -> dict[str, Any]:

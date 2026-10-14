@@ -154,6 +154,35 @@ def test_duplicate_delivery_is_skipped():
     assert runner.calls == []
 
 
+def test_valid_disposition_is_posted_when_the_runner_does_not_finish():
+    github = MemoryGitHub()
+    raw = disposition(
+        validity="unsupported_request",
+        model_decision="decline",
+        implementation_contract=None,
+        summary="A new resource is a feature request.",
+    )
+    runner = ScriptedRunner([outcome(raw, status="error", exit_code=2)])
+    result = _pipeline(runner, mode="comment", github=github).handle_issue(_issue(237))
+    assert result["decision"] == "decline"
+    assert result["label"] == "agent:declined"
+    assert "error" not in result
+    assert result["runner_status"] == "error"
+    assert github.comments
+    assert any(labels == ["agent:declined"] for _, labels in github.labels)
+    assert "disposition run status: error" in github.comments[0][1]
+
+
+def test_unfinished_disposition_cannot_proceed():
+    github = MemoryGitHub()
+    runner = ScriptedRunner([outcome(disposition(), status="token_budget", exit_code=2)])
+    result = _pipeline(runner, mode="comment", github=github).handle_issue(_issue(4))
+    assert result["decision"] == "decline"
+    assert result["disposition"]["implementation_contract"] is None
+    assert result["runner_status"] == "token_budget"
+    assert "agent:running" not in [label for _, labels in github.labels for label in labels]
+
+
 def test_startup_and_run_failures_do_not_publish():
     github = MemoryGitHub()
     startup = outcome("", status="startup_error", exit_code=1, started=False)

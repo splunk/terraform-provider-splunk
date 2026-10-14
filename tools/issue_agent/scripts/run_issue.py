@@ -58,10 +58,15 @@ def main() -> int:
     except (PolicyError, RunnerError, GitHubError) as exc:
         print(str(exc).replace(token, "[redacted]") if token else str(exc), file=sys.stderr)
         return 1
+    if result.get("runner_status"):
+        print(f"runner status: {result['runner_status']}", file=sys.stderr)
     if result.get("error"):
-        detail = result.get("detail") or result["error"]
-        print(redact(str(detail), _secrets()), file=sys.stderr)
-    print(result.get("decision"), result.get("pull_request", {}).get("html_url", ""))
+        print(result["error"], file=sys.stderr)
+        detail = result.get("detail") or ""
+        if detail and detail != result["error"]:
+            print(redact(str(detail), _secrets()), file=sys.stderr)
+    decision = result.get("decision") or ""
+    print(decision, result.get("pull_request", {}).get("html_url", ""))
     disposition = result.get("disposition") or {}
     fix_failed = (
         mode == "review-and-fix"
