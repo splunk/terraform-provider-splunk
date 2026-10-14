@@ -84,6 +84,7 @@ class Pipeline:
             return {
                 "issue_number": issue["number"],
                 "error": outcome.status,
+                "detail": outcome.result_text,
                 "exit_code": outcome.exit_code,
                 "agent_id": outcome.agent_id,
                 "run_id": outcome.run_id,

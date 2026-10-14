@@ -14,6 +14,7 @@ from issue_agent.local_flow import run_issue, verify_workspace  # noqa: E402
 from issue_agent.pipeline import Pipeline  # noqa: E402
 from issue_agent.policy import ALLOWED_REPOSITORY, PolicyError  # noqa: E402
 from issue_agent.publisher import ChangePublisher, SubprocessGit  # noqa: E402
+from issue_agent.redact import redact  # noqa: E402
 from issue_agent.runner import AgentRunner, RunnerError  # noqa: E402
 
 
@@ -57,6 +58,9 @@ def main() -> int:
     except (PolicyError, RunnerError, GitHubError) as exc:
         print(str(exc).replace(token, "[redacted]") if token else str(exc), file=sys.stderr)
         return 1
+    if result.get("error"):
+        detail = result.get("detail") or result["error"]
+        print(redact(str(detail), _secrets()), file=sys.stderr)
     print(result.get("decision"), result.get("pull_request", {}).get("html_url", ""))
     disposition = result.get("disposition") or {}
     fix_failed = (

@@ -236,6 +236,7 @@ def test_runner_retries_startup_errors_and_closes(tmp_path, monkeypatch):
 
         def send(self, prompt, idempotency_key=None):
             seen["prompt"] = prompt
+            seen["send_idempotency_key"] = idempotency_key
             return Run()
 
         def close(self):
@@ -249,6 +250,7 @@ def test_runner_retries_startup_errors_and_closes(tmp_path, monkeypatch):
             state["attempts"] += 1
             seen["cloud"] = kwargs["cloud"]
             seen["local"] = kwargs["local"]
+            seen["create_keys"] = set(kwargs)
             if state["attempts"] == 1:
                 raise CursorAgentError("busy", is_retryable=True, retry_after="0")
             state["agent"] = Agent()
@@ -282,6 +284,8 @@ def test_runner_retries_startup_errors_and_closes(tmp_path, monkeypatch):
     assert delays == [0]
     assert state["agent"].closed is True
     assert seen["cloud"] is None
+    assert "idempotency_key" not in seen["create_keys"]
+    assert seen["send_idempotency_key"] == "issue-1"
     assert seen["local"].cwd == str(tmp_path)
     assert seen["local"].setting_sources == []
     assert os.environ["CURSOR_API_KEY"] == "cursor_test_key"

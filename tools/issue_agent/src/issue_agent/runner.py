@@ -98,6 +98,8 @@ class AgentRunner:
                 with hidden_secrets():
                     sdk = self.sdk_factory()
                     error_type = sdk["CursorAgentError"]
+                    # CreateAgent rejects idempotency keys for local agents.
+                    # The key stays on send(), which the local runtime accepts.
                     options = {
                         "model": self.model,
                         "api_key": self.api_key,
@@ -105,7 +107,6 @@ class AgentRunner:
                         "local": _local(sdk, workdir),
                         "cloud": None,
                         "tools": _tools(role),
-                        "idempotency_key": idempotency_key,
                     }
                     option_type = sdk.get("AgentOptions")
                     if option_type is None:
