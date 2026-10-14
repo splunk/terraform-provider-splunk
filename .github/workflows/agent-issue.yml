@@ -15,6 +15,17 @@ on:
         options:
           - review-only
           - review-and-fix
+      token_continuations:
+        description: Follow-up turns after a finished turn exceeds its token budget
+        required: true
+        default: default
+        type: choice
+        options:
+          - default
+          - "0"
+          - "1"
+          - "2"
+          - "3"
 
 concurrency:
   group: issue-agent-${{ inputs.issue_number }}
@@ -50,6 +61,7 @@ jobs:
         env:
           ISSUE_NUMBER: ${{ inputs.issue_number }}
           ISSUE_AGENT_MODE: ${{ inputs.mode }}
+          ISSUE_AGENT_TOKEN_CONTINUATIONS: ${{ inputs.token_continuations }}
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}

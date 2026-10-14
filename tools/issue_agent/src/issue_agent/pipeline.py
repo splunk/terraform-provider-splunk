@@ -94,7 +94,7 @@ class Pipeline:
                 "agent_id": outcome.agent_id,
                 "run_id": outcome.run_id,
             }
-        if outcome.exit_code != 0:
+        if outcome.exit_code != 0 and outcome.status != "token_budget":
             _keep_decline_only(disposition, outcome.status)
 
         kind = _metric_kind(disposition, self.mode, implemented=False)
@@ -256,7 +256,11 @@ def _parse_disposition(
 
 
 def _keep_decline_only(disposition: dict[str, Any], status: str) -> None:
-    """A complete answer can be posted. Implementation stays off until a clean run."""
+    """Post a parsed answer, and block implementation when the run did not finish.
+
+    Token-budget overruns are excluded by the caller. A finished answer keeps
+    the decision policy already made.
+    """
     disposition["reasons"].append(f"disposition run status: {status}")
     if disposition["decision"] != "proceed":
         return

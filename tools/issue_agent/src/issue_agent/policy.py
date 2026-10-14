@@ -20,11 +20,20 @@ MAX_COMMENTS = 10
 MAX_ISSUE_TEXT_CHARS = 36_000
 MAX_DIFF_CHARS = 60_000
 TOKEN_BUDGET = {
-    "disposition": 80_000,
-    "implement": 200_000,
-    "revise": 200_000,
-    "review": 80_000,
+    "disposition": 200_000,
+    "implement": 400_000,
+    "revise": 400_000,
+    "review": 200_000,
 }
+# Follow-up turns after a finished turn reports more than TOKEN_BUDGET.
+# Disposition and review stay single-turn unless the operator overrides them.
+TOKEN_CONTINUATIONS = {
+    "disposition": 0,
+    "implement": 1,
+    "revise": 1,
+    "review": 0,
+}
+MAX_TOKEN_CONTINUATIONS = 3
 
 CONTRACT_MARKER = "<!-- issue-agent-contract -->"
 REVIEW_MARKER = "<!-- issue-agent-review -->"

@@ -86,6 +86,24 @@ def implementation_prompt(
     )
 
 
+def continue_prompt(role: str) -> str:
+    if role in {"implement", "revise"}:
+        return (
+            "The previous turn finished over the token budget. "
+            "Continue from the current working tree and finish only the remaining approved edits. "
+            "Do not repeat completed work. Do not commit, push, or open a pull request."
+        )
+    if role == "review":
+        return (
+            "The previous turn finished over the token budget. "
+            "Return only the final review JSON object. Do not investigate further."
+        )
+    return (
+        "The previous turn finished over the token budget. "
+        "Return only the final disposition JSON object. Do not investigate further."
+    )
+
+
 def review_prompt(contract_text: str, diff_text: str) -> str:
     return (
         f"{REVIEW_INSTRUCTIONS}\n\n<approved-contract>\n{contract_text}\n</approved-contract>\n"

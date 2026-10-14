@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 from issue_agent.github import MemoryGitHub
 from issue_agent.pipeline import Pipeline, issue_text
-from issue_agent.policy import ALLOWED_REPOSITORY
+from issue_agent.policy import ALLOWED_REPOSITORY, TOKEN_BUDGET
 from issue_agent.prompts import disposition_prompt
 from issue_agent.runner import AgentRunner
 from support import disposition, finished_result, outcome, review_payload, ScriptedRunner
@@ -173,13 +173,26 @@ def test_valid_disposition_is_posted_when_the_runner_does_not_finish():
     assert "disposition run status: error" in github.comments[0][1]
 
 
-def test_unfinished_disposition_cannot_proceed():
+def test_token_budget_keeps_a_parsed_proceed_decision():
     github = MemoryGitHub()
     runner = ScriptedRunner([outcome(disposition(), status="token_budget", exit_code=2)])
     result = _pipeline(runner, mode="comment", github=github).handle_issue(_issue(4))
+    assert result["decision"] == "proceed"
+    assert result["label"] is None
+    assert result["disposition"]["implementation_contract"] is not None
+    assert result["runner_status"] == "token_budget"
+    assert "implementation skipped" not in github.comments[0][1]
+    assert any("implementation_contract" in body for _, body in github.comments)
+    assert "agent:declined" not in [label for _, labels in github.labels for label in labels]
+
+
+def test_unfinished_disposition_cannot_proceed():
+    github = MemoryGitHub()
+    runner = ScriptedRunner([outcome(disposition(), status="error", exit_code=2)])
+    result = _pipeline(runner, mode="comment", github=github).handle_issue(_issue(4))
     assert result["decision"] == "decline"
     assert result["disposition"]["implementation_contract"] is None
-    assert result["runner_status"] == "token_budget"
+    assert result["runner_status"] == "error"
     assert "agent:running" not in [label for _, labels in github.labels for label in labels]
 
 
@@ -320,9 +333,12 @@ def test_runner_retries_startup_errors_and_closes(tmp_path, monkeypatch):
     assert os.environ["CURSOR_API_KEY"] == "cursor_test_key"
 
 
-def test_runner_rejects_a_run_over_the_token_budget():
+def _budget_runner(prompts, token_counts):
+    counts = iter(token_counts)
+
     class Run:
-        run_id = "run-budget"
+        def __init__(self, run_id):
+            self.run_id = run_id
 
         def supports(self, operation):
             return True
@@ -331,7 +347,7 @@ def test_runner_rejects_a_run_over_the_token_budget():
             return SimpleNamespace(
                 status="finished",
                 result="{}",
-                usage=SimpleNamespace(total_tokens=80_001),
+                usage=SimpleNamespace(total_tokens=next(counts)),
             )
 
         def cancel(self):
@@ -341,12 +357,13 @@ def test_runner_rejects_a_run_over_the_token_budget():
         agent_id = "agent-budget"
 
         def send(self, prompt, idempotency_key=None):
-            return Run()
+            prompts.append(prompt)
+            return Run(f"run-{len(prompts)}")
 
         def close(self):
             return None
 
-    runner = AgentRunner(
+    return AgentRunner(
         api_key="cursor_test_key",
         repository=ALLOWED_REPOSITORY,
         cwd=".",
@@ -356,7 +373,12 @@ def test_runner_rejects_a_run_over_the_token_budget():
             "LocalAgentOptions": lambda **kwargs: SimpleNamespace(**kwargs),
         },
     )
-    result = runner.complete(
+
+
+def test_runner_rejects_a_run_over_the_token_budget(monkeypatch):
+    monkeypatch.delenv("ISSUE_AGENT_TOKEN_CONTINUATIONS", raising=False)
+    prompts = []
+    result = _budget_runner(prompts, [TOKEN_BUDGET["disposition"] + 1]).complete(
         role="disposition",
         prompt="disposition",
         runtime="local",
@@ -364,6 +386,58 @@ def test_runner_rejects_a_run_over_the_token_budget():
     )
     assert result.status == "token_budget"
     assert result.exit_code == 2
+    assert prompts == ["disposition"]
+
+
+def test_implementation_continues_once_after_the_token_budget(monkeypatch):
+    monkeypatch.delenv("ISSUE_AGENT_TOKEN_CONTINUATIONS", raising=False)
+    prompts = []
+    result = _budget_runner(
+        prompts,
+        [TOKEN_BUDGET["implement"] + 1, 100],
+    ).complete(
+        role="implement",
+        prompt="implement the contract",
+        runtime="local",
+        idempotency_key="issue-continue",
+    )
+    assert result.status == "finished"
+    assert result.exit_code == 0
+    assert result.run_id == "run-2"
+    assert len(prompts) == 2
+    assert "token budget" in prompts[1]
+
+
+def test_implementation_stops_when_the_follow_up_is_also_over_budget(monkeypatch):
+    monkeypatch.delenv("ISSUE_AGENT_TOKEN_CONTINUATIONS", raising=False)
+    prompts = []
+    over = TOKEN_BUDGET["implement"] + 1
+    result = _budget_runner(prompts, [over, over]).complete(
+        role="implement",
+        prompt="implement the contract",
+        runtime="local",
+        idempotency_key="issue-continue-stop",
+    )
+    assert result.status == "token_budget"
+    assert result.exit_code == 2
+    assert len(prompts) == 2
+
+
+def test_token_continuations_override_lets_disposition_continue(monkeypatch):
+    monkeypatch.setenv("ISSUE_AGENT_TOKEN_CONTINUATIONS", "1")
+    prompts = []
+    result = _budget_runner(
+        prompts,
+        [TOKEN_BUDGET["disposition"] + 1, 100],
+    ).complete(
+        role="disposition",
+        prompt="disposition",
+        runtime="local",
+        idempotency_key="issue-disposition-continue",
+    )
+    assert result.status == "finished"
+    assert result.exit_code == 0
+    assert len(prompts) == 2
 
 
 def test_runner_does_not_retry_a_finished_error(monkeypatch):

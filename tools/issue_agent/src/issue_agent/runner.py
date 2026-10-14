@@ -12,7 +12,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Iterator
 
-from issue_agent.policy import MAX_RETRIES, TIMEOUT_SECONDS, TOKEN_BUDGET
+from issue_agent.policy import (
+    MAX_RETRIES,
+    MAX_TOKEN_CONTINUATIONS,
+    TIMEOUT_SECONDS,
+    TOKEN_BUDGET,
+    TOKEN_CONTINUATIONS,
+)
+from issue_agent.prompts import continue_prompt
 
 # composer-2.5 is absent from this API key's catalog. `default` is the
 # server-selected model that catalog does list.
@@ -121,16 +128,26 @@ class AgentRunner:
                     agent_id = getattr(agent, "agent_id", "")
                     run_id = getattr(run, "run_id", "")
                     self._record(role, agent_id, run_id)
-                    result = self._wait(run)
-                status = getattr(result, "status", "error")
-                text = getattr(result, "result", "") or ""
-                total_tokens = _total_tokens(result)
-                budget = TOKEN_BUDGET.get(role)
-                if budget is not None and total_tokens > budget:
-                    return RunOutcome("token_budget", text, agent_id, run_id, 2, True)
-                if status != "finished":
-                    return RunOutcome(status, text, agent_id, run_id, 2, True)
-                return RunOutcome(status, text, agent_id, run_id, 0, True)
+                    remaining = _continuation_limit(role)
+                    while True:
+                        result = self._wait(run)
+                        status = getattr(result, "status", "error")
+                        text = getattr(result, "result", "") or ""
+                        run_id = getattr(run, "run_id", run_id)
+                        total_tokens = _total_tokens(result)
+                        budget = TOKEN_BUDGET.get(role)
+                        over_budget = budget is not None and total_tokens > budget
+                        if status == "finished" and not over_budget:
+                            return RunOutcome("finished", text, agent_id, run_id, 0, True)
+                        if status == "finished" and over_budget and remaining > 0:
+                            remaining -= 1
+                            run = agent.send(continue_prompt(role))
+                            run_id = getattr(run, "run_id", "")
+                            self._record(role, agent_id, run_id)
+                            continue
+                        if over_budget:
+                            return RunOutcome("token_budget", text, agent_id, run_id, 2, True)
+                        return RunOutcome(status, text, agent_id, run_id, 2, True)
             except error_type as exc:
                 last_error = exc
                 retryable = bool(getattr(exc, "is_retryable", False))
@@ -168,6 +185,17 @@ class AgentRunner:
 class _Expired:
     status = "expired"
     result = ""
+
+
+def _continuation_limit(role: str) -> int:
+    raw = os.environ.get("ISSUE_AGENT_TOKEN_CONTINUATIONS", "").strip()
+    if raw and raw != "default":
+        try:
+            requested = int(raw)
+        except ValueError:
+            return 0
+        return max(0, min(requested, MAX_TOKEN_CONTINUATIONS))
+    return TOKEN_CONTINUATIONS.get(role, 0)
 
 
 def _total_tokens(result: Any) -> int:

@@ -40,7 +40,17 @@ Each issue gets a disposition before any code is written:
 
 The draft records the unit and format commands that ran in the agent workflow. A pull request opened with the workflow token does not start the repository test or lint workflows. Before merge, run **test** and **golangci-lint** from the Actions tab and select branch `agent/issue-<number>`. The agent cannot approve or merge.
 
-One manual run sends at most the latest 12,000 characters of the issue body and 10 comments of 2,000 characters each. The model calls also stop the rest of the run when reported usage passes 80,000 tokens for disposition or review, or 200,000 tokens for an implementation attempt. Set a spend limit on the Cursor API key as the hard billing control. The SDK has no setting that stops a run before those tokens are consumed.
+One manual run sends at most the latest 12,000 characters of the issue body and 10 comments of 2,000 characters each. A turn stops the rest of that role when reported usage passes 200,000 tokens for disposition or review, or 400,000 tokens for an implementation or revision attempt. Implementation and revision then get one follow-up on the same agent, which continues from the working tree. Disposition and review do not follow up unless you ask for it.
+
+On the **agent-issue** form, **Token continuations** controls that follow-up:
+
+| Value | Effect |
+| --- | --- |
+| `default` | One follow-up for implementation and revision. None for disposition or review. |
+| `0` | Stop as soon as a finished turn is over its budget. |
+| `1`, `2`, or `3` | That many follow-ups for every role, including disposition and review. |
+
+The SDK cannot stop a turn before those tokens are consumed, and a follow-up cannot resume a turn that is still running. Set a spend limit on the Cursor API key as the hard billing control. `ISSUE_AGENT_TOKEN_CONTINUATIONS` is the same control when you run the script locally.
 
 Labels record the outcome. They do not grant permission to start work:
 
