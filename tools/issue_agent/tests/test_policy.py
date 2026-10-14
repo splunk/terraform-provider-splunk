@@ -16,6 +16,48 @@ def test_confirmed_defect_proceeds():
     assert result["implementation_contract"]["allowed_paths"]
 
 
+def test_compatible_feature_request_proceeds_with_plan():
+    feature_plan = contract(
+        paths=[
+            "splunk/resource_field_alias.go",
+            "splunk/resource_field_alias_test.go",
+            "splunk/provider.go",
+            "docs/resources/field_alias.md",
+        ],
+        files=4,
+        lines=300,
+    )
+    feature_plan["summary"] = "Add a field alias resource backed by the supported REST endpoint."
+    result = normalize_disposition(
+        disposition(
+            validity="feature_request",
+            summary="Field aliases should have a first-class resource.",
+            implementation_contract=feature_plan,
+        )
+    )
+    assert result["decision"] == "proceed"
+    assert result["label"] is None
+    assert result["reasons"] == ["approved compatible feature"]
+
+
+def test_feature_request_requires_high_confidence_and_compatible_plan():
+    low_confidence = normalize_disposition(
+        disposition(validity="feature_request", confidence="medium")
+    )
+    assert low_confidence["decision"] == "decline"
+    assert low_confidence["implementation_contract"] is None
+    flags = {**disposition()["breaking"], "changes_successful_apply": True}
+    breaking = normalize_disposition(
+        disposition(
+            validity="feature_request",
+            compatibility="breaking",
+            breaking=flags,
+        )
+    )
+    assert breaking["decision"] == "decline"
+    assert breaking["label"] == "agent:breaking-risk"
+
+
 def test_model_proceed_is_overridden_for_user_error():
     raw = disposition(
         validity="user_error",
@@ -83,8 +125,8 @@ def test_docs_mismatch_is_docs_only():
     assert rejected["decision"] == "decline"
 
 
-def test_unsupported_duplicate_and_fixed_decline():
-    for validity in ("unsupported_request", "duplicate", "already_fixed"):
+def test_unsupported_supported_duplicate_and_fixed_decline():
+    for validity in ("unsupported_request", "already_supported", "duplicate", "already_fixed"):
         result = normalize_disposition(disposition(validity=validity, model_decision="proceed"))
         assert result["label"] == "agent:declined"
         assert result["decision"] == "decline"
@@ -125,6 +167,25 @@ def test_comment_does_not_contact_the_author():
     assert "please provide" not in lowered
     assert "can you" not in lowered
     assert "issue-agent-disposition" in body
+
+
+def test_feature_comment_publishes_implementation_plan():
+    planned = normalize_disposition(
+        disposition(
+            validity="feature_request",
+            implementation_contract=contract(
+                paths=["splunk/resource_field_alias.go"],
+                files=1,
+                lines=100,
+            ),
+        )
+    )
+    body = build_comment(planned)
+    assert "Implementation plan:" in body
+    assert "Allowed paths:" in body
+    assert "Required tests:" in body
+    assert "Acceptance criteria:" in body
+    assert "splunk/resource_field_alias.go" in body
 
 
 def test_review_blocks_paths_outside_the_contract():

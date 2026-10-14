@@ -25,13 +25,16 @@ Each issue gets a disposition before any code is written:
 | Result | Meaning |
 | --- | --- |
 | `confirmed_defect` | A compatible fix can proceed |
+| `feature_request` | A useful, compatible feature can proceed from an implementation plan |
 | `docs_mismatch` | Only `docs/` may change |
 | `user_error` | The reported result matches documented behavior |
-| `unsupported_request`, `already_fixed`, `duplicate` | No change |
+| `already_supported` | Existing provider features already satisfy the request |
+| `unsupported_request` | The requested capability should not be added |
+| `already_fixed`, `duplicate` | No change |
 | `insufficient_evidence` | Not enough evidence to change code safely |
 | `agent:breaking-risk` | A fix would change schema, defaults, identity, import format, or a configuration that already applies |
 
-`proceed` requires a confirmed, high-confidence defect, or a docs-only correction, and a fix that preserves configurations that already apply. Tightening validation or changing a default is a breaking change.
+`proceed` requires a confirmed, high-confidence defect; a high-confidence feature with a bounded implementation plan; or a docs-only correction. Every implementation must preserve configurations that already apply. The disposition comment publishes the approved paths, tests, and acceptance criteria before `review-and-fix` may implement the change and open a draft pull request. Tightening validation or changing a default is a breaking change.
 
 `CURSOR_API_KEY` is a repository secret. Do not put it in source, prompts, logs, or comments. Fork pull requests cannot start the implementation agent.
 

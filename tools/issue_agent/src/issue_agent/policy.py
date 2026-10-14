@@ -99,7 +99,12 @@ def normalize_disposition(raw: dict[str, Any]) -> dict[str, Any]:
     if validity == "user_error":
         label = "agent:user-error"
         reasons.append("reported behavior matches documented usage")
-    elif validity in {"unsupported_request", "already_fixed", "duplicate"}:
+    elif validity in {
+        "unsupported_request",
+        "already_supported",
+        "already_fixed",
+        "duplicate",
+    }:
         label = "agent:declined"
         reasons.append(validity)
     elif validity == "insufficient_evidence":
@@ -127,6 +132,16 @@ def normalize_disposition(raw: dict[str, Any]) -> dict[str, Any]:
             decision = "proceed"
             label = None
             reasons.append("confirmed compatible defect")
+    elif validity == "feature_request" and worth_it and compatible and high and code_evidence and contract:
+        path_error = _paths_allowed(contract["allowed_paths"])
+        size_error = _size_allowed(contract["expected_files"], contract["expected_lines"])
+        if path_error or size_error:
+            label = "agent:declined"
+            reasons.append(path_error or size_error or "out of bounds")
+        else:
+            decision = "proceed"
+            label = None
+            reasons.append("approved compatible feature")
     else:
         label = "agent:declined"
         reasons.append("the change is not worth an automated fix")
@@ -229,6 +244,28 @@ def build_comment(disposition: dict[str, Any]) -> str:
     for item in disposition["evidence"]:
         lines.append(
             f"- {item['source']}: {_public_text(item['ref'])} — {_public_text(item['note'])}"
+        )
+    contract = disposition.get("implementation_contract")
+    if disposition["decision"] == "proceed" and contract:
+        lines.extend(
+            [
+                "",
+                "Implementation plan:",
+                _public_text(contract["summary"]),
+                (
+                    f"Estimated scope: {contract['expected_files']} files, "
+                    f"{contract['expected_lines']} changed lines."
+                ),
+                "",
+                "Allowed paths:",
+            ]
+        )
+        lines.extend(f"- {_public_text(path)}" for path in contract["allowed_paths"])
+        lines.extend(["", "Required tests:"])
+        lines.extend(f"- {_public_text(test)}" for test in contract["tests_required"])
+        lines.extend(["", "Acceptance criteria:"])
+        lines.extend(
+            f"- {_public_text(criterion)}" for criterion in contract["acceptance_criteria"]
         )
     if disposition["label"] == "agent:breaking-risk":
         lines.extend(

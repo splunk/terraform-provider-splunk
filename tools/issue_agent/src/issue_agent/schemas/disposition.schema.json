@@ -19,9 +19,11 @@
       "type": "string",
       "enum": [
         "confirmed_defect",
+        "feature_request",
         "user_error",
         "docs_mismatch",
         "unsupported_request",
+        "already_supported",
         "already_fixed",
         "duplicate",
         "insufficient_evidence"

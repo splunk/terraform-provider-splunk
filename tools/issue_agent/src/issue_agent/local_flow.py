@@ -87,7 +87,7 @@ def run_issue(
                 published = publisher.publish(
                     workspace,
                     issue_number=issue_number,
-                    title=_title(issue_number, disposition["summary"]),
+                    title=_title(issue_number, disposition),
                     body=_pull_body(issue_number, disposition, verified.checks),
                     allowed_paths=list(contract["allowed_paths"]),
                 )
@@ -147,14 +147,16 @@ def _public(text: str) -> str:
     return " ".join(redact(text).replace("@", "").split())
 
 
-def _title(issue_number: int, summary: str) -> str:
-    compact = " ".join(_public(summary).split())
-    return f"Fix #{issue_number}: {compact[:80]}".strip()
+def _title(issue_number: int, disposition: dict[str, Any]) -> str:
+    compact = " ".join(_public(disposition["summary"]).split())
+    action = "Implement" if disposition["validity"] == "feature_request" else "Fix"
+    return f"{action} #{issue_number}: {compact[:80]}".strip()
 
 
 def _pull_body(issue_number: int, disposition: dict[str, Any], checks: list[tuple[str, str]]) -> str:
+    closing = "Closes" if disposition["validity"] == "feature_request" else "Fixes"
     lines = [
-        f"Fixes #{issue_number}",
+        f"{closing} #{issue_number}",
         "",
         _public(disposition["summary"]),
         "",

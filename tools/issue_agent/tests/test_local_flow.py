@@ -115,6 +115,38 @@ def test_review_and_fix_opens_one_local_draft():
     assert any(labels == ["agent:running"] for _, labels in github.labels)
 
 
+def test_review_and_fix_implements_feature_plan():
+    git = FakeGit()
+    github = MemoryGitHub()
+    feature = disposition(
+        validity="feature_request",
+        summary="Add first-class field alias management.",
+    )
+    runner = ScriptedRunner(
+        [
+            outcome(feature),
+            outcome("{}"),
+            outcome(review_payload()),
+        ]
+    )
+    result = run_issue(
+        issue=_issue(237),
+        mode="review-and-fix",
+        pipeline=_pipeline(runner, github=github),
+        workspace="/work",
+        publisher=_publisher(git, github),
+        verifier=_verifier,
+    )
+    assert result["pull_request"]["draft"] is True
+    assert github.pulls[0]["title"].startswith("Implement #237:")
+    assert "Closes #237" in github.pulls[0]["body"]
+    assert [call["role"] for call in runner.calls] == [
+        "disposition",
+        "implement",
+        "review",
+    ]
+
+
 def test_forbidden_diff_is_not_pushed():
     git = FakeGit(name=".github/workflows/test.yml")
     github = MemoryGitHub()
