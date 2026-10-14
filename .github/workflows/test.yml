@@ -42,8 +42,8 @@ jobs:
       - name: Start Splunk
         run: |
           docker run -d --name splunk \
-            -p 8000:8000 \
-            -p 8089:8089 \
+            -p 127.0.0.1:8000:8000 \
+            -p 127.0.0.1:8089:8089 \
             -v "${GITHUB_WORKSPACE}:/workspace" \
             -e SPLUNK_START_ARGS=--accept-license \
             -e SPLUNK_GENERAL_TERMS=--accept-sgt-current-at-splunk-com \
@@ -51,12 +51,32 @@ jobs:
             splunk/splunk:9.4.14
       - name: Wait until Splunk answers
         run: |
-          for _ in $(seq 1 60); do
-            if curl -sfk --user "admin:${SPLUNK_PASSWORD}" \
-              "https://127.0.0.1:8089/services/server/info?output_mode=json" >/dev/null; then
-              exit 0
+          # splunkd answers before the image finishes its first-boot playbook
+          # and restarts the daemon. Wait for that restart, then for a stable API.
+          provisioned=0
+          for _ in $(seq 1 90); do
+            if docker logs splunk 2>&1 | grep -q "Ansible playbook complete"; then
+              provisioned=1
+              break
             fi
             sleep 10
+          done
+          if [ "$provisioned" -ne 1 ]; then
+            echo "Splunk did not become ready" >&2
+            exit 1
+          fi
+          stable=0
+          for _ in $(seq 1 30); do
+            if curl -sfk --user "admin:${SPLUNK_PASSWORD}" \
+              "https://127.0.0.1:8089/services/server/info?output_mode=json" >/dev/null; then
+              stable=$((stable + 1))
+              if [ "$stable" -ge 3 ]; then
+                exit 0
+              fi
+            else
+              stable=0
+            fi
+            sleep 5
           done
           echo "Splunk did not become ready" >&2
           exit 1
@@ -67,14 +87,14 @@ jobs:
         run: terraform -chdir=terraform init
       - name: Terraform apply
         env:
-          SPLUNK_URL: localhost:8089
+          SPLUNK_URL: 127.0.0.1:8089
           SPLUNK_USERNAME: admin
         run: terraform -chdir=terraform apply --auto-approve
       - name: Acceptance tests
         run: |
           TF_ACC=1 \
             SPLUNK_HOME=/opt/splunk \
-            SPLUNK_URL=localhost:8089 \
+            SPLUNK_URL=127.0.0.1:8089 \
             SPLUNK_USERNAME=admin \
             SPLUNK_PASSWORD="${SPLUNK_PASSWORD}" \
             go test ./... -v

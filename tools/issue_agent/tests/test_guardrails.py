@@ -158,6 +158,8 @@ def test_ci_password_is_not_committed_and_image_is_pinned():
     assert 'SPLUNK_PASSWORD: password' not in workflow
     assert "password = \"password\"" not in terraform
     assert "splunk/splunk:9.4.14" in workflow
+    assert "Ansible playbook complete" in workflow
+    assert "127.0.0.1:8089" in workflow
     assert "services/server/info" in workflow
     assert "name: unit" in workflow
     assert "name: acceptance" in workflow

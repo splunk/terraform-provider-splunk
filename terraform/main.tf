@@ -8,7 +8,7 @@ terraform {
 
 provider "splunk" {
   # The password is read from SPLUNK_PASSWORD. Do not commit it.
-  url      = "localhost:8089"
+  url      = "127.0.0.1:8089"
   username = "admin"
 }
 
