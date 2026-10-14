@@ -15,7 +15,7 @@ from issue_agent.pipeline import Pipeline  # noqa: E402
 from issue_agent.policy import ALLOWED_REPOSITORY, PolicyError  # noqa: E402
 from issue_agent.publisher import ChangePublisher, SubprocessGit  # noqa: E402
 from issue_agent.redact import redact  # noqa: E402
-from issue_agent.runner import AgentRunner, RunnerError  # noqa: E402
+from issue_agent.runner import DEFAULT_MODEL, AgentRunner, RunnerError  # noqa: E402
 
 
 def main() -> int:
@@ -34,7 +34,7 @@ def main() -> int:
     try:
         runner = AgentRunner(
             api_key=api_key,
-            model=os.environ.get("AGENT_MODEL", "composer-2.5"),
+            model=os.environ.get("AGENT_MODEL", DEFAULT_MODEL),
             repository=repository,
             cwd=workspace,
         )

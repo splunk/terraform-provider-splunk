@@ -14,6 +14,10 @@ from typing import Any, Callable, Iterator
 
 from issue_agent.policy import MAX_RETRIES, TIMEOUT_SECONDS, TOKEN_BUDGET
 
+# composer-2.5 is absent from this API key's catalog. `default` is the
+# server-selected model that catalog does list.
+DEFAULT_MODEL = "default"
+
 SECRET_ENV = (
     "CURSOR_API_KEY",
     "GITHUB_TOKEN",
@@ -55,7 +59,7 @@ class AgentRunner:
         self,
         *,
         api_key: str,
-        model: str = "composer-2.5",
+        model: str = DEFAULT_MODEL,
         repository: str,
         cwd: str | None = None,
         sdk_factory: Callable[[], dict[str, Any]] | None = None,

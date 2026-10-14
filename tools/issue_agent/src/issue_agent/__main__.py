@@ -12,7 +12,7 @@ from typing import Any, Sequence
 from issue_agent.github import GitHubClient, MemoryGitHub
 from issue_agent.pipeline import Pipeline
 from issue_agent.policy import ALLOWED_REPOSITORY, PolicyError, readiness
-from issue_agent.runner import AgentRunner, RunnerError
+from issue_agent.runner import DEFAULT_MODEL, AgentRunner, RunnerError
 from issue_agent.scan import find_merge_calls
 
 
@@ -152,7 +152,7 @@ def _runner(repository: str, cwd: str) -> AgentRunner:
     record = Path(os.environ.get("AGENT_RUN_RECORD", "agent-run.json"))
     return AgentRunner(
         api_key=api_key,
-        model=os.environ.get("AGENT_MODEL", "composer-2.5"),
+        model=os.environ.get("AGENT_MODEL", DEFAULT_MODEL),
         repository=repository,
         cwd=cwd,
         run_record_path=record,
