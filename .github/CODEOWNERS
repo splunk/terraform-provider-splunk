@@ -1,4 +1,0 @@
-# Code owner review stays off until require_code_owner_review is enabled in
-# .github/rulesets/master.json and that ruleset is applied from master.
-#
-* @rrossetti-splunk

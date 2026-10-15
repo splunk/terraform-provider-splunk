@@ -23,12 +23,8 @@ build:
 
 # Use external linker on macOS to avoid dyld "missing LC_UUID" abort (macOS 15+).
 # TF_ACC= ensures acceptance tests are skipped (no API required).
-# macOS needs the external linker. Linux CI uses test-ci instead.
 test:
 	TF_ACC= go test -ldflags="-linkmode=external" ./...
-
-test-ci:
-	TF_ACC= go test ./...
 
 testacc:
 	TF_ACC=1 go test -ldflags="-linkmode=external" ./... -v

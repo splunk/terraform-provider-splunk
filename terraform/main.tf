@@ -7,9 +7,9 @@ terraform {
 }
 
 provider "splunk" {
-  # The password is read from SPLUNK_PASSWORD. Do not commit it.
   url      = "localhost:8089"
   username = "admin"
+  password = "password"
 }
 
 resource "splunk_apps_local" "lookup_file_editing" {

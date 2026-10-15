@@ -43,7 +43,7 @@ Build the provider: `make build`
 
 ### Contributions
 We are open to contributions!
-<p>Please follow <a href="CONTRIBUTING.md">CONTRIBUTING.md</a> and open a PR against the <code>master</code> branch. The PR should trigger the GitHub actions to run
+<p>Please follow development guidelines and feel free to open a PR against the `master` branch with your changes. The PR should trigger the GitHub actions to run
 both the unit and acceptance tests. Once all tests have passed, our team will review, make suggestions, approve, and merge the PR.
 After merging, our team will update the changelog.MD file and create a version tag that should automatically create a new release.</p>
 
