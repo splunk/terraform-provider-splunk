@@ -1081,7 +1081,7 @@ func TestSavedSearchesCreateWaitsForReplication(t *testing.T) {
 				return jsonResponse(http.StatusConflict, `{"messages":[{"type":"ERROR","text":"An object with name=alert already exists"}]}`), nil
 			}
 			return jsonResponse(http.StatusCreated, "{}"), nil
-		case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/nobody/search/saved/searches/alert/acl":
+		case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/saved/searches/alert/acl":
 			acls++
 			if acls == 1 {
 				return notFoundResponse(), nil
@@ -1117,6 +1117,58 @@ func TestSavedSearchesCreateWaitsForReplication(t *testing.T) {
 	}
 	if creates != 2 || acls != 2 || reads != 2 {
 		t.Errorf("creates = %d, acls = %d, reads = %d, want 2 each", creates, acls, reads)
+	}
+}
+
+func TestSavedSearchesCreateACLUsesOwner(t *testing.T) {
+	const entry = `{"entry":[{"name":"alert","acl":{"app":"search","owner":"jdoe","sharing":"app"},"content":{"search":"index=main"}}]}`
+	tests := []struct {
+		sharing  string
+		wantACL  string
+		wantRead string
+	}{
+		{"app", "/servicesNS/jdoe/search/saved/searches/alert/acl", "/servicesNS/nobody/search/saved/searches/alert"},
+		{"global", "/servicesNS/jdoe/search/saved/searches/alert/acl", "/servicesNS/nobody/search/saved/searches/alert"},
+		{"user", "/servicesNS/jdoe/search/saved/searches/alert/acl", "/servicesNS/jdoe/search/saved/searches/alert"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.sharing, func(t *testing.T) {
+			var aclPath, readPath string
+			meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+				switch r.Method {
+				case http.MethodPost:
+					if strings.HasSuffix(r.URL.Path, "/acl") {
+						aclPath = r.URL.Path
+					}
+					return jsonResponse(http.StatusCreated, "{}"), nil
+				case http.MethodGet:
+					readPath = r.URL.Path
+					return jsonResponse(http.StatusOK, entry), nil
+				}
+				t.Fatalf("unexpected request %s %s", r.Method, r.URL.Path)
+				return nil, nil
+			})
+
+			savedSearch := savedSearches()
+			config := terraform.NewResourceConfigRaw(map[string]interface{}{
+				"name":   "alert",
+				"search": "index=main",
+				"acl":    []interface{}{map[string]interface{}{"owner": "jdoe", "app": "search", "sharing": tt.sharing}},
+			})
+			diff, err := savedSearch.Diff(nil, config, meta)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := savedSearch.Apply(nil, diff, meta); err != nil {
+				t.Fatal(err)
+			}
+			if aclPath != tt.wantACL {
+				t.Errorf("acl path = %q, want %q", aclPath, tt.wantACL)
+			}
+			if readPath != tt.wantRead {
+				t.Errorf("read path = %q, want %q", readPath, tt.wantRead)
+			}
+		})
 	}
 }
 
@@ -1236,34 +1288,38 @@ func TestSavedSearchesDeleteRetriesNotFound(t *testing.T) {
 	}
 }
 
-func TestSavedSearchesCreateACLForbiddenDoesNotRetry(t *testing.T) {
-	var acls int
-	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
-		switch {
-		case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/saved/searches":
-			return jsonResponse(http.StatusCreated, "{}"), nil
-		case r.Method == http.MethodPost && strings.HasSuffix(r.URL.Path, "/acl"):
-			acls++
-			return jsonResponse(http.StatusForbidden, `{"messages":[{"type":"ERROR","text":"denied"}]}`), nil
-		}
-		t.Fatalf("unexpected request %s %s", r.Method, r.URL.Path)
-		return nil, nil
-	})
+func TestSavedSearchesCreateACLClientErrorDoesNotRetry(t *testing.T) {
+	for _, code := range []int{http.StatusBadRequest, http.StatusForbidden} {
+		t.Run(http.StatusText(code), func(t *testing.T) {
+			var acls int
+			meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+				switch {
+				case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/saved/searches":
+					return jsonResponse(http.StatusCreated, "{}"), nil
+				case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/saved/searches/alert/acl":
+					acls++
+					return jsonResponse(code, `{"messages":[{"type":"ERROR","text":"denied"}]}`), nil
+				}
+				t.Fatalf("unexpected request %s %s", r.Method, r.URL.Path)
+				return nil, nil
+			})
 
-	savedSearch := savedSearches()
-	config := terraform.NewResourceConfigRaw(map[string]interface{}{
-		"name":   "alert",
-		"search": "index=main",
-		"acl":    []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
-	})
-	diff, err := savedSearch.Diff(nil, config, meta)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := savedSearch.Apply(nil, diff, meta); err == nil {
-		t.Fatal("expected the ACL 403 to fail the create")
-	}
-	if acls != 1 {
-		t.Fatalf("acl requests = %d, want 1", acls)
+			savedSearch := savedSearches()
+			config := terraform.NewResourceConfigRaw(map[string]interface{}{
+				"name":   "alert",
+				"search": "index=main",
+				"acl":    []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
+			})
+			diff, err := savedSearch.Diff(nil, config, meta)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := savedSearch.Apply(nil, diff, meta); err == nil {
+				t.Fatal("expected the ACL error to fail the create")
+			}
+			if acls != 1 {
+				t.Fatalf("acl requests = %d, want 1", acls)
+			}
+		})
 	}
 }

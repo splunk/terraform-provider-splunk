@@ -1353,8 +1353,9 @@ func savedSearchesCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if _, ok := d.GetOk("acl"); ok {
+		// A new saved search is private to its owner until this call shares it.
 		err := retryUpdateAcl(remaining(), func() error {
-			return (*provider.Client).UpdateAcl(sharedObjectOwner(aclObject), aclObject.App, name, aclObject, "saved", "searches")
+			return (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "saved", "searches")
 		})
 		if err != nil {
 			return fmt.Errorf("savedSearchesCreate: updateacl: %s\n%#v", err, aclObject)

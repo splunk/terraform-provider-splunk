@@ -1,14 +1,15 @@
 package splunk
 
 import (
+	"errors"
 	"log"
 	"net/http"
-	"strings"
 	"sync"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/splunk/terraform-provider-splunk/client"
 )
 
 // search head cluster members replicate objects asynchronously, so a request right after a write can fail
@@ -80,15 +81,16 @@ func retryOnStatus(timeout time.Duration, statusCode int, request func() (*http.
 	return resp, nil
 }
 
-// retryUpdateAcl retries only a 404. UpdateAcl returns the status text inside the error
-// ("404 Not Found"), and a 400 or 403 should fail the apply on the first response.
+// retryUpdateAcl retries only a 404 from UpdateAcl's HTTPStatusError.
+// A 400 or 403 fails the apply on the first response.
 func retryUpdateAcl(timeout time.Duration, update func() error) error {
 	return resource.Retry(timeout, func() *resource.RetryError {
 		err := update()
 		if err == nil {
 			return nil
 		}
-		if strings.Contains(err.Error(), "404 Not Found") {
+		var statusErr *client.HTTPStatusError
+		if errors.As(err, &statusErr) && statusErr.StatusCode == http.StatusNotFound {
 			log.Printf("[DEBUG] %s. Retrying...", err)
 			return resource.RetryableError(err)
 		}

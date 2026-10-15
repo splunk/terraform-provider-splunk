@@ -75,9 +75,10 @@ func splunkDashboardsCreate(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 
-	// a shared dashboard is not visible on the ACL endpoint until replication finishes
+	// A new dashboard is private to its owner until this call shares it, so nobody
+	// returns 404. Later reads, updates, and deletes of a shared dashboard use nobody.
 	err = retryUpdateAcl(remaining(), func() error {
-		return (*provider.Client).UpdateAcl(sharedObjectOwner(aclObject), aclObject.App, name, aclObject, "data", "ui", "views")
+		return (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, name, aclObject, "data", "ui", "views")
 	})
 	if err != nil {
 		return err

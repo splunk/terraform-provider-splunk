@@ -161,7 +161,7 @@ func TestSplunkDashboardsCreateWaitsForReplication(t *testing.T) {
 				return jsonResponse(http.StatusConflict, `{"messages":[{"type":"ERROR","text":"An object with name=terraform already exists"}]}`), nil
 			}
 			return jsonResponse(http.StatusCreated, "{}"), nil
-		case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/nobody/search/data/ui/views/terraform/acl":
+		case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/data/ui/views/terraform/acl":
 			acls++
 			if acls == 1 {
 				return notFoundResponse(), nil
@@ -197,6 +197,93 @@ func TestSplunkDashboardsCreateWaitsForReplication(t *testing.T) {
 	}
 	if creates != 2 || acls != 2 || reads != 2 {
 		t.Errorf("creates = %d, acls = %d, reads = %d, want 2 each", creates, acls, reads)
+	}
+}
+
+func TestSplunkDashboardsCreateACLUsesOwner(t *testing.T) {
+	tests := []struct {
+		sharing  string
+		wantACL  string
+		wantRead string
+	}{
+		{"app", "/servicesNS/jdoe/search/data/ui/views/terraform/acl", "/servicesNS/nobody/search/data/ui/views/terraform"},
+		{"global", "/servicesNS/jdoe/search/data/ui/views/terraform/acl", "/servicesNS/nobody/search/data/ui/views/terraform"},
+		{"user", "/servicesNS/jdoe/search/data/ui/views/terraform/acl", "/servicesNS/jdoe/search/data/ui/views/terraform"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.sharing, func(t *testing.T) {
+			var aclPath, readPath string
+			meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+				switch r.Method {
+				case http.MethodPost:
+					if strings.HasSuffix(r.URL.Path, "/acl") {
+						aclPath = r.URL.Path
+					}
+					return jsonResponse(http.StatusCreated, "{}"), nil
+				case http.MethodGet:
+					readPath = r.URL.Path
+					return jsonResponse(http.StatusOK, dashboardEntry), nil
+				}
+				t.Fatalf("unexpected request %s %s", r.Method, r.URL.Path)
+				return nil, nil
+			})
+
+			dashboard := splunkDashboards()
+			config := terraform.NewResourceConfigRaw(map[string]interface{}{
+				"name":     "terraform",
+				"eai_data": "<dashboard/>",
+				"acl":      []interface{}{map[string]interface{}{"owner": "jdoe", "app": "search", "sharing": tt.sharing}},
+			})
+			diff, err := dashboard.Diff(nil, config, meta)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := dashboard.Apply(nil, diff, meta); err != nil {
+				t.Fatal(err)
+			}
+			if aclPath != tt.wantACL {
+				t.Errorf("acl path = %q, want %q", aclPath, tt.wantACL)
+			}
+			if readPath != tt.wantRead {
+				t.Errorf("read path = %q, want %q", readPath, tt.wantRead)
+			}
+		})
+	}
+}
+
+func TestSplunkDashboardsCreateACLClientErrorDoesNotRetry(t *testing.T) {
+	for _, code := range []int{http.StatusBadRequest, http.StatusForbidden} {
+		t.Run(http.StatusText(code), func(t *testing.T) {
+			var acls int
+			meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+				switch {
+				case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/data/ui/views":
+					return jsonResponse(http.StatusCreated, "{}"), nil
+				case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/data/ui/views/terraform/acl":
+					acls++
+					return jsonResponse(code, `{"messages":[{"type":"ERROR","text":"denied"}]}`), nil
+				}
+				t.Fatalf("unexpected request %s %s", r.Method, r.URL.Path)
+				return nil, nil
+			})
+
+			dashboard := splunkDashboards()
+			config := terraform.NewResourceConfigRaw(map[string]interface{}{
+				"name":     "terraform",
+				"eai_data": "<dashboard/>",
+				"acl":      []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
+			})
+			diff, err := dashboard.Diff(nil, config, meta)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := dashboard.Apply(nil, diff, meta); err == nil {
+				t.Fatal("expected the ACL error to fail the create")
+			}
+			if acls != 1 {
+				t.Fatalf("acl requests = %d, want 1", acls)
+			}
+		})
 	}
 }
 

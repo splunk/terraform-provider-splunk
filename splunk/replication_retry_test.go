@@ -93,14 +93,21 @@ func TestRetryOnStatusGivesUpAfterTimeout(t *testing.T) {
 	resp.Body.Close()
 }
 
-func TestRetryUpdateAclDoesNotRetryForbidden(t *testing.T) {
-	calls := 0
-	err := retryUpdateAcl(time.Second, func() error {
-		calls++
-		return errors.New("POST failed for endpoint /servicesNS/admin/search/saved/searches/alert/acl: 403 Forbidden: denied")
-	})
-	if err == nil || calls != 1 {
-		t.Fatalf("err = %v, calls = %d, want one 403 and no retry", err, calls)
+func TestRetryUpdateAclDoesNotRetryClientErrors(t *testing.T) {
+	for _, code := range []int{http.StatusBadRequest, http.StatusForbidden} {
+		t.Run(http.StatusText(code), func(t *testing.T) {
+			calls := 0
+			err := retryUpdateAcl(time.Second, func() error {
+				calls++
+				return &client.HTTPStatusError{
+					StatusCode: code,
+					Message:    "POST failed for endpoint /acl: " + http.StatusText(code),
+				}
+			})
+			if err == nil || calls != 1 {
+				t.Fatalf("err = %v, calls = %d, want one %d and no retry", err, calls, code)
+			}
+		})
 	}
 }
 
@@ -109,7 +116,10 @@ func TestRetryUpdateAclRetriesNotFound(t *testing.T) {
 	err := retryUpdateAcl(time.Second, func() error {
 		calls++
 		if calls == 1 {
-			return errors.New("POST failed for endpoint /acl: 404 Not Found: missing")
+			return &client.HTTPStatusError{
+				StatusCode: http.StatusNotFound,
+				Message:    "POST failed for endpoint /acl: 404 Not Found: missing",
+			}
 		}
 		return nil
 	})
@@ -118,6 +128,17 @@ func TestRetryUpdateAclRetriesNotFound(t *testing.T) {
 	}
 	if calls != 2 {
 		t.Fatalf("calls = %d, want 2", calls)
+	}
+}
+
+func TestRetryUpdateAclDoesNotRetryStatusText(t *testing.T) {
+	calls := 0
+	err := retryUpdateAcl(time.Second, func() error {
+		calls++
+		return errors.New("POST failed for endpoint /acl: 404 Not Found: missing")
+	})
+	if err == nil || calls != 1 {
+		t.Fatalf("err = %v, calls = %d, want one plain 404 string and no retry", err, calls)
 	}
 }
 
