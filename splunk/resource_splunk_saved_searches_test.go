@@ -1074,7 +1074,7 @@ func TestSavedSearchesDeleteReturnsClientError(t *testing.T) {
 			if !strings.Contains(err.Error(), "400 Bad Request") || !strings.Contains(err.Error(), tt.body) {
 				t.Fatalf("savedSearchesDelete error = %q, want status and response body", err)
 			}
-			const want = "DELETE /servicesNS/admin/search/saved/searches/alert"
+			const want = "DELETE /servicesNS/nobody/search/saved/searches/alert"
 			if got != want {
 				t.Fatalf("request = %q, want %q", got, want)
 			}
@@ -1098,6 +1098,7 @@ func TestSavedSearchesDeleteSucceeds(t *testing.T) {
 
 func TestSavedSearchesReadDropsStateWhenMissing(t *testing.T) {
 	t.Setenv("HTTPScheme", "http")
+	useRefreshTimeout(t, time.Millisecond)
 
 	tests := []struct {
 		name   string
@@ -1137,6 +1138,8 @@ func TestSavedSearchesReadKeepsStateWhenCreateCannotSeeSearch(t *testing.T) {
 
 	d := savedSearchReadResourceData(t)
 	d.MarkNewResource()
+	createDeadlines.Store(d, time.Now().Add(time.Second))
+	t.Cleanup(func() { createDeadlines.Delete(d) })
 	err := savedSearchesRead(d, httpTestProvider(t, server))
 	if err == nil {
 		t.Fatal("savedSearchesRead error = nil, want a missing-search error during create")
