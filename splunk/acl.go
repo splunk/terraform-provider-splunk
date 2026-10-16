@@ -204,10 +204,14 @@ func flattenACL(acl *models.ACLObject) []interface{} {
 	return []interface{}{m}
 }
 
-// sharedObjectOwner uses nobody for app and global objects, so objects owned by other users can be read
+// sharedObjectOwner is the servicesNS user for reads, deletes, and ACL updates
+// of an object that already exists. Private objects use the owner. Every other
+// sharing value is addressed as nobody, so a caller who is not the owner can
+// manage app and global objects. Create addresses the new object as its owner,
+// because it is still private until the ACL call shares it.
 func sharedObjectOwner(aclObject *models.ACLObject) string {
-	if aclObject.Sharing == "app" || aclObject.Sharing == "global" {
-		return "nobody"
+	if aclObject.Sharing == "user" {
+		return aclObject.Owner
 	}
-	return aclObject.Owner
+	return "nobody"
 }

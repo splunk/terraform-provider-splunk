@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -1038,6 +1039,7 @@ func TestSavedSearchesNamespaceForOtherOwners(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.sharing, func(t *testing.T) {
+			useRefreshTimeout(t, 200*time.Millisecond)
 			var paths []string
 			meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
 				paths = append(paths, r.Method+" "+r.URL.Path)
@@ -1118,9 +1120,62 @@ func TestSavedSearchesCreateWaitsForReplication(t *testing.T) {
 	}
 }
 
+func TestSavedSearchesCreateACLUsesOwner(t *testing.T) {
+	const entry = `{"entry":[{"name":"alert","acl":{"app":"search","owner":"jdoe","sharing":"app"},"content":{"search":"index=main"}}]}`
+	tests := []struct {
+		sharing  string
+		wantACL  string
+		wantRead string
+	}{
+		{"app", "/servicesNS/jdoe/search/saved/searches/alert/acl", "/servicesNS/nobody/search/saved/searches/alert"},
+		{"global", "/servicesNS/jdoe/search/saved/searches/alert/acl", "/servicesNS/nobody/search/saved/searches/alert"},
+		{"user", "/servicesNS/jdoe/search/saved/searches/alert/acl", "/servicesNS/jdoe/search/saved/searches/alert"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.sharing, func(t *testing.T) {
+			var aclPath, readPath string
+			meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+				switch r.Method {
+				case http.MethodPost:
+					if strings.HasSuffix(r.URL.Path, "/acl") {
+						aclPath = r.URL.Path
+					}
+					return jsonResponse(http.StatusCreated, "{}"), nil
+				case http.MethodGet:
+					readPath = r.URL.Path
+					return jsonResponse(http.StatusOK, entry), nil
+				}
+				t.Fatalf("unexpected request %s %s", r.Method, r.URL.Path)
+				return nil, nil
+			})
+
+			savedSearch := savedSearches()
+			config := terraform.NewResourceConfigRaw(map[string]interface{}{
+				"name":   "alert",
+				"search": "index=main",
+				"acl":    []interface{}{map[string]interface{}{"owner": "jdoe", "app": "search", "sharing": tt.sharing}},
+			})
+			diff, err := savedSearch.Diff(nil, config, meta)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := savedSearch.Apply(nil, diff, meta); err != nil {
+				t.Fatal(err)
+			}
+			if aclPath != tt.wantACL {
+				t.Errorf("acl path = %q, want %q", aclPath, tt.wantACL)
+			}
+			if readPath != tt.wantRead {
+				t.Errorf("read path = %q, want %q", readPath, tt.wantRead)
+			}
+		})
+	}
+}
+
 func TestSavedSearchesUpdateSendsACLOnlyWhenChanged(t *testing.T) {
 	search, write := "index=main", "admin"
 	var aclRequests int
+	var aclPath string
 	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
 		if r.Method == http.MethodPost {
 			body, err := io.ReadAll(r.Body)
@@ -1133,6 +1188,7 @@ func TestSavedSearchesUpdateSendsACLOnlyWhenChanged(t *testing.T) {
 			}
 			if strings.HasSuffix(r.URL.Path, "/acl") {
 				aclRequests++
+				aclPath = r.URL.Path
 				write = form.Get("perms.write")
 			} else if form.Has("search") {
 				search = form.Get("search")
@@ -1172,5 +1228,98 @@ func TestSavedSearchesUpdateSendsACLOnlyWhenChanged(t *testing.T) {
 	apply(state, "index=main | head 1", "power")
 	if aclRequests != 1 {
 		t.Errorf("acl requests = %d after an acl change, want 1", aclRequests)
+	}
+	if aclPath != "/servicesNS/nobody/search/saved/searches/alert/acl" {
+		t.Errorf("acl path = %q, want the nobody namespace", aclPath)
+	}
+}
+
+func TestSavedSearchesReadRetriesNotFound(t *testing.T) {
+	reads := 0
+	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+		reads++
+		if reads == 1 {
+			return notFoundResponse(), nil
+		}
+		return jsonResponse(http.StatusOK, `{"entry":[{"name":"alert","acl":{"app":"search","owner":"jdoe","sharing":"app"},"content":{"search":"index=main"}}]}`), nil
+	})
+	d := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"name":   "alert",
+		"search": "index=main",
+		"acl":    []interface{}{map[string]interface{}{"owner": "jdoe", "app": "search", "sharing": "app"}},
+	})
+	d.SetId("alert")
+
+	if err := savedSearchesRead(d, meta); err != nil {
+		t.Fatal(err)
+	}
+	if d.Id() != "alert" {
+		t.Fatalf("id = %q, want the saved search kept after a retried 404", d.Id())
+	}
+	if reads < 2 {
+		t.Fatalf("reads = %d, want a retry after the first 404", reads)
+	}
+}
+
+func TestSavedSearchesDeleteRetriesNotFound(t *testing.T) {
+	deletes := 0
+	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+		deletes++
+		if r.URL.Path != "/servicesNS/nobody/search/saved/searches/alert" {
+			t.Errorf("path = %s, want the nobody namespace", r.URL.Path)
+		}
+		if deletes == 1 {
+			return notFoundResponse(), nil
+		}
+		return jsonResponse(http.StatusOK, "{}"), nil
+	})
+	d := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"name":   "alert",
+		"search": "index=main",
+		"acl":    []interface{}{map[string]interface{}{"owner": "jdoe", "app": "search", "sharing": "app"}},
+	})
+	d.SetId("alert")
+
+	if err := savedSearchesDelete(d, meta); err != nil {
+		t.Fatal(err)
+	}
+	if deletes < 2 {
+		t.Fatalf("deletes = %d, want a retry after the first 404", deletes)
+	}
+}
+
+func TestSavedSearchesCreateACLClientErrorDoesNotRetry(t *testing.T) {
+	for _, code := range []int{http.StatusBadRequest, http.StatusForbidden} {
+		t.Run(http.StatusText(code), func(t *testing.T) {
+			var acls int
+			meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+				switch {
+				case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/saved/searches":
+					return jsonResponse(http.StatusCreated, "{}"), nil
+				case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/saved/searches/alert/acl":
+					acls++
+					return jsonResponse(code, `{"messages":[{"type":"ERROR","text":"denied"}]}`), nil
+				}
+				t.Fatalf("unexpected request %s %s", r.Method, r.URL.Path)
+				return nil, nil
+			})
+
+			savedSearch := savedSearches()
+			config := terraform.NewResourceConfigRaw(map[string]interface{}{
+				"name":   "alert",
+				"search": "index=main",
+				"acl":    []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
+			})
+			diff, err := savedSearch.Diff(nil, config, meta)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := savedSearch.Apply(nil, diff, meta); err == nil {
+				t.Fatal("expected the ACL error to fail the create")
+			}
+			if acls != 1 {
+				t.Fatalf("acl requests = %d, want 1", acls)
+			}
+		})
 	}
 }

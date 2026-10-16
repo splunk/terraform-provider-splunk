@@ -232,7 +232,9 @@ In addition to all arguments above, This resource block exports the following ar
 
 ## Timeouts
 
-- `create` - (Default `1m`) How long to retry while a new saved search is not yet visible on every search head cluster member: a create that returns 409 for a saved search just deleted by a replace, or an ACL update or read back that returns 404.
+- `create` - (Default `1m`) One budget for the whole create. The provider retries a create 409, a 404 from the ACL update, and a 404 from the read back while search head cluster replication catches up. A 400 or 403 fails on the first response.
+
+A refresh retries a 404 for 15s. If the saved search is still missing, Terraform removes it from state so the next plan can create it. A delete retries a 404 for that same 15s, then succeeds if it is still missing.
 
 ## Import
 
