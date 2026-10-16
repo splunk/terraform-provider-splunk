@@ -1375,17 +1375,16 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	resp, err := readKnowledgeObject(d, func() (*http.Response, error) {
 		return (*provider.Client).ReadSavedSearches(name, sharedObjectOwner(aclObject), aclObject.App)
 	})
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 	if err != nil {
-		if hasStatus(resp, http.StatusNotFound) && !d.IsNewResource() {
+		if hasStatus(resp, http.StatusNotFound) && dropDeletedResource(d) {
 			log.Printf("[WARN] Saved search %s not found, removing from state", name)
-			closeBody(resp)
-			d.SetId("")
 			return nil
 		}
-		closeBody(resp)
 		return err
 	}
-	defer resp.Body.Close()
 
 	entry, err := getSavedSearchesConfigByName(name, resp)
 	if err != nil {
@@ -1393,6 +1392,9 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if entry == nil {
+		if dropDeletedResource(d) {
+			return nil
+		}
 		return fmt.Errorf("Unable to find resource: %v", name)
 	}
 
@@ -2021,17 +2023,7 @@ func savedSearchesDelete(d *schema.ResourceData, meta interface{}) error {
 		return err
 	}
 	defer resp.Body.Close()
-
-	switch resp.StatusCode {
-	case 200, 201:
-		return nil
-
-	default:
-		errorResponse := &models.InputsUDPResponse{}
-		_ = json.NewDecoder(resp.Body).Decode(errorResponse)
-		err := errors.New(errorResponse.Messages[0].Text)
-		return err
-	}
+	return nil
 }
 
 func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.SavedSearchObject) {

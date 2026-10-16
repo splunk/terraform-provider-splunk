@@ -31,7 +31,7 @@ This resource block supports the following arguments:
 * `name` - (Required) Token name (inputs.conf key)
 * `token` - (Optional, Sensitive) Token value for sending data to collector/event endpoint
 * `index` - (Optional) Index to store generated events
-* `indexes` - (Optional) Set of indexes allowed for events with this token
+* `indexes` - (Optional) Set of indexes allowed for events with this token. Order does not matter.
 * `host` - (Optional) Default host value for events with this token
 * `source` - (Optional) Default source for events with this token
 * `sourcetype` - (Optional) Default source type for events with this token

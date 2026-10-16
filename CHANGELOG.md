@@ -1,4 +1,7 @@
-## 1.5.9
+## 1.6.0
+* Fix: `splunk_indexes` reads `max_hot_buckets`, `bucket_rebuild_memory_hint`, and `rep_factor` when Splunk returns them as JSON numbers or strings. `max_hot_buckets = 6` stays a number, including when Splunk returns `"auto"` (stored as 3). `bucket_rebuild_memory_hint` still accepts `auto` and sizes such as `16MB`. `rep_factor` still sends `0` and `auto`, and a refresh does not plan a change between them
+* Fix: `splunk_indexes` and `splunk_saved_searches` drop state when Splunk no longer has the object, so the next apply recreates an index or saved search deleted outside Terraform
+* Fix: HTTP Event Collector `indexes` is stored as a set, so plans ignore order and show only added or removed index names. Existing state is migrated
 * Feature: `splunk_admin_proxysso_groups` manages Splunk Enterprise Proxy SSO group-to-role mappings (`admin/ProxySSO-groups`)
 * Feature: saved searches can configure Jira Service Desk ticket deduplication with `action_jira_service_desk_param_jira_dedup`
 * Fix: `splunk_authorization_roles` lowercases role names in API calls and state. A refresh rewrites a mixed-case id to the role name Splunk stored, so later reads, updates, and deletes find the role

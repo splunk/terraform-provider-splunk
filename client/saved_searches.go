@@ -32,14 +32,11 @@ func (client *Client) CreateSavedSearches(name, owner, app string, savedSearchOb
 	return resp, nil
 }
 
+// ReadSavedSearches fetches one saved search. The response is returned together
+// with any status error so the caller can tell a 404 from other failures.
 func (client *Client) ReadSavedSearches(name, owner, app string) (*http.Response, error) {
 	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, name, "servicesNS", owner, app, "saved", "searches")
-	resp, err := client.Get(endpoint)
-	if err != nil {
-		return resp, err
-	}
-
-	return resp, nil
+	return client.Get(endpoint)
 }
 
 func (client *Client) UpdateSavedSearches(name string, owner string, app string, savedSearchObject *models.SavedSearchObject) error {

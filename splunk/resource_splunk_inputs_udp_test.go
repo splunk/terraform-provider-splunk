@@ -2,10 +2,15 @@ package splunk
 
 import (
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"io"
 	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
+
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
 const newUDPInput = `
@@ -87,4 +92,76 @@ func testAccSplunkUDPInputDestroyResources(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+func TestInputsUDPDeleteReturnsClientError(t *testing.T) {
+	t.Setenv("HTTPScheme", "http")
+
+	tests := []struct {
+		name string
+		body string
+	}{
+		{
+			name: "splunk message",
+			body: `{"messages":[{"type":"ERROR","text":"Could not find object id=41000"}]}`,
+		},
+		{
+			name: "empty messages",
+			body: `{"messages":[]}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got string
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				got = r.Method + " " + r.URL.EscapedPath()
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusBadRequest)
+				_, _ = io.WriteString(w, tt.body)
+			}))
+			defer server.Close()
+
+			d := udpDeleteResourceData(t)
+			err := inputsUDPDelete(d, httpTestProvider(t, server))
+			if err == nil {
+				t.Fatal("inputsUDPDelete error = nil, want the client status error")
+			}
+			if !strings.Contains(err.Error(), "400 Bad Request") || !strings.Contains(err.Error(), tt.body) {
+				t.Fatalf("inputsUDPDelete error = %q, want status and response body", err)
+			}
+			const want = "DELETE /servicesNS/nobody/search/data/inputs/udp/41000"
+			if got != want {
+				t.Fatalf("request = %q, want %q", got, want)
+			}
+		})
+	}
+}
+
+func TestInputsUDPDeleteSucceeds(t *testing.T) {
+	t.Setenv("HTTPScheme", "http")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = io.WriteString(w, `{}`)
+	}))
+	defer server.Close()
+
+	if err := inputsUDPDelete(udpDeleteResourceData(t), httpTestProvider(t, server)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func udpDeleteResourceData(t *testing.T) *schema.ResourceData {
+	t.Helper()
+	d := schema.TestResourceDataRaw(t, inputsUDP().Schema, map[string]interface{}{
+		"name": "41000",
+		"acl": []interface{}{map[string]interface{}{
+			"owner":   "nobody",
+			"app":     "search",
+			"sharing": "app",
+		}},
+	})
+	d.SetId("41000")
+	return d
 }

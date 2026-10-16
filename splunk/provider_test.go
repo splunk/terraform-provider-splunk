@@ -1,6 +1,8 @@
 package splunk
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"os"
 	"testing"
@@ -103,6 +105,55 @@ func newTestClient() (*client.Client, error) {
 		host,
 		"",
 		http)
+}
+
+func httpTestProvider(t *testing.T, server *httptest.Server) *SplunkProvider {
+	t.Helper()
+	backend, err := url.Parse(server.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	api, err := client.NewSplunkdClient("", [2]string{}, backend.Host, "", server.Client())
+	if err != nil {
+		t.Fatal(err)
+	}
+	return &SplunkProvider{Client: api}
+}
+
+// deleteAndWaitForNotFound removes an object and polls until GET returns 404.
+// Index deletion is asynchronous, so the delete response alone is not enough.
+func deleteAndWaitForNotFound(t *testing.T, deleteFn func(c *client.Client) (*http.Response, error), goneURL func(c *client.Client) url.URL) {
+	t.Helper()
+	c, err := newTestClient()
+	if err != nil {
+		t.Fatalf("newTestClient: %s", err)
+	}
+	resp, err := deleteFn(c)
+	if resp != nil {
+		resp.Body.Close()
+	}
+	if err != nil {
+		t.Fatalf("pre-config delete: %s", err)
+	}
+
+	deadline := time.Now().Add(30 * time.Second)
+	var lastStatus int
+	var lastErr error
+	for {
+		getResp, getErr := c.Get(goneURL(c))
+		if getResp != nil {
+			lastStatus = getResp.StatusCode
+			getResp.Body.Close()
+			if getResp.StatusCode == http.StatusNotFound {
+				return
+			}
+		}
+		lastErr = getErr
+		if time.Now().After(deadline) {
+			t.Fatalf("resource still present after delete (status %d): %v", lastStatus, lastErr)
+		}
+		time.Sleep(time.Second)
+	}
 }
 
 func testAccPreCheck(t *testing.T) {

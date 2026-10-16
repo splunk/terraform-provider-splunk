@@ -89,7 +89,11 @@ func (c *Client) BuildSplunkURL(queryValues url.Values, urlPathParts ...string) 
 	}
 
 	queryValues.Set("output_mode", "json")
-	queryValues.Set("count", "-1") // To avoid http response truncation
+	// Keep a caller-supplied count. Splunk documents 0 as "return every entry",
+	// and an unconditional Set would replace that with -1.
+	if !queryValues.Has("count") {
+		queryValues.Set("count", "-1") // To avoid http response truncation
+	}
 	httpScheme := getEnv(envVarHTTPScheme, defaultScheme)
 
 	return url.URL{

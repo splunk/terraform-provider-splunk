@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"reflect"
 	"strconv"
@@ -14,6 +15,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"github.com/splunk/terraform-provider-splunk/client"
 )
 
 const newSavedSearches = `
@@ -477,6 +479,25 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "dispatch_index_latest", "-5m"),
 					resource.TestCheckResourceAttr(resourceName, "cron_schedule", "*/5 * * * *"),
 					resource.TestCheckResourceAttr(resourceName, "is_visible", "true"),
+				),
+			},
+			{
+				// Recreate a saved search deleted outside Terraform, then keep the in-place update below.
+				// The fixture ACL places the object in admin/launcher; nobody/search does not contain it.
+				PreConfig: func() {
+					deleteAndWaitForNotFound(t,
+						func(c *client.Client) (*http.Response, error) {
+							return c.DeleteSavedSearches("Test New Alert", "admin", "launcher")
+						},
+						func(c *client.Client) url.URL {
+							return c.BuildSplunkURLWithEscapedPathPart(nil, "Test New Alert", "servicesNS", "admin", "launcher", "saved", "searches")
+						},
+					)
+				},
+				Config: newSavedSearches,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test New Alert"),
+					resource.TestCheckResourceAttr(resourceName, "search", "index=main"),
 				),
 			},
 			{
@@ -1015,6 +1036,156 @@ func TestGetSavedSearchesConfigByNameDecodeError(t *testing.T) {
 	if entry != nil {
 		t.Fatalf("getSavedSearchesConfigByName entry = %#v, want nil", entry)
 	}
+}
+
+func TestSavedSearchesDeleteReturnsClientError(t *testing.T) {
+	t.Setenv("HTTPScheme", "http")
+
+	tests := []struct {
+		name string
+		body string
+	}{
+		{
+			name: "splunk message",
+			body: `{"messages":[{"type":"ERROR","text":"Could not find object id=alert"}]}`,
+		},
+		{
+			name: "empty messages",
+			body: `{"messages":[]}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got string
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				got = r.Method + " " + r.URL.EscapedPath()
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusBadRequest)
+				_, _ = io.WriteString(w, tt.body)
+			}))
+			defer server.Close()
+
+			d := savedSearchDeleteResourceData(t)
+			err := savedSearchesDelete(d, httpTestProvider(t, server))
+			if err == nil {
+				t.Fatal("savedSearchesDelete error = nil, want the client status error")
+			}
+			if !strings.Contains(err.Error(), "400 Bad Request") || !strings.Contains(err.Error(), tt.body) {
+				t.Fatalf("savedSearchesDelete error = %q, want status and response body", err)
+			}
+			const want = "DELETE /servicesNS/admin/search/saved/searches/alert"
+			if got != want {
+				t.Fatalf("request = %q, want %q", got, want)
+			}
+		})
+	}
+}
+
+func TestSavedSearchesDeleteSucceeds(t *testing.T) {
+	t.Setenv("HTTPScheme", "http")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = io.WriteString(w, `{}`)
+	}))
+	defer server.Close()
+
+	if err := savedSearchesDelete(savedSearchDeleteResourceData(t), httpTestProvider(t, server)); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSavedSearchesReadDropsStateWhenMissing(t *testing.T) {
+	t.Setenv("HTTPScheme", "http")
+
+	tests := []struct {
+		name   string
+		status int
+		body   string
+	}{
+		{name: "not found", status: http.StatusNotFound, body: `{"messages":[{"type":"ERROR","text":"Could not find object"}]}`},
+		{name: "empty feed", status: http.StatusOK, body: `{"entry":[]}`},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(tt.status)
+				_, _ = io.WriteString(w, tt.body)
+			}))
+			defer server.Close()
+
+			d := savedSearchReadResourceData(t)
+			if err := savedSearchesRead(d, httpTestProvider(t, server)); err != nil {
+				t.Fatal(err)
+			}
+			if d.Id() != "" {
+				t.Fatalf("id = %q, want empty", d.Id())
+			}
+		})
+	}
+}
+
+func TestSavedSearchesReadKeepsStateWhenCreateCannotSeeSearch(t *testing.T) {
+	t.Setenv("HTTPScheme", "http")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.NotFound(w, r)
+	}))
+	defer server.Close()
+
+	d := savedSearchReadResourceData(t)
+	d.MarkNewResource()
+	err := savedSearchesRead(d, httpTestProvider(t, server))
+	if err == nil {
+		t.Fatal("savedSearchesRead error = nil, want a missing-search error during create")
+	}
+	if d.Id() != "deleted-search" {
+		t.Fatalf("id = %q, want deleted-search", d.Id())
+	}
+}
+
+func TestSavedSearchesReadKeepsStateOnServerError(t *testing.T) {
+	t.Setenv("HTTPScheme", "http")
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, `{"messages":[{"type":"ERROR","text":"unavailable"}]}`, http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	d := savedSearchReadResourceData(t)
+	if err := savedSearchesRead(d, httpTestProvider(t, server)); err == nil {
+		t.Fatal("savedSearchesRead error = nil, want the server error")
+	}
+	if d.Id() != "deleted-search" {
+		t.Fatalf("id = %q, want deleted-search", d.Id())
+	}
+}
+
+func savedSearchReadResourceData(t *testing.T) *schema.ResourceData {
+	t.Helper()
+	d := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"name":   "deleted-search",
+		"search": "index=main",
+	})
+	d.SetId("deleted-search")
+	return d
+}
+
+func savedSearchDeleteResourceData(t *testing.T) *schema.ResourceData {
+	t.Helper()
+	d := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"name":   "alert",
+		"search": "index=main",
+		"acl": []interface{}{map[string]interface{}{
+			"owner":   "admin",
+			"app":     "search",
+			"sharing": "app",
+		}},
+	})
+	d.SetId("alert")
+	return d
 }
 
 func TestGetSavedSearchesConfigActionEmailCommand(t *testing.T) {
