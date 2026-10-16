@@ -25,6 +25,12 @@ In addition to all arguments above, This resource block exports the following ar
 
 * `id` - The ID of the dashboard
 
+## Timeouts
+
+* `create` - (Default `1m`) One budget for the whole create. The provider retries a create 409, a 404 from the ACL update, and a 404 from the read back while search head cluster replication catches up. A 400 or 403 fails on the first response.
+
+A refresh retries a 404 for 15s. If the dashboard is still missing, Terraform removes it from state so the next plan can create it. A delete retries a 404 for that same 15s, then succeeds if it is still missing.
+
 ## Import
 
 Dashboards/views in the default namespace can be imported by name:

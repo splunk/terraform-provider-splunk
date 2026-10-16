@@ -2,12 +2,17 @@ package splunk
 
 import (
 	"fmt"
+	"io"
 	"net/http"
+	"net/url"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
 const splunkDashboardsObjectWithAcl = `
@@ -142,4 +147,331 @@ func testAccSplunkDashboardDestroyResources(s *terraform.State) error {
 		}
 	}
 	return nil
+}
+
+const dashboardEntry = `{"entry":[{"name":"terraform","acl":{"app":"search","owner":"admin","sharing":"app"},"content":{"eai:data":"<dashboard/>"}}]}`
+
+func TestSplunkDashboardsCreateWaitsForReplication(t *testing.T) {
+	var creates, acls, reads int
+	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+		switch {
+		case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/data/ui/views":
+			creates++
+			if creates == 1 {
+				return jsonResponse(http.StatusConflict, `{"messages":[{"type":"ERROR","text":"An object with name=terraform already exists"}]}`), nil
+			}
+			return jsonResponse(http.StatusCreated, "{}"), nil
+		case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/data/ui/views/terraform/acl":
+			acls++
+			if acls == 1 {
+				return notFoundResponse(), nil
+			}
+			return jsonResponse(http.StatusOK, "{}"), nil
+		case r.Method == http.MethodGet && r.URL.Path == "/servicesNS/nobody/search/data/ui/views/terraform":
+			reads++
+			if reads == 1 {
+				return notFoundResponse(), nil
+			}
+			return jsonResponse(http.StatusOK, dashboardEntry), nil
+		}
+		t.Fatalf("unexpected request %s %s", r.Method, r.URL.Path)
+		return nil, nil
+	})
+
+	dashboard := splunkDashboards()
+	config := terraform.NewResourceConfigRaw(map[string]interface{}{
+		"name":     "terraform",
+		"eai_data": "<dashboard/>",
+		"acl":      []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
+	})
+	diff, err := dashboard.Diff(nil, config, meta)
+	if err != nil {
+		t.Fatal(err)
+	}
+	state, err := dashboard.Apply(nil, diff, meta)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if state.ID != "terraform" || state.Attributes["eai_data"] != "<dashboard/>" {
+		t.Errorf("state = %v", state)
+	}
+	if creates != 2 || acls != 2 || reads != 2 {
+		t.Errorf("creates = %d, acls = %d, reads = %d, want 2 each", creates, acls, reads)
+	}
+}
+
+func TestSplunkDashboardsCreateACLUsesOwner(t *testing.T) {
+	tests := []struct {
+		sharing  string
+		wantACL  string
+		wantRead string
+	}{
+		{"app", "/servicesNS/jdoe/search/data/ui/views/terraform/acl", "/servicesNS/nobody/search/data/ui/views/terraform"},
+		{"global", "/servicesNS/jdoe/search/data/ui/views/terraform/acl", "/servicesNS/nobody/search/data/ui/views/terraform"},
+		{"user", "/servicesNS/jdoe/search/data/ui/views/terraform/acl", "/servicesNS/jdoe/search/data/ui/views/terraform"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.sharing, func(t *testing.T) {
+			var aclPath, readPath string
+			meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+				switch r.Method {
+				case http.MethodPost:
+					if strings.HasSuffix(r.URL.Path, "/acl") {
+						aclPath = r.URL.Path
+					}
+					return jsonResponse(http.StatusCreated, "{}"), nil
+				case http.MethodGet:
+					readPath = r.URL.Path
+					return jsonResponse(http.StatusOK, dashboardEntry), nil
+				}
+				t.Fatalf("unexpected request %s %s", r.Method, r.URL.Path)
+				return nil, nil
+			})
+
+			dashboard := splunkDashboards()
+			config := terraform.NewResourceConfigRaw(map[string]interface{}{
+				"name":     "terraform",
+				"eai_data": "<dashboard/>",
+				"acl":      []interface{}{map[string]interface{}{"owner": "jdoe", "app": "search", "sharing": tt.sharing}},
+			})
+			diff, err := dashboard.Diff(nil, config, meta)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := dashboard.Apply(nil, diff, meta); err != nil {
+				t.Fatal(err)
+			}
+			if aclPath != tt.wantACL {
+				t.Errorf("acl path = %q, want %q", aclPath, tt.wantACL)
+			}
+			if readPath != tt.wantRead {
+				t.Errorf("read path = %q, want %q", readPath, tt.wantRead)
+			}
+		})
+	}
+}
+
+func TestSplunkDashboardsCreateACLClientErrorDoesNotRetry(t *testing.T) {
+	for _, code := range []int{http.StatusBadRequest, http.StatusForbidden} {
+		t.Run(http.StatusText(code), func(t *testing.T) {
+			var acls int
+			meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+				switch {
+				case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/data/ui/views":
+					return jsonResponse(http.StatusCreated, "{}"), nil
+				case r.Method == http.MethodPost && r.URL.Path == "/servicesNS/admin/search/data/ui/views/terraform/acl":
+					acls++
+					return jsonResponse(code, `{"messages":[{"type":"ERROR","text":"denied"}]}`), nil
+				}
+				t.Fatalf("unexpected request %s %s", r.Method, r.URL.Path)
+				return nil, nil
+			})
+
+			dashboard := splunkDashboards()
+			config := terraform.NewResourceConfigRaw(map[string]interface{}{
+				"name":     "terraform",
+				"eai_data": "<dashboard/>",
+				"acl":      []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
+			})
+			diff, err := dashboard.Diff(nil, config, meta)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := dashboard.Apply(nil, diff, meta); err == nil {
+				t.Fatal("expected the ACL error to fail the create")
+			}
+			if acls != 1 {
+				t.Fatalf("acl requests = %d, want 1", acls)
+			}
+		})
+	}
+}
+
+func TestSplunkDashboardsReadRemovesDeletedDashboard(t *testing.T) {
+	useRefreshTimeout(t, 200*time.Millisecond)
+	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+		return notFoundResponse(), nil
+	})
+
+	d := schema.TestResourceDataRaw(t, splunkDashboards().Schema, map[string]interface{}{
+		"name":     "terraform",
+		"eai_data": "<dashboard/>",
+		"acl":      []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
+	})
+	d.SetId("terraform")
+
+	if err := splunkDashboardsRead(d, meta); err != nil {
+		t.Fatal(err)
+	}
+	if d.Id() != "" {
+		t.Errorf("id = %q, want the resource removed from state", d.Id())
+	}
+}
+
+func TestSplunkDashboardsDeleteIgnoresDeletedDashboard(t *testing.T) {
+	useRefreshTimeout(t, 200*time.Millisecond)
+	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+		return notFoundResponse(), nil
+	})
+
+	d := schema.TestResourceDataRaw(t, splunkDashboards().Schema, map[string]interface{}{
+		"name":     "terraform",
+		"eai_data": "<dashboard/>",
+		"acl":      []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
+	})
+	d.SetId("terraform")
+
+	if err := splunkDashboardsDelete(d, meta); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSplunkDashboardsReadRetriesNotFound(t *testing.T) {
+	reads := 0
+	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+		reads++
+		if reads == 1 {
+			return notFoundResponse(), nil
+		}
+		return jsonResponse(http.StatusOK, dashboardEntry), nil
+	})
+	d := schema.TestResourceDataRaw(t, splunkDashboards().Schema, map[string]interface{}{
+		"name":     "terraform",
+		"eai_data": "<dashboard/>",
+		"acl":      []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
+	})
+	d.SetId("terraform")
+
+	if err := splunkDashboardsRead(d, meta); err != nil {
+		t.Fatal(err)
+	}
+	if d.Id() != "terraform" {
+		t.Fatalf("id = %q, want the dashboard kept after a retried 404", d.Id())
+	}
+	if reads < 2 {
+		t.Fatalf("reads = %d, want a retry after the first 404", reads)
+	}
+}
+
+func TestSplunkDashboardsDeleteRetriesNotFound(t *testing.T) {
+	deletes := 0
+	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+		deletes++
+		if deletes == 1 {
+			return notFoundResponse(), nil
+		}
+		return jsonResponse(http.StatusOK, "{}"), nil
+	})
+	d := schema.TestResourceDataRaw(t, splunkDashboards().Schema, map[string]interface{}{
+		"name":     "terraform",
+		"eai_data": "<dashboard/>",
+		"acl":      []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
+	})
+	d.SetId("terraform")
+
+	if err := splunkDashboardsDelete(d, meta); err != nil {
+		t.Fatal(err)
+	}
+	if deletes < 2 {
+		t.Fatalf("deletes = %d, want a retry after the first 404", deletes)
+	}
+}
+
+func TestSplunkDashboardsTimeoutsKeepExistingStateUnchanged(t *testing.T) {
+	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+		if r.Method == http.MethodGet {
+			return jsonResponse(http.StatusOK, dashboardEntry), nil
+		}
+		return jsonResponse(http.StatusCreated, "{}"), nil
+	})
+	dashboard := splunkDashboards()
+	if got := *dashboard.Timeouts.Create; got != defaultReplicationTimeout {
+		t.Errorf("default create timeout = %s, want %s", got, defaultReplicationTimeout)
+	}
+
+	config := terraform.NewResourceConfigRaw(map[string]interface{}{
+		"name":     "terraform",
+		"eai_data": "<dashboard/>",
+		"acl":      []interface{}{map[string]interface{}{"owner": "admin", "app": "search", "sharing": "app"}},
+	})
+	diff, err := dashboard.Diff(nil, config, meta)
+	if err != nil {
+		t.Fatal(err)
+	}
+	state, err := dashboard.Apply(nil, diff, meta)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// state from a version without timeouts
+	delete(state.Meta, schema.TimeoutKey)
+
+	diff, err = dashboard.Diff(state, config, meta)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff != nil && !diff.Empty() {
+		t.Errorf("diff = %v, want no changes", diff.Attributes)
+	}
+}
+
+func TestSplunkDashboardsUpdateSendsACLOnlyWhenChanged(t *testing.T) {
+	eaiData, write := "<dashboard/>", "admin"
+	var aclRequests int
+	var aclPath string
+	meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+		if r.Method == http.MethodPost {
+			body, err := io.ReadAll(r.Body)
+			if err != nil {
+				t.Fatal(err)
+			}
+			form, err := url.ParseQuery(string(body))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if strings.HasSuffix(r.URL.Path, "/acl") {
+				aclRequests++
+				aclPath = r.URL.Path
+				write = form.Get("perms.write")
+			} else if form.Has("eai:data") {
+				eaiData = form.Get("eai:data")
+			}
+			return jsonResponse(http.StatusOK, "{}"), nil
+		}
+		return jsonResponse(http.StatusOK, fmt.Sprintf(`{"entry":[{"name":"terraform","acl":{"app":"search","owner":"jdoe","sharing":"app","perms":{"read":["*"],"write":[%q]}},"content":{"eai:data":%q}}]}`, write, eaiData)), nil
+	})
+
+	dashboard := splunkDashboards()
+	apply := func(state *terraform.InstanceState, eaiData, write string) *terraform.InstanceState {
+		t.Helper()
+		config := terraform.NewResourceConfigRaw(map[string]interface{}{
+			"name":     "terraform",
+			"eai_data": eaiData,
+			"acl":      []interface{}{map[string]interface{}{"owner": "jdoe", "app": "search", "sharing": "app", "read": []interface{}{"*"}, "write": []interface{}{write}}},
+		})
+		diff, err := dashboard.Diff(state, config, meta)
+		if err != nil {
+			t.Fatal(err)
+		}
+		state, err = dashboard.Apply(state, diff, meta)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return state
+	}
+
+	state := apply(nil, "<dashboard/>", "admin")
+	aclRequests = 0
+
+	state = apply(state, "<form/>", "admin")
+	if aclRequests != 0 {
+		t.Errorf("acl requests = %d after an eai_data change, want 0", aclRequests)
+	}
+
+	apply(state, "<form/>", "power")
+	if aclRequests != 1 {
+		t.Errorf("acl requests = %d after an acl change, want 1", aclRequests)
+	}
+	if aclPath != "/servicesNS/nobody/search/data/ui/views/terraform/acl" {
+		t.Errorf("acl path = %q, want the nobody namespace", aclPath)
+	}
 }

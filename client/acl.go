@@ -114,15 +114,33 @@ func (client *Client) UpdateAcl(owner, app, name string, acl *models.ACLObject, 
 		resp, err = client.Post(endpoint, values)
 	}
 	if err != nil {
-		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, err)
+		return withHTTPStatus(resp, fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, err))
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
-		return fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, resp.Status)
+		return withHTTPStatus(resp, fmt.Errorf("POST failed for endpoint %s: %s", endpoint.Path, resp.Status))
 	}
 
 	return nil
+}
+
+// HTTPStatusError is an UpdateAcl failure that carries the response status.
+// Error text stays the same, so callers that only print the error are unchanged.
+type HTTPStatusError struct {
+	StatusCode int
+	Message    string
+}
+
+func (e *HTTPStatusError) Error() string {
+	return e.Message
+}
+
+func withHTTPStatus(resp *http.Response, err error) error {
+	if resp == nil || err == nil {
+		return err
+	}
+	return &HTTPStatusError{StatusCode: resp.StatusCode, Message: err.Error()}
 }
 
 func (client *Client) buildAclEndpoint(queryValues url.Values, owner, app, name string, resources ...string) url.URL {

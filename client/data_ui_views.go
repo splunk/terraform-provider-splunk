@@ -8,26 +8,26 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-func (client *Client) CreateDashboardObject(owner string, app string, splunkDashboardsObj *models.SplunkDashboardsObject) error {
+func (client *Client) CreateDashboardObject(owner string, app string, splunkDashboardsObj *models.SplunkDashboardsObject) (*http.Response, error) {
 	values, err := query.Values(&splunkDashboardsObj)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "ui", "views")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
-		return err
+		return resp, err
 	}
 	defer resp.Body.Close()
 
-	return nil
+	return resp, nil
 }
 
 func (client *Client) ReadDashboardObject(name, owner, app string) (*http.Response, error) {
 	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, name, "servicesNS", owner, app, "data", "ui", "views")
 	resp, err := client.Get(endpoint)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 
 	return resp, nil
@@ -53,7 +53,7 @@ func (client *Client) DeleteDashboardObject(owner string, app string, name strin
 	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, name, "servicesNS", owner, app, "data", "ui", "views")
 	resp, err := client.Delete(endpoint)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 	defer resp.Body.Close()
 

@@ -8,17 +8,17 @@ import (
 	"net/http/httputil"
 )
 
-func (client *Client) CreateSavedSearches(name, owner, app string, savedSearchObject *models.SavedSearchObject) error {
+func (client *Client) CreateSavedSearches(name, owner, app string, savedSearchObject *models.SavedSearchObject) (*http.Response, error) {
 	values, err := query.Values(savedSearchObject)
 	values.Add("name", name)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "saved", "searches")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
-		return err
+		return resp, err
 	}
 
 	respBody, error := httputil.DumpResponse(resp, true)
@@ -29,7 +29,7 @@ func (client *Client) CreateSavedSearches(name, owner, app string, savedSearchOb
 	log.Printf("[DEBUG] Response object returned from CreateSavedSearches is: %s", string(respBody))
 
 	defer resp.Body.Close()
-	return nil
+	return resp, nil
 }
 
 // ReadSavedSearches fetches one saved search. The response is returned together
@@ -57,7 +57,7 @@ func (client *Client) DeleteSavedSearches(name, owner, app string) (*http.Respon
 	endpoint := client.BuildSplunkURLWithEscapedPathPart(nil, name, "servicesNS", owner, app, "saved", "searches")
 	resp, err := client.Delete(endpoint)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 
 	respBody, error := httputil.DumpResponse(resp, true)

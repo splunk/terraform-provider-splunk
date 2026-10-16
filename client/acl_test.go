@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -96,6 +97,76 @@ func TestGetAcl_NonCloudMode_OmitsOwnerSharingFromQuery(t *testing.T) {
 	if q.Get("sharing") != "" {
 		t.Errorf("non-cloud mode should not set sharing query param, got %q", q.Get("sharing"))
 	}
+}
+
+func TestUpdateAclReturnsHTTPStatus(t *testing.T) {
+	t.Setenv(envVarHTTPScheme, "http")
+
+	acl := &models.ACLObject{Sharing: "app", Owner: "admin", App: "search"}
+	tests := []struct {
+		name  string
+		cloud bool
+		code  int
+	}{
+		{"enterprise 404", false, http.StatusNotFound},
+		{"enterprise 400", false, http.StatusBadRequest},
+		{"cloud 404", true, http.StatusNotFound},
+		{"cloud 403", true, http.StatusForbidden},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				http.Error(w, "denied", tt.code)
+			}))
+			defer server.Close()
+
+			backend, err := url.Parse(server.URL)
+			if err != nil {
+				t.Fatal(err)
+			}
+			c, err := NewSplunkdClient("", defaultAuth, backend.Host, "", server.Client())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if tt.cloud {
+				c.ACLGetMode = ACLGetModeCloud
+			}
+
+			err = c.UpdateAcl("admin", "search", "alert", acl, "saved", "searches")
+			var statusErr *HTTPStatusError
+			if !errors.As(err, &statusErr) || statusErr.StatusCode != tt.code {
+				t.Fatalf("err = %v, want HTTPStatusError %d", err, tt.code)
+			}
+			if !strings.Contains(err.Error(), "POST failed for endpoint") {
+				t.Fatalf("err = %q, want the existing POST failed message", err)
+			}
+		})
+	}
+}
+
+func TestUpdateAclTransportErrorHasNoStatus(t *testing.T) {
+	t.Setenv(envVarHTTPScheme, "http")
+
+	c, err := NewSplunkdClient("", defaultAuth, "splunk.example:8089", "", &http.Client{
+		Transport: roundTripFunc(func(*http.Request) (*http.Response, error) {
+			return nil, errors.New("dial failed")
+		}),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = c.UpdateAcl("admin", "search", "alert", &models.ACLObject{Sharing: "app"}, "saved", "searches")
+	var statusErr *HTTPStatusError
+	if err == nil || errors.As(err, &statusErr) {
+		t.Fatalf("err = %v, want a transport error without an HTTP status", err)
+	}
+}
+
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(r *http.Request) (*http.Response, error) {
+	return f(r)
 }
 
 func TestAclURLsEscapeResourceName(t *testing.T) {
