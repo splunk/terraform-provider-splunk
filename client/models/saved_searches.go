@@ -202,8 +202,8 @@ type SavedSearchObject struct {
 	ActionEmailUseSSL                                  bool         `json:"action.email.use_ssl" url:"action.email.use_ssl"`
 	ActionEmailUseTLS                                  bool         `json:"action.email.use_tls" url:"action.email.use_tls"`
 	ActionEmailWidthSortColumns                        bool         `json:"action.email.width_sort_columns" url:"action.email.width_sort_columns"`
-	ActionPagerdutyIntegrationURL                      string       `json:"action.pagerduty.param.integration_url,omitempty" url:"action.pagerduty.param.integration_url"`
-	ActionPagerdutyIntegrationURLOverride              string       `json:"action.pagerduty.param.integration_url_override,omitempty" url:"action.pagerduty.param.integration_url_override"`
+	ActionPagerdutyIntegrationURL                      string       `json:"action.pagerduty.param.integration_url,omitempty" url:"action.pagerduty.param.integration_url,omitempty"`
+	ActionPagerdutyIntegrationURLOverride              string       `json:"action.pagerduty.param.integration_url_override,omitempty" url:"action.pagerduty.param.integration_url_override,omitempty"`
 	ActionPagerdutyParamCustDetails                    string       `json:"action.pagerduty.param.custom_details,omitempty" url:"action.pagerduty.param.custom_details,omitempty"`
 	ActionPagerdutyParamIntKey                         string       `json:"action.pagerduty.param.integration_key,omitempty" url:"action.pagerduty.param.integration_key,omitempty"`
 	ActionPagerdutyParamIntKeyOverride                 string       `json:"action.pagerduty.param.integration_key_override,omitempty" url:"action.pagerduty.param.integration_key_override,omitempty"`
@@ -254,49 +254,49 @@ type SavedSearchObject struct {
 	ActionLogEventParamIndex                           string       `json:"action.logevent.param.index,omitempty" url:"action.logevent.param.index"`
 	ActionLogEventParamSourceType                      string       `json:"action.logevent.param.sourcetype,omitempty" url:"action.logevent.param.sourcetype"`
 	ActionLogEventParamSource                          string       `json:"action.logevent.param.source,omitempty" url:"action.logevent.param.source"`
-	ActionCreateXsoarIncident                          string       `json:"action.create_xsoar_incident,omitempty" url:"action.create_xsoar_incident"`
-	ActionCreateXsoarIncidentParamSendAllServers       string       `json:"action.create_xsoar_incident.param.send_all_servers,omitempty" url:"action.create_xsoar_incident.param.send_all_servers"`
-	ActionCreateXsoarIncidentParamServerUrl            string       `json:"action.create_xsoar_incident.param.server_url,omitempty" url:"action.create_xsoar_incident.param.server_url"`
-	ActionCreateXsoarIncidentParamIncidentName         string       `json:"action.create_xsoar_incident.param.incident_name,omitempty" url:"action.create_xsoar_incident.param.incident_name"`
-	ActionCreateXsoarIncidentParamDetails              string       `json:"action.create_xsoar_incident.param.details,omitempty" url:"action.create_xsoar_incident.param.details"`
-	ActionCreateXsoarIncidentParamCustomFields         string       `json:"action.create_xsoar_incident.param.custom_fields,omitempty" url:"action.create_xsoar_incident.param.custom_fields"`
-	ActionCreateXsoarIncidentParamSeverity             string       `json:"action.create_xsoar_incident.param.severity,omitempty" url:"action.create_xsoar_incident.param.severity"`
-	ActionCreateXsoarIncidentParamOccurred             string       `json:"action.create_xsoar_incident.param.occurred,omitempty" url:"action.create_xsoar_incident.param.occurred"`
-	ActionCreateXsoarIncidentParamType                 string       `json:"action.create_xsoar_incident.param.type" url:"action.create_xsoar_incident.param.type"`
-	ActionSlackParamAttachment                         string       `json:"action.slack.param.attachment,omitempty" url:"action.slack.param.attachment"`
-	ActionSlackParamChannel                            string       `json:"action.slack.param.channel,omitempty" url:"action.slack.param.channel"`
-	ActionSlackParamFields                             string       `json:"action.slack.param.fields,omitempty" url:"action.slack.param.fields"`
-	ActionSlackParamMessage                            string       `json:"action.slack.param.message,omitempty" url:"action.slack.param.message"`
-	ActionSlackParamWebhookUrlOverride                 string       `json:"action.slack.param.webhook_url_override,omitempty" url:"action.slack.param.webhook_url_override"`
-	ActionSlackAppAlertIntegrationParamAutoJoinChannel string       `json:"action.slack_app_alert_integration.param.auto_join_channel,omitempty" url:"action.slack_app_alert_integration.param.auto_join_channel"`
-	ActionSlackAppAlertIntegrationParamBotUsername     string       `json:"action.slack_app_alert_integration.param.bot_username,omitempty" url:"action.slack_app_alert_integration.param.bot_username"`
-	ActionSlackAppAlertIntegrationParamChannel         string       `json:"action.slack_app_alert_integration.param.channel,omitempty" url:"action.slack_app_alert_integration.param.channel"`
-	ActionSlackAppAlertIntegrationParamEmoji           string       `json:"action.slack_app_alert_integration.param.emoji,omitempty" url:"action.slack_app_alert_integration.param.emoji"`
-	ActionSlackAppAlertIntegrationParamMessage         string       `json:"action.slack_app_alert_integration.param.message,omitempty" url:"action.slack_app_alert_integration.param.message"`
-	ActionJiraServiceDeskParamAccount                  string       `json:"action.jira_service_desk.param.account,omitempty" url:"action.jira_service_desk.param.account"`
-	ActionJiraServiceDeskParamJiraProject              string       `json:"action.jira_service_desk.param.jira_project,omitempty" url:"action.jira_service_desk.param.jira_project"`
-	ActionJiraServiceDeskParamJiraIssueType            string       `json:"action.jira_service_desk.param.jira_issue_type,omitempty" url:"action.jira_service_desk.param.jira_issue_type"`
-	ActionJiraServiceDeskParamJiraSummary              string       `json:"action.jira_service_desk.param.jira_summary,omitempty" url:"action.jira_service_desk.param.jira_summary"`
-	ActionJiraServiceDeskParamJiraPriority             string       `json:"action.jira_service_desk.param.jira_priority,omitempty" url:"action.jira_service_desk.param.jira_priority"`
-	ActionJiraServiceDeskParamJiraDescription          string       `json:"action.jira_service_desk.param.jira_description,omitempty" url:"action.jira_service_desk.param.jira_description"`
-	ActionJiraServiceDeskParamJiraDedup                string       `json:"action.jira_service_desk.param.jira_dedup,omitempty" url:"action.jira_service_desk.param.jira_dedup"`
-	ActionJiraServiceDeskParamJiraCustomfields         string       `json:"action.jira_service_desk.param.jira_customfields,omitempty" url:"action.jira_service_desk.param.jira_customfields"`
-	ActionVictoropsParamMessageType                    string       `json:"action.victorops.param.message_type,omitempty" url:"action.victorops.param.message_type"`
-	ActionVictoropsParamMonitoringTool                 string       `json:"action.victorops.param.monitoring_tool,omitempty" url:"action.victorops.param.monitoring_tool"`
-	ActionVictoropsParamEntityId                       string       `json:"action.victorops.param.entity_id,omitempty" url:"action.victorops.param.entity_id"`
-	ActionVictoropsParamStateMessage                   string       `json:"action.victorops.param.state_message,omitempty" url:"action.victorops.param.state_message"`
-	ActionVictoropsParamRecordId                       string       `json:"action.victorops.param.record_id,omitempty" url:"action.victorops.param.record_id"`
-	ActionVictoropsParamRoutingKeyOverride             string       `json:"action.victorops.param.routing_key_override,omitempty" url:"action.victorops.param.routing_key_override"`
-	ActionVictoropsParamEnableRecovery                 string       `json:"action.victorops.param.enable_recovery,omitempty" url:"action.victorops.param.enable_recovery"`
-	ActionVictoropsParamPollInterval                   string       `json:"action.victorops.param.poll_interval,omitempty" url:"action.victorops.param.poll_interval"`
-	ActionVictoropsParamInactivePolls                  string       `json:"action.victorops.param.inactive_polls,omitempty" url:"action.victorops.param.inactive_polls"`
-	ActionBetterWebhookParamUrl                        string       `json:"action.better_webhook.param.url,omitempty" url:"action.better_webhook.param.url"`
-	ActionBetterWebhookParamBodyFormat                 string       `json:"action.better_webhook.param.body_format,omitempty" url:"action.better_webhook.param.body_format"`
-	ActionBetterWebhookParamCredential                 string       `json:"action.better_webhook.param.credential,omitempty" url:"action.better_webhook.param.credential"`
-	ActionBetterWebhookParamCredentials                string       `json:"action.better_webhook.param.credentials,omitempty" url:"action.better_webhook.param.credentials"`
+	ActionCreateXsoarIncident                          string       `json:"action.create_xsoar_incident,omitempty" url:"action.create_xsoar_incident,omitempty"`
+	ActionCreateXsoarIncidentParamSendAllServers       string       `json:"action.create_xsoar_incident.param.send_all_servers,omitempty" url:"action.create_xsoar_incident.param.send_all_servers,omitempty"`
+	ActionCreateXsoarIncidentParamServerUrl            string       `json:"action.create_xsoar_incident.param.server_url,omitempty" url:"action.create_xsoar_incident.param.server_url,omitempty"`
+	ActionCreateXsoarIncidentParamIncidentName         string       `json:"action.create_xsoar_incident.param.incident_name,omitempty" url:"action.create_xsoar_incident.param.incident_name,omitempty"`
+	ActionCreateXsoarIncidentParamDetails              string       `json:"action.create_xsoar_incident.param.details,omitempty" url:"action.create_xsoar_incident.param.details,omitempty"`
+	ActionCreateXsoarIncidentParamCustomFields         string       `json:"action.create_xsoar_incident.param.custom_fields,omitempty" url:"action.create_xsoar_incident.param.custom_fields,omitempty"`
+	ActionCreateXsoarIncidentParamSeverity             string       `json:"action.create_xsoar_incident.param.severity,omitempty" url:"action.create_xsoar_incident.param.severity,omitempty"`
+	ActionCreateXsoarIncidentParamOccurred             string       `json:"action.create_xsoar_incident.param.occurred,omitempty" url:"action.create_xsoar_incident.param.occurred,omitempty"`
+	ActionCreateXsoarIncidentParamType                 string       `json:"action.create_xsoar_incident.param.type,omitempty" url:"action.create_xsoar_incident.param.type,omitempty"`
+	ActionSlackParamAttachment                         string       `json:"action.slack.param.attachment,omitempty" url:"action.slack.param.attachment,omitempty"`
+	ActionSlackParamChannel                            string       `json:"action.slack.param.channel,omitempty" url:"action.slack.param.channel,omitempty"`
+	ActionSlackParamFields                             string       `json:"action.slack.param.fields,omitempty" url:"action.slack.param.fields,omitempty"`
+	ActionSlackParamMessage                            string       `json:"action.slack.param.message,omitempty" url:"action.slack.param.message,omitempty"`
+	ActionSlackParamWebhookUrlOverride                 string       `json:"action.slack.param.webhook_url_override,omitempty" url:"action.slack.param.webhook_url_override,omitempty"`
+	ActionSlackAppAlertIntegrationParamAutoJoinChannel string       `json:"action.slack_app_alert_integration.param.auto_join_channel,omitempty" url:"action.slack_app_alert_integration.param.auto_join_channel,omitempty"`
+	ActionSlackAppAlertIntegrationParamBotUsername     string       `json:"action.slack_app_alert_integration.param.bot_username,omitempty" url:"action.slack_app_alert_integration.param.bot_username,omitempty"`
+	ActionSlackAppAlertIntegrationParamChannel         string       `json:"action.slack_app_alert_integration.param.channel,omitempty" url:"action.slack_app_alert_integration.param.channel,omitempty"`
+	ActionSlackAppAlertIntegrationParamEmoji           string       `json:"action.slack_app_alert_integration.param.emoji,omitempty" url:"action.slack_app_alert_integration.param.emoji,omitempty"`
+	ActionSlackAppAlertIntegrationParamMessage         string       `json:"action.slack_app_alert_integration.param.message,omitempty" url:"action.slack_app_alert_integration.param.message,omitempty"`
+	ActionJiraServiceDeskParamAccount                  string       `json:"action.jira_service_desk.param.account,omitempty" url:"action.jira_service_desk.param.account,omitempty"`
+	ActionJiraServiceDeskParamJiraProject              string       `json:"action.jira_service_desk.param.jira_project,omitempty" url:"action.jira_service_desk.param.jira_project,omitempty"`
+	ActionJiraServiceDeskParamJiraIssueType            string       `json:"action.jira_service_desk.param.jira_issue_type,omitempty" url:"action.jira_service_desk.param.jira_issue_type,omitempty"`
+	ActionJiraServiceDeskParamJiraSummary              string       `json:"action.jira_service_desk.param.jira_summary,omitempty" url:"action.jira_service_desk.param.jira_summary,omitempty"`
+	ActionJiraServiceDeskParamJiraPriority             string       `json:"action.jira_service_desk.param.jira_priority,omitempty" url:"action.jira_service_desk.param.jira_priority,omitempty"`
+	ActionJiraServiceDeskParamJiraDescription          string       `json:"action.jira_service_desk.param.jira_description,omitempty" url:"action.jira_service_desk.param.jira_description,omitempty"`
+	ActionJiraServiceDeskParamJiraDedup                string       `json:"action.jira_service_desk.param.jira_dedup,omitempty" url:"action.jira_service_desk.param.jira_dedup,omitempty"`
+	ActionJiraServiceDeskParamJiraCustomfields         string       `json:"action.jira_service_desk.param.jira_customfields,omitempty" url:"action.jira_service_desk.param.jira_customfields,omitempty"`
+	ActionVictoropsParamMessageType                    string       `json:"action.victorops.param.message_type,omitempty" url:"action.victorops.param.message_type,omitempty"`
+	ActionVictoropsParamMonitoringTool                 string       `json:"action.victorops.param.monitoring_tool,omitempty" url:"action.victorops.param.monitoring_tool,omitempty"`
+	ActionVictoropsParamEntityId                       string       `json:"action.victorops.param.entity_id,omitempty" url:"action.victorops.param.entity_id,omitempty"`
+	ActionVictoropsParamStateMessage                   string       `json:"action.victorops.param.state_message,omitempty" url:"action.victorops.param.state_message,omitempty"`
+	ActionVictoropsParamRecordId                       string       `json:"action.victorops.param.record_id,omitempty" url:"action.victorops.param.record_id,omitempty"`
+	ActionVictoropsParamRoutingKeyOverride             string       `json:"action.victorops.param.routing_key_override,omitempty" url:"action.victorops.param.routing_key_override,omitempty"`
+	ActionVictoropsParamEnableRecovery                 string       `json:"action.victorops.param.enable_recovery,omitempty" url:"action.victorops.param.enable_recovery,omitempty"`
+	ActionVictoropsParamPollInterval                   string       `json:"action.victorops.param.poll_interval,omitempty" url:"action.victorops.param.poll_interval,omitempty"`
+	ActionVictoropsParamInactivePolls                  string       `json:"action.victorops.param.inactive_polls,omitempty" url:"action.victorops.param.inactive_polls,omitempty"`
+	ActionBetterWebhookParamUrl                        string       `json:"action.better_webhook.param.url,omitempty" url:"action.better_webhook.param.url,omitempty"`
+	ActionBetterWebhookParamBodyFormat                 string       `json:"action.better_webhook.param.body_format,omitempty" url:"action.better_webhook.param.body_format,omitempty"`
+	ActionBetterWebhookParamCredential                 string       `json:"action.better_webhook.param.credential,omitempty" url:"action.better_webhook.param.credential,omitempty"`
+	ActionBetterWebhookParamCredentials                string       `json:"action.better_webhook.param.credentials,omitempty" url:"action.better_webhook.param.credentials,omitempty"`
 	ActionWebhookParamUrl                              string       `json:"action.webhook.param.url,omitempty" url:"action.webhook.param.url"`
-	ActionRunAiagentParamAgentName                     string       `json:"action.run_aiagent.param.agent_name,omitempty" url:"action.run_aiagent.param.agent_name"`
-	ActionRunAiagentParamPrompt                        string       `json:"action.run_aiagent.param.prompt,omitempty" url:"action.run_aiagent.param.prompt"`
+	ActionRunAiagentParamAgentName                     string       `json:"action.run_aiagent.param.agent_name,omitempty" url:"action.run_aiagent.param.agent_name,omitempty"`
+	ActionRunAiagentParamPrompt                        string       `json:"action.run_aiagent.param.prompt,omitempty" url:"action.run_aiagent.param.prompt,omitempty"`
 	AlertDigestMode                                    bool         `json:"alert.digest_mode" url:"alert.digest_mode"`
 	AlertExpires                                       string       `json:"alert.expires,omitempty" url:"alert.expires,omitempty"`
 	AlertSeverity                                      int          `json:"alert.severity,omitempty" url:"alert.severity,omitempty"`

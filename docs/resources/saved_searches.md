@@ -162,7 +162,7 @@ This resource block supports the following arguments:
 - `action_webhook_param_url` - (Optional, Sensitive) URL to send the HTTP POST request to. Must be accessible from the Splunk server
 - `action_run_aiagent_param_agent_name` - (Optional) Name of the AI agent to run, as configured in the Splunk AI Toolkit app
 - `action_run_aiagent_param_prompt` - (Optional) Prompt passed to the AI agent
-- `actions` - (Optional) A comma-separated list of actions to enable. For example: rss,email
+- `actions` - (Optional) A comma-separated list of actions to enable. For example: rss,email. Arguments for alert actions that are not built into Splunk are sent only when set, so a saved search does not require those add-ons to be installed
 - `alert_comparator` - (Optional) One of the following strings: greater than, less than, equal to, rises by, drops by, rises by perc, drops by percUsed with alert_threshold to trigger alert actions.
 - `alert_condition` - (Optional) Contains a conditional search that is evaluated against the results of the saved search. Defaults to an empty string.
 - `alert_digest_mode` - (Optional) Specifies whether alert actions are applied to the entire result set or on each individual result.Defaults to 1 (true).

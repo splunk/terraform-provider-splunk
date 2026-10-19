@@ -12,10 +12,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-querystring/query"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/splunk/terraform-provider-splunk/client"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
 const newSavedSearches = `
@@ -1200,6 +1202,158 @@ func TestGetSavedSearchesConfigActionEmailCommand(t *testing.T) {
 	if got, want := config.ActionEmailCommand, "$name$"; got != want {
 		t.Errorf("ActionEmailCommand: got %q, want %q", got, want)
 	}
+}
+
+// builtinSavedSearchActions are alert actions shipped with Splunk Enterprise.
+// Any other action.* argument belongs to a modular-alert add-on. Splunk rejects
+// it when that add-on is not installed (#256).
+var builtinSavedSearchActions = map[string]struct{}{
+	"email":           {},
+	"logevent":        {},
+	"populate_lookup": {},
+	"rss":             {},
+	"script":          {},
+	"summary_index":   {},
+	"webhook":         {},
+}
+
+// TestVanillaSavedSearchPostsNoAddOnActions is the saved-search create/update
+// regression for a scheduled alert that does not use an add-on. It fails when
+// any non-built-in action.* argument is present, including a new field added
+// with a schema default or without omitempty on its url tag.
+func TestVanillaSavedSearchPostsNoAddOnActions(t *testing.T) {
+	const search = "index=main EventCode=1116 | table _time, host, user"
+	resourceData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"name":                   "Highly_Relevant_Antivirus_Alert",
+		"search":                 search,
+		"disabled":               false,
+		"is_scheduled":           true,
+		"cron_schedule":          "*/5 * * * *",
+		"dispatch_earliest_time": "-5m",
+		"dispatch_latest_time":   "now",
+		"alert_type":             "number of events",
+		"alert_comparator":       "greater than",
+		"alert_threshold":        "0",
+		"alert_track":            true,
+		"alert_severity":         4,
+	})
+	config := getSavedSearchesConfig(resourceData)
+	forms := []struct {
+		name   string
+		values url.Values
+	}{
+		{"create", savedSearchFormValues(t, config)},
+		{"update", savedSearchUpdateFormValues(t, config)},
+	}
+	for _, form := range forms {
+		t.Run(form.name, func(t *testing.T) {
+			var posted []string
+			for key, vals := range form.values {
+				action, ok := savedSearchActionName(key)
+				if !ok {
+					continue
+				}
+				if _, builtin := builtinSavedSearchActions[action]; builtin {
+					continue
+				}
+				posted = append(posted, fmt.Sprintf("%s=%q", key, vals))
+			}
+			if len(posted) > 0 {
+				t.Errorf("vanilla saved search posts add-on arguments:\n%s", strings.Join(posted, "\n"))
+			}
+			if got := form.values.Get("search"); got != search {
+				t.Errorf("search = %q, want %q", got, search)
+			}
+			if got := form.values.Get("cron_schedule"); got != "*/5 * * * *" {
+				t.Errorf("cron_schedule = %q", got)
+			}
+			if got := form.values.Get("alert_threshold"); got != "0" {
+				t.Errorf("alert_threshold = %q, want 0", got)
+			}
+			if !form.values.Has("action.email") {
+				t.Error("built-in action.email was omitted")
+			}
+		})
+	}
+}
+
+// TestAddOnActionValuesAreEncodedWhenSet checks every non-built-in action
+// field, so omitempty cannot drop a value the user configured.
+func TestAddOnActionValuesAreEncodedWhenSet(t *testing.T) {
+	base := getSavedSearchesConfig(schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+		"search": "index=main",
+	}))
+	typ := reflect.TypeOf(*base)
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+		formKey, ok := formKeyFromURLTag(field.Tag.Get("url"))
+		if !ok {
+			continue
+		}
+		action, ok := savedSearchActionName(formKey)
+		if !ok {
+			continue
+		}
+		if _, builtin := builtinSavedSearchActions[action]; builtin {
+			continue
+		}
+		t.Run(formKey, func(t *testing.T) {
+			configured := *base
+			fv := reflect.ValueOf(&configured).Elem().Field(i)
+			switch fv.Kind() {
+			case reflect.String:
+				fv.SetString("configured")
+			case reflect.Int:
+				fv.SetInt(1)
+			default:
+				t.Fatalf("unsupported add-on field kind %s", fv.Kind())
+			}
+			for _, values := range []url.Values{savedSearchFormValues(t, &configured), savedSearchUpdateFormValues(t, &configured)} {
+				if !values.Has(formKey) || values.Get(formKey) == "" {
+					t.Errorf("configured %s was omitted", formKey)
+				}
+			}
+		})
+	}
+}
+
+func savedSearchActionName(formKey string) (string, bool) {
+	rest, ok := strings.CutPrefix(formKey, "action.")
+	if !ok || rest == "" {
+		return "", false
+	}
+	name, _, _ := strings.Cut(rest, ".")
+	return name, name != ""
+}
+
+func formKeyFromURLTag(tag string) (string, bool) {
+	if tag == "" || tag == "-" {
+		return "", false
+	}
+	name, _, _ := strings.Cut(tag, ",")
+	if name == "" || name == "-" {
+		return "", false
+	}
+	return name, true
+}
+
+func savedSearchFormValues(t *testing.T, config *models.SavedSearchObject) url.Values {
+	t.Helper()
+	values, err := query.Values(config)
+	if err != nil {
+		t.Fatalf("query.Values: %v", err)
+	}
+	return values
+}
+
+func savedSearchUpdateFormValues(t *testing.T, config *models.SavedSearchObject) url.Values {
+	t.Helper()
+	// UpdateSavedSearches encodes a pointer to the saved-search pointer.
+	values, err := query.Values(&config)
+	if err != nil {
+		t.Fatalf("query.Values update: %v", err)
+	}
+	return values
 }
 
 func TestSavedSearchesNamespaceForOtherOwners(t *testing.T) {

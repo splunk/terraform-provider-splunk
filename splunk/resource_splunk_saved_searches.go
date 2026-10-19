@@ -685,10 +685,10 @@ func savedSearches() *schema.Resource {
 					"Comma-separated list of field names. Allows wildcards. eg. index,source*",
 			},
 			"action_slack_param_attachment": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Default:     "none",
-				Description: "Optionally include a message attachment. Valid values are message, alert_link, or none",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Description:      "Optionally include a message attachment. Valid values are message, alert_link, or none",
+				DiffSuppressFunc: suppressDefault("none"),
 			},
 			"action_slack_param_message": {
 				Type:        schema.TypeString,
@@ -771,9 +771,9 @@ func savedSearches() *schema.Resource {
 			"action_victorops_param_message_type": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Default:  "CRITICAL",
-				Description: "Valid values: (INFO | WARNING | CRITICAL | ACKNOLEGEMENT | RECOVERY)" +
-					"Specifies the type of message to send to VictorOps. Defaults to CRITICAL.",
+				Description: "Valid values: (INFO | WARNING | CRITICAL | ACKNOLEGEMENT | RECOVERY). " +
+					"Specifies the type of message to send to VictorOps.",
+				DiffSuppressFunc: suppressDefault("CRITICAL"),
 			},
 			"action_victorops_param_monitoring_tool": {
 				Type:     schema.TypeString,
@@ -803,10 +803,10 @@ func savedSearches() *schema.Resource {
 				Description: "Routing key to override the default routing key configured in VictorOps.",
 			},
 			"action_victorops_param_enable_recovery": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Specifies whether to enable recovery polling to send RECOVERY messages when the alert condition is no longer met. [1|0]",
-				Default:     "0",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Description:      "Specifies whether to enable recovery polling to send RECOVERY messages when the alert condition is no longer met. [1|0]",
+				DiffSuppressFunc: suppressDefault("0"),
 			},
 			"action_victorops_param_poll_interval": {
 				Type:        schema.TypeString,
@@ -825,10 +825,10 @@ func savedSearches() *schema.Resource {
 				ValidateFunc: validation.StringMatch(regexp.MustCompile(`^https?://[^\s]+$`), "Webhook URL is invalid"),
 			},
 			"action_better_webhook_param_body_format": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Format of the body to send in the HTTP POST request.",
-				Default:     "{\n  \"sid\": $$sid$$,\n  \"search_name\": $$search_name$$,\n  \"app\": $$app$$,\n  \"owner\": $$owner$$,\n  \"results_link\": $$results_link$$,\n  \"result\": $$full_result$$\n}",
+				Type:             schema.TypeString,
+				Optional:         true,
+				Description:      "Format of the body to send in the HTTP POST request. Sent only when set.",
+				DiffSuppressFunc: suppressDefault("{\n  \"sid\": $$sid$$,\n  \"search_name\": $$search_name$$,\n  \"app\": $$app$$,\n  \"owner\": $$owner$$,\n  \"results_link\": $$results_link$$,\n  \"result\": $$full_result$$\n}"),
 			},
 			"action_better_webhook_param_credential": {
 				Type:        schema.TypeString,
