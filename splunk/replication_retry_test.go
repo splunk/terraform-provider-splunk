@@ -80,10 +80,12 @@ func TestRetryOnStatus(t *testing.T) {
 }
 
 func TestRetryOnStatusGivesUpAfterTimeout(t *testing.T) {
-	resp, err := retryOnStatus(time.Second, http.StatusNotFound, func() (*http.Response, error) {
+	start := time.Now()
+	resp, err := retryOnStatus(200*time.Millisecond, http.StatusNotFound, func() (*http.Response, error) {
 		resp := notFoundResponse()
 		return resp, errors.New(resp.Status)
 	})
+	elapsed := time.Since(start)
 	if err == nil || err.Error() != "404 Not Found" {
 		t.Errorf("err = %v, want the last request error", err)
 	}
@@ -91,6 +93,10 @@ func TestRetryOnStatusGivesUpAfterTimeout(t *testing.T) {
 		t.Fatalf("resp = %v, want the last 404", resp)
 	}
 	resp.Body.Close()
+	// The wait ends at the deadline. A longer backoff or the SDK retry grace period would still be running.
+	if elapsed > time.Second {
+		t.Fatalf("elapsed = %s, want the retry to stop at the timeout", elapsed)
+	}
 }
 
 func TestRetryUpdateAclDoesNotRetryClientErrors(t *testing.T) {

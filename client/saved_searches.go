@@ -28,7 +28,7 @@ func (client *Client) CreateSavedSearches(name, owner, app string, savedSearchOb
 
 	log.Printf("[DEBUG] Response object returned from CreateSavedSearches is: %s", string(respBody))
 
-	defer resp.Body.Close()
+	// Leave the body open. DumpResponse replaced it with a readable copy, and the caller closes it.
 	return resp, nil
 }
 

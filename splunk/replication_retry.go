@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/splunk/terraform-provider-splunk/client"
 )
@@ -17,7 +16,13 @@ const defaultReplicationTimeout = time.Minute
 
 // replicationRefreshTimeout is how long a refresh or delete retries a 404 before treating the object as gone.
 // Short enough that a missing object still leaves plan, long enough to ride out one lagged cluster member.
+// The wait ends at this deadline. Polls use a short delay capped by the time remaining.
 var replicationRefreshTimeout = 15 * time.Second
+
+const (
+	replicationRetryMinDelay = 500 * time.Millisecond
+	replicationRetryMaxDelay = 2 * time.Second
+)
 
 // createDeadlines records the create budget for the ResourceData currently being applied.
 // Terraform applies resources concurrently, so the key is that ResourceData pointer.
@@ -59,20 +64,15 @@ func closeBody(resp *http.Response) {
 
 func retryOnStatus(timeout time.Duration, statusCode int, request func() (*http.Response, error)) (*http.Response, error) {
 	var resp *http.Response
-	err := resource.Retry(timeout, func() *resource.RetryError {
+	err := retryFor(timeout, func() error {
 		closeBody(resp)
 		resp = nil
 
 		r, reqErr := request()
 		resp = r
-		if reqErr == nil {
-			return nil
-		}
-		if hasStatus(r, statusCode) {
-			log.Printf("[DEBUG] %s. Retrying...", reqErr)
-			return resource.RetryableError(reqErr)
-		}
-		return resource.NonRetryableError(reqErr)
+		return reqErr
+	}, func(error) bool {
+		return hasStatus(resp, statusCode)
 	})
 	// The last response stays open so the caller can read the status and close the body.
 	if err != nil {
@@ -82,20 +82,45 @@ func retryOnStatus(timeout time.Duration, statusCode int, request func() (*http.
 }
 
 // retryUpdateAcl retries only a 404 from UpdateAcl's HTTPStatusError.
-// A 400 or 403 fails the apply on the first response.
+// A 400 or 403 from the ACL update fails the apply on the first response.
 func retryUpdateAcl(timeout time.Duration, update func() error) error {
-	return resource.Retry(timeout, func() *resource.RetryError {
-		err := update()
-		if err == nil {
-			return nil
-		}
+	return retryFor(timeout, update, func(err error) bool {
 		var statusErr *client.HTTPStatusError
-		if errors.As(err, &statusErr) && statusErr.StatusCode == http.StatusNotFound {
-			log.Printf("[DEBUG] %s. Retrying...", err)
-			return resource.RetryableError(err)
-		}
-		return resource.NonRetryableError(err)
+		return errors.As(err, &statusErr) && statusErr.StatusCode == http.StatusNotFound
 	})
+}
+
+// retryFor retries while retryable reports true and the deadline has not passed.
+// The next wait is capped by the time remaining, so the loop returns at the deadline
+// instead of sleeping through a longer backoff.
+func retryFor(timeout time.Duration, call func() error, retryable func(error) bool) error {
+	if timeout < 0 {
+		timeout = 0
+	}
+	deadline := time.Now().Add(timeout)
+	delay := replicationRetryMinDelay
+	for {
+		err := call()
+		if err == nil || !retryable(err) {
+			return err
+		}
+		remaining := time.Until(deadline)
+		if remaining <= 0 {
+			return err
+		}
+		wait := delay
+		if wait > remaining {
+			wait = remaining
+		}
+		log.Printf("[DEBUG] %s. Retrying...", err)
+		time.Sleep(wait)
+		if delay < replicationRetryMaxDelay {
+			delay *= 2
+			if delay > replicationRetryMaxDelay {
+				delay = replicationRetryMaxDelay
+			}
+		}
+	}
 }
 
 // readKnowledgeObject retries 404 after create for the remainder of timeouts.create.

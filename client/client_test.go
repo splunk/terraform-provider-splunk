@@ -12,6 +12,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/splunk/terraform-provider-splunk/client/models"
 )
 
 const (
@@ -578,5 +580,51 @@ func TestSendsCookies(t *testing.T) {
 
 	if got, want := resp.Cookies()[0].Value, "SECOND"; got != want {
 		t.Errorf("Returned Cookie is %v, want %v", got, want)
+	}
+}
+
+func TestCreateResponsesLeaveBodyOpen(t *testing.T) {
+	t.Setenv(envVarHTTPScheme, "http")
+
+	const body = `{"entry":[]}`
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusCreated)
+		_, _ = io.WriteString(w, body)
+	}))
+	defer server.Close()
+
+	backend, err := url.Parse(server.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := NewSplunkdClient("", defaultAuth, backend.Host, "", server.Client())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	dashboard, err := c.CreateDashboardObject("admin", "search", &models.SplunkDashboardsObject{Name: "view"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer dashboard.Body.Close()
+	got, err := io.ReadAll(dashboard.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(got) != body {
+		t.Fatalf("dashboard body = %q, want %q", got, body)
+	}
+
+	savedSearch, err := c.CreateSavedSearches("alert", "admin", "search", &models.SavedSearchObject{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer savedSearch.Body.Close()
+	got, err = io.ReadAll(savedSearch.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(got) != body {
+		t.Fatalf("saved search body = %q, want %q", got, body)
 	}
 }

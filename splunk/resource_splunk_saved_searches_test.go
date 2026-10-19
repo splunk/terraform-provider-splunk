@@ -1098,7 +1098,7 @@ func TestSavedSearchesDeleteSucceeds(t *testing.T) {
 
 func TestSavedSearchesReadDropsStateWhenMissing(t *testing.T) {
 	t.Setenv("HTTPScheme", "http")
-	useRefreshTimeout(t, time.Millisecond)
+	useRefreshTimeout(t, 200*time.Millisecond)
 
 	tests := []struct {
 		name   string

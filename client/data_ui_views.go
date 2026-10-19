@@ -18,8 +18,7 @@ func (client *Client) CreateDashboardObject(owner string, app string, splunkDash
 	if err != nil {
 		return resp, err
 	}
-	defer resp.Body.Close()
-
+	// Leave the body open. The caller reads the status and closes it.
 	return resp, nil
 }
 
