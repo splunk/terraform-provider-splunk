@@ -1367,7 +1367,9 @@ func TestSavedSearchesNamespaceForOtherOwners(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.sharing, func(t *testing.T) {
-			useRefreshTimeout(t, 200*time.Millisecond)
+			// A positive refresh timeout still retries a 404 once, because the wait is capped
+			// by the time remaining. This test checks the namespace path, so do not retry.
+			useRefreshTimeout(t, 0)
 			var paths []string
 			meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
 				paths = append(paths, r.Method+" "+r.URL.Path)
