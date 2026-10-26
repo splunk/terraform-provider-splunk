@@ -1073,15 +1073,13 @@ func savedSearches() *schema.Resource {
 			"dispatch_index_earliest": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Computed: true,
-				Description: "A time string that specifies the latest time for this search. Can be a relative or absolute time." +
+				Description: "A time string that specifies the earliest index time for this search. Can be a relative or absolute time. " +
 					"If this value is an absolute time, use the dispatch.time_format to format the value.",
 			},
 			"dispatch_index_latest": {
 				Type:     schema.TypeString,
 				Optional: true,
-				Computed: true,
-				Description: "A time string that specifies the earliest time for this search. Can be a relative or absolute time." +
+				Description: "A time string that specifies the latest index time for this search. Can be a relative or absolute time. " +
 					"If this value is an absolute time, use the dispatch.time_format to format the value.",
 			},
 			"dispatch_indexed_realtime": {
@@ -1992,7 +1990,7 @@ func savedSearchesUpdate(d *schema.ResourceData, meta interface{}) error {
 	// Updating a shared object in the owner's namespace creates a private copy.
 	owner := sharedObjectOwner(aclObject)
 
-	err := (*provider.Client).UpdateSavedSearches(d.Id(), owner, aclObject.App, savedSearchesConfig)
+	err := (*provider.Client).UpdateSavedSearches(d.Id(), owner, aclObject.App, savedSearchesConfig, savedSearchesClearedKeys(d))
 	if err != nil {
 		return err
 	}
@@ -2024,6 +2022,24 @@ func savedSearchesDelete(d *schema.ResourceData, meta interface{}) error {
 	}
 	defer resp.Body.Close()
 	return nil
+}
+
+// savedSearchesClearableKeys pairs attributes whose Splunk default is empty with
+// their form keys. Splunk keeps any key an update leaves out, so a removed
+// attribute is only cleared when its key is posted with an empty value.
+var savedSearchesClearableKeys = []struct{ attr, key string }{
+	{"dispatch_index_earliest", "dispatch.index_earliest"},
+	{"dispatch_index_latest", "dispatch.index_latest"},
+}
+
+func savedSearchesClearedKeys(d *schema.ResourceData) []string {
+	var keys []string
+	for _, k := range savedSearchesClearableKeys {
+		if d.HasChange(k.attr) && d.Get(k.attr).(string) == "" {
+			keys = append(keys, k.key)
+		}
+	}
+	return keys
 }
 
 func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.SavedSearchObject) {

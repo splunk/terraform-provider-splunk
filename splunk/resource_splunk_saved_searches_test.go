@@ -153,6 +153,31 @@ resource "splunk_saved_searches" "test" {
     }
 }
 `
+const savedSearchesDispatchIndexWindow = `
+resource "splunk_saved_searches" "test" {
+    name = "Test Dispatch Index Window"
+    search = "index=main"
+    dispatch_index_earliest = "-10m"
+    dispatch_index_latest = "-5m"
+}
+`
+
+const savedSearchesDispatchIndexRemoved = `
+resource "splunk_saved_searches" "test" {
+    name = "Test Dispatch Index Window"
+    search = "index=main"
+}
+`
+
+const savedSearchesDispatchIndexEmpty = `
+resource "splunk_saved_searches" "test" {
+    name = "Test Dispatch Index Window"
+    search = "index=main"
+    dispatch_index_earliest = ""
+    dispatch_index_latest = ""
+}
+`
+
 const newSavedSearchesLogEvent = `
 resource "splunk_saved_searches" "test" {
 	name = "Test Log Event Alert"
@@ -901,6 +926,31 @@ func TestAccSplunkSavedSearchesEmailIncludeLinksZero(t *testing.T) {
 	})
 }
 
+func TestAccSplunkSavedSearchesDispatchIndexCleared(t *testing.T) {
+	resourceName := "splunk_saved_searches.test"
+	window := resource.ComposeTestCheckFunc(
+		resource.TestCheckResourceAttr(resourceName, "dispatch_index_earliest", "-10m"),
+		resource.TestCheckResourceAttr(resourceName, "dispatch_index_latest", "-5m"),
+	)
+	cleared := resource.ComposeTestCheckFunc(
+		resource.TestCheckResourceAttr(resourceName, "dispatch_index_earliest", ""),
+		resource.TestCheckResourceAttr(resourceName, "dispatch_index_latest", ""),
+	)
+	resource.Test(t, resource.TestCase{
+		PreCheck: func() {
+			testAccPreCheck(t)
+		},
+		Providers:    testAccProviders,
+		CheckDestroy: testAccSplunkSavedSearchesDestroyResources,
+		Steps: []resource.TestStep{
+			{Config: savedSearchesDispatchIndexWindow, Check: window},
+			{Config: savedSearchesDispatchIndexRemoved, Check: cleared},
+			{Config: savedSearchesDispatchIndexWindow, Check: window},
+			{Config: savedSearchesDispatchIndexEmpty, Check: cleared},
+		},
+	})
+}
+
 func testAccSplunkSavedSearchesDestroyResources(s *terraform.State) error {
 	client, err := newTestClient()
 	if err != nil {
@@ -1561,6 +1611,125 @@ func TestSavedSearchesUpdateSendsACLOnlyWhenChanged(t *testing.T) {
 	}
 	if aclPath != "/servicesNS/nobody/search/saved/searches/alert/acl" {
 		t.Errorf("acl path = %q, want the nobody namespace", aclPath)
+	}
+}
+
+// TestSavedSearchesUpdateClearsDispatchIndexWindow runs against a server that,
+// like Splunk, keeps any key an update leaves out.
+func TestSavedSearchesUpdateClearsDispatchIndexWindow(t *testing.T) {
+	keys := []string{"dispatch.index_earliest", "dispatch.index_latest"}
+	tests := []struct {
+		name    string
+		cleared map[string]interface{}
+	}{
+		{"removed", map[string]interface{}{}},
+		{"empty", map[string]interface{}{"dispatch_index_earliest": "", "dispatch_index_latest": ""}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			stored := map[string]string{}
+			var updates []url.Values
+			meta := newRoundTripProvider(t, func(r *http.Request) (*http.Response, error) {
+				if r.Method == http.MethodPost {
+					body, err := io.ReadAll(r.Body)
+					if err != nil {
+						t.Fatal(err)
+					}
+					form, err := url.ParseQuery(string(body))
+					if err != nil {
+						t.Fatal(err)
+					}
+					if strings.HasSuffix(r.URL.Path, "/saved/searches/alert") {
+						updates = append(updates, form)
+					}
+					for _, key := range append([]string{"search"}, keys...) {
+						if form.Has(key) {
+							stored[key] = form.Get(key)
+						}
+					}
+					return jsonResponse(http.StatusOK, "{}"), nil
+				}
+				return jsonResponse(http.StatusOK, fmt.Sprintf(`{"entry":[{"name":"alert","acl":{"app":"search","owner":"admin","sharing":"app"},"content":{"search":%q,"dispatch.index_earliest":%q,"dispatch.index_latest":%q}}]}`,
+					stored["search"], stored["dispatch.index_earliest"], stored["dispatch.index_latest"])), nil
+			})
+
+			savedSearch := savedSearches()
+			config := func(search string, attrs map[string]interface{}) *terraform.ResourceConfig {
+				raw := map[string]interface{}{"name": "alert", "search": search}
+				for k, v := range attrs {
+					raw[k] = v
+				}
+				return terraform.NewResourceConfigRaw(raw)
+			}
+			apply := func(state *terraform.InstanceState, config *terraform.ResourceConfig) *terraform.InstanceState {
+				t.Helper()
+				diff, err := savedSearch.Diff(state, config, meta)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if diff.Empty() {
+					return state
+				}
+				state, err = savedSearch.Apply(state, diff, meta)
+				if err != nil {
+					t.Fatal(err)
+				}
+				return state
+			}
+
+			state := apply(nil, config("index=main", map[string]interface{}{"dispatch_index_earliest": "-10m", "dispatch_index_latest": "-5m"}))
+			if stored[keys[0]] != "-10m" || stored[keys[1]] != "-5m" {
+				t.Fatalf("index window not created: %v", stored)
+			}
+
+			updates = nil
+			state = apply(state, config("index=main", tt.cleared))
+			for _, key := range keys {
+				if got := stored[key]; got != "" {
+					t.Errorf("%s = %q after the update, want it cleared", key, got)
+				}
+			}
+			if len(updates) != 1 {
+				t.Fatalf("updates = %d, want 1", len(updates))
+			}
+			for key, vals := range updates[0] {
+				if vals[0] == "" && key != keys[0] && key != keys[1] {
+					t.Errorf("update posted an empty %s", key)
+				}
+			}
+
+			diff, err := savedSearch.Diff(state, config("index=main", tt.cleared), meta)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !diff.Empty() {
+				for _, attr := range []string{"dispatch_index_earliest", "dispatch_index_latest"} {
+					if _, ok := diff.Attributes[attr]; ok {
+						t.Errorf("plan after the update still changes %s", attr)
+					}
+				}
+			}
+
+			updates = nil
+			state = apply(state, config("index=main | head 1", tt.cleared))
+			if len(updates) != 1 {
+				t.Fatalf("updates = %d, want 1", len(updates))
+			}
+			for _, key := range keys {
+				if updates[0].Has(key) {
+					t.Errorf("a later search change posted %s", key)
+				}
+			}
+
+			updates = nil
+			apply(state, config("index=main | head 1", map[string]interface{}{"dispatch_index_earliest": "-10m", "dispatch_index_latest": "-5m"}))
+			if len(updates) != 1 {
+				t.Fatalf("updates = %d, want 1", len(updates))
+			}
+			if got := updates[0][keys[0]]; len(got) != 1 || got[0] != "-10m" {
+				t.Errorf("%s = %q when set again, want [-10m]", keys[0], got)
+			}
+		})
 	}
 }
 
