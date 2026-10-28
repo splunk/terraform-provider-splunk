@@ -1624,6 +1624,7 @@ func TestSavedSearchesUpdateClearsDispatchIndexWindow(t *testing.T) {
 	}{
 		{"removed", map[string]interface{}{}},
 		{"empty", map[string]interface{}{"dispatch_index_earliest": "", "dispatch_index_latest": ""}},
+		{"null", map[string]interface{}{"dispatch_index_earliest": nil, "dispatch_index_latest": nil}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1726,8 +1727,14 @@ func TestSavedSearchesUpdateClearsDispatchIndexWindow(t *testing.T) {
 			if len(updates) != 1 {
 				t.Fatalf("updates = %d, want 1", len(updates))
 			}
-			if got := updates[0][keys[0]]; len(got) != 1 || got[0] != "-10m" {
-				t.Errorf("%s = %q when set again, want [-10m]", keys[0], got)
+			want := map[string]string{keys[0]: "-10m", keys[1]: "-5m"}
+			for _, key := range keys {
+				if got := updates[0][key]; len(got) != 1 || got[0] != want[key] {
+					t.Errorf("%s = %q when set again, want [%s]", key, got, want[key])
+				}
+				if stored[key] != want[key] {
+					t.Errorf("%s stored %q when set again, want %q", key, stored[key], want[key])
+				}
 			}
 		})
 	}
