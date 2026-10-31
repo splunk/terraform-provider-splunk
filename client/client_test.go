@@ -85,7 +85,7 @@ func TestBuildSplunkURLWithEscapedPathPart(t *testing.T) {
 	if got, want := url.Path, "servicesNS/nobody/app/saved/searches/A/B+C D"; got != want {
 		t.Errorf("path invalid, got %s, want %s", got, want)
 	}
-	if got, want := url.EscapedPath(), "servicesNS/nobody/app/saved/searches/A%2FB+C%20D"; got != want {
+	if got, want := url.EscapedPath(), "servicesNS/nobody/app/saved/searches/A%2FB%2BC%20D"; got != want {
 		t.Errorf("escaped path invalid, got %s, want %s", got, want)
 	}
 }
@@ -101,21 +101,21 @@ func TestNamespacedResourceReadersEscapeFinalPathSegment(t *testing.T) {
 	}{
 		{
 			name: "saved search",
-			want: "/servicesNS/nobody/app/saved/searches/A%2FB+C%20D",
+			want: "/servicesNS/nobody/app/saved/searches/A%2FB%2BC%20D",
 			call: func(client *Client) (*http.Response, error) {
 				return client.ReadSavedSearches("A/B+C D", "nobody", "app")
 			},
 		},
 		{
 			name: "dashboard view",
-			want: "/servicesNS/nobody/app/data/ui/views/A%2FB+C%20D",
+			want: "/servicesNS/nobody/app/data/ui/views/A%2FB%2BC%20D",
 			call: func(client *Client) (*http.Response, error) {
 				return client.ReadDashboardObject("A/B+C D", "nobody", "app")
 			},
 		},
 		{
 			name: "federated provider",
-			want: "/services/data/federated/provider/A%2FB+C%20D",
+			want: "/services/data/federated/provider/A%2FB%2BC%20D",
 			call: func(client *Client) (*http.Response, error) {
 				return client.ReadFederatedProvider("A/B+C D")
 			},
@@ -626,5 +626,84 @@ func TestCreateResponsesLeaveBodyOpen(t *testing.T) {
 	}
 	if string(got) != body {
 		t.Fatalf("saved search body = %q, want %q", got, body)
+	}
+}
+
+// splunkd decodes "+" in a path segment as a space, so a literal "+" in a
+// saved search name has to reach it as %2B (#246).
+func TestSavedSearchNameWithPlusSurvivesSplunkdDecoding(t *testing.T) {
+	t.Setenv(envVarHTTPScheme, "http")
+
+	const name = "Test 30+ days"
+	const prefix = "/servicesNS/nobody/app/saved/searches/"
+
+	tests := []struct {
+		name string
+		call func(*Client) error
+	}{
+		{
+			name: "read",
+			call: func(c *Client) error {
+				resp, err := c.ReadSavedSearches(name, "nobody", "app")
+				if resp != nil {
+					defer resp.Body.Close()
+				}
+				return err
+			},
+		},
+		{
+			name: "update",
+			call: func(c *Client) error {
+				return c.UpdateSavedSearches(name, "nobody", "app", &models.SavedSearchObject{}, nil)
+			},
+		},
+		{
+			name: "delete",
+			call: func(c *Client) error {
+				resp, err := c.DeleteSavedSearches(name, "nobody", "app")
+				if resp != nil {
+					defer resp.Body.Close()
+				}
+				return err
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var got string
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				escaped := r.URL.EscapedPath()
+				if len(escaped) < len(prefix) || escaped[:len(prefix)] != prefix {
+					t.Errorf("unexpected path %s", escaped)
+				} else {
+					// Decode the last segment the way splunkd does: "+" means a space.
+					decoded, err := url.QueryUnescape(escaped[len(prefix):])
+					if err != nil {
+						t.Errorf("cannot decode %s: %s", escaped, err)
+					}
+					got = decoded
+				}
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(`{}`))
+			}))
+			defer server.Close()
+
+			backend, err := url.Parse(server.URL)
+			if err != nil {
+				t.Fatal(err)
+			}
+			client, err := NewSplunkdClient("", defaultAuth, backend.Host, "", server.Client())
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if err := tt.call(client); err != nil {
+				t.Fatalf("call failed: %s", err)
+			}
+			if got != name {
+				t.Errorf("splunkd would look up %q, want %q", got, name)
+			}
+		})
 	}
 }
