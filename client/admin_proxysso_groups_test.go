@@ -41,7 +41,7 @@ func TestAdminProxyssoGroupsRequests(t *testing.T) {
 		{
 			name:       "update posts the escaped entity and omits name",
 			wantMethod: http.MethodPost,
-			wantPath:   "/services/admin/ProxySSO-groups/A%2FB+C%20D",
+			wantPath:   "/services/admin/ProxySSO-groups/A%2FB%2BC%20D",
 			wantRoles:  []string{"power", "admin"},
 			call: func(c *Client) error {
 				return c.UpdateAdminProxyssoGroups(groupName, obj)
@@ -50,7 +50,7 @@ func TestAdminProxyssoGroupsRequests(t *testing.T) {
 		{
 			name:       "delete uses the escaped entity",
 			wantMethod: http.MethodDelete,
-			wantPath:   "/services/admin/ProxySSO-groups/A%2FB+C%20D",
+			wantPath:   "/services/admin/ProxySSO-groups/A%2FB%2BC%20D",
 			call: func(c *Client) error {
 				resp, err := c.DeleteAdminProxyssoGroups(groupName)
 				if resp != nil {
@@ -62,7 +62,7 @@ func TestAdminProxyssoGroupsRequests(t *testing.T) {
 		{
 			name:       "read uses the escaped entity",
 			wantMethod: http.MethodGet,
-			wantPath:   "/services/admin/ProxySSO-groups/A%2FB+C%20D",
+			wantPath:   "/services/admin/ProxySSO-groups/A%2FB%2BC%20D",
 			call: func(c *Client) error {
 				resp, err := c.ReadAdminProxyssoGroups(groupName)
 				if resp != nil {
