@@ -187,7 +187,7 @@ func TestAclURLsEscapeResourceName(t *testing.T) {
 	}{
 		{
 			name: "get saved search acl",
-			want: "/servicesNS/nobody/app/saved/searches/A%2FB+C%20D/acl",
+			want: "/servicesNS/nobody/app/saved/searches/A%2FB%2BC%20D/acl",
 			call: func(c *Client) error {
 				resp, err := c.GetAcl("nobody", "app", "A/B+C D", "app", "saved", "searches")
 				if resp != nil {
@@ -198,14 +198,14 @@ func TestAclURLsEscapeResourceName(t *testing.T) {
 		},
 		{
 			name: "update saved search acl",
-			want: "/servicesNS/nobody/app/saved/searches/A%2FB+C%20D/acl",
+			want: "/servicesNS/nobody/app/saved/searches/A%2FB%2BC%20D/acl",
 			call: func(c *Client) error {
 				return c.UpdateAcl("nobody", "app", "A/B+C D", acl, "saved", "searches")
 			},
 		},
 		{
 			name: "update dashboard view acl",
-			want: "/servicesNS/nobody/app/data/ui/views/A%2FB+C%20D/acl",
+			want: "/servicesNS/nobody/app/data/ui/views/A%2FB%2BC%20D/acl",
 			call: func(c *Client) error {
 				return c.UpdateAcl("nobody", "app", "A/B+C D", acl, "data", "ui", "views")
 			},

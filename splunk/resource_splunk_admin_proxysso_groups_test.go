@@ -53,7 +53,7 @@ func TestAdminProxyssoGroupsCreateReadUpdateDelete(t *testing.T) {
 	t.Setenv("HTTPScheme", "http")
 
 	const groupName = "A/B+C D"
-	const entityPath = "/services/admin/ProxySSO-groups/A%2FB+C%20D"
+	const entityPath = "/services/admin/ProxySSO-groups/A%2FB%2BC%20D"
 	const collectionPath = "/services/admin/ProxySSO-groups"
 
 	roles := []string{"power", "admin"}

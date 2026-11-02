@@ -1,3 +1,7 @@
+## 1.6.3
+* Fix: object names that contain `+` are sent as `%2B` on read, update, delete, and ACL. splunkd treats a bare `+` in a path as a space, so a saved search such as `Test 30+ days` was refreshed as `Test 30  days` and the read after import returned 404 (#246). The same encoding applies to dashboards, `splunk_configs_conf` stanzas, federated indexes and providers, and SAML and ProxySSO groups. A space in those names is still `%20`. Import keeps a bare `+` and `%2B` as a literal plus; encode a space as `%20`
+* Fix: `splunk_inputs_monitor`, `splunk_inputs_script`, and `splunk_inputs_tcp_splunktcptoken` encode a literal `+` as well. Slashes and spaces in those names stay on the encoding they already used
+
 ## 1.6.2
 * Fix: `splunk_saved_searches` clears `dispatch_index_earliest` and `dispatch_index_latest` when they are removed from the configuration or set to `null` or `""`. A value set outside Terraform and missing from the configuration is cleared on the next apply
 

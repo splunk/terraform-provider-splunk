@@ -41,7 +41,7 @@ terraform import splunk_configs_conf.example "<configuration>/<stanza>"
 ```
 
 Configuration stanzas in a specific Splunk namespace can be imported with a
-Splunk REST path or URL. URL-encode the stanza as one path segment when needed:
+Splunk REST path or URL. Encode the stanza as one path segment when needed. A space is `%20` and a literal `+` is `%2B`. A bare `+` in the path is kept as a plus:
 
 ```
 terraform import splunk_configs_conf.example "/servicesNS/<owner>/<app>/configs/conf-<configuration>/<url-encoded-stanza>"

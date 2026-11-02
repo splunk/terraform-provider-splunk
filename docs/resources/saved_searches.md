@@ -244,7 +244,7 @@ Saved searches in the default namespace can be imported by name:
 terraform import splunk_saved_searches.example "<saved-search-name>"
 ```
 
-Saved searches in a specific Splunk namespace can be imported with a Splunk REST path or URL. URL-encode the saved search name when it contains spaces or other special characters:
+Saved searches in a specific Splunk namespace can be imported with a Splunk REST path or URL. Encode the saved search name as one path segment: a space is `%20` and a literal `+` is `%2B`. A bare `+` in the path is kept as a plus. For example, `Test 30+ days` is `Test%2030%2B%20days`.
 
 ```
 terraform import splunk_saved_searches.example "/servicesNS/<owner>/<app>/saved/searches/<url-encoded-saved-search-name>"

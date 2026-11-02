@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/splunk/terraform-provider-splunk/client/models"
 	"net/http"
-	"net/url"
 	"regexp"
+
+	"github.com/splunk/terraform-provider-splunk/client"
+	"github.com/splunk/terraform-provider-splunk/client/models"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
@@ -58,7 +59,7 @@ func inputsSplunkTCPTokenCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	if _, ok := d.GetOk("acl"); ok {
-		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, url.PathEscape(name), aclObject, "data", "inputs", "tcp", "splunktcptoken")
+		err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, client.EscapeSplunkPathPart(name), aclObject, "data", "inputs", "tcp", "splunktcptoken")
 		if err != nil {
 			return err
 		}
@@ -129,7 +130,7 @@ func inputsSplunkTCPTokenUpdate(d *schema.ResourceData, meta interface{}) error 
 	}
 
 	//ACL update
-	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, url.PathEscape(d.Id()), aclObject, "data", "inputs", "tcp", "splunktcptoken")
+	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, client.EscapeSplunkPathPart(d.Id()), aclObject, "data", "inputs", "tcp", "splunktcptoken")
 	if err != nil {
 		return err
 	}

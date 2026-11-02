@@ -39,7 +39,7 @@ Dashboards/views in the default namespace can be imported by name:
 terraform import splunk_data_ui_views.example "<view-name>"
 ```
 
-Dashboards/views in a specific Splunk namespace can be imported with a Splunk REST path or URL. URL-encode the view name when it contains spaces or other special characters:
+Dashboards/views in a specific Splunk namespace can be imported with a Splunk REST path or URL. Encode the view name as one path segment: a space is `%20` and a literal `+` is `%2B`. A bare `+` in the path is kept as a plus.
 
 ```
 terraform import splunk_data_ui_views.example "/servicesNS/<owner>/<app>/data/ui/views/<url-encoded-view-name>"
