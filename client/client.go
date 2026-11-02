@@ -112,9 +112,16 @@ func (c *Client) BuildSplunkURLWithEscapedPathPart(queryValues url.Values, pathP
 	}
 
 	endpoint.Path = appendURLPathPart(endpoint.Path, pathPart)
-	endpoint.RawPath = appendURLPathPart(rawPath, url.PathEscape(pathPart))
+	endpoint.RawPath = appendURLPathPart(rawPath, escapeSplunkPathPart(pathPart))
 
 	return endpoint
+}
+
+// escapeSplunkPathPart escapes a single path segment for splunkd. splunkd decodes
+// "+" in the path as a space (BuildSplunkURL relies on this), and url.PathEscape
+// leaves "+" as is, so a literal "+" in a name must be sent as %2B.
+func escapeSplunkPathPart(pathPart string) string {
+	return strings.ReplaceAll(url.PathEscape(pathPart), "+", "%2B")
 }
 
 func appendURLPathPart(basePath, pathPart string) string {
