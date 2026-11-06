@@ -307,15 +307,7 @@ func TestAccSplunkInputsMonitorPlusName(t *testing.T) {
 	if os.Getenv("TF_ACC") == "" {
 		t.Skip("acceptance tests skipped unless TF_ACC is set")
 	}
-	home := os.Getenv("SPLUNK_HOME")
-	if home == "" {
-		t.Fatal("SPLUNK_HOME must be set for acceptance tests")
-	}
-	path := filepath.Join(home, "var", "log", "splunk", "tfacc-plus+name.log")
-	if err := os.WriteFile(path, []byte("tfacc\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { _ = os.Remove(path) })
+	path := monitorPlusPath(t)
 
 	resourceName := "splunk_inputs_monitor.plus"
 	config := fmt.Sprintf(`
@@ -358,6 +350,40 @@ resource "splunk_inputs_monitor" "plus" {
 			},
 		},
 	})
+}
+
+// monitorPlusPath returns a file path Splunk can monitor. A local Splunk
+// install can read a file written under SPLUNK_HOME. GitHub Actions runs the
+// tests on the host and Splunk in a service container, so SPLUNK_HOME is not
+// on the host. That workflow mounts the workspace at /workspace inside the
+// container, which is where the file has to live.
+func monitorPlusPath(t *testing.T) string {
+	t.Helper()
+	const fileName = "tfacc-plus+name.log"
+	home := os.Getenv("SPLUNK_HOME")
+	if home == "" {
+		t.Fatal("SPLUNK_HOME must be set for acceptance tests")
+	}
+	dir := filepath.Join(home, "var", "log", "splunk")
+	if info, err := os.Stat(dir); err == nil && info.IsDir() {
+		path := filepath.Join(dir, fileName)
+		writeMonitorPlusFile(t, path)
+		return path
+	}
+	workspace := os.Getenv("GITHUB_WORKSPACE")
+	if workspace == "" {
+		t.Skipf("monitor directory %s is not available on this host", dir)
+	}
+	writeMonitorPlusFile(t, filepath.Join(workspace, fileName))
+	return "/workspace/" + fileName
+}
+
+func writeMonitorPlusFile(t *testing.T, path string) {
+	t.Helper()
+	if err := os.WriteFile(path, []byte("tfacc\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Remove(path) })
 }
 
 func TestAccSplunkInputsScriptPlusName(t *testing.T) {
