@@ -11,7 +11,9 @@ import (
 // FlexString unmarshals a Splunk JSON value that is either a string or a
 // number. Index fields such as bucketRebuildMemoryHint ("auto", "16MB") and
 // repFactor ("auto", "0") are strings in indexes.conf, and Splunk sometimes
-// returns those same fields as JSON numbers. null leaves the value unchanged.
+// returns those same fields as JSON numbers. Splunk Cloud returns a JSON
+// boolean for some empty fields such as action.snow_event.param.severity:
+// false decodes as "" and true as "true". null leaves the value unchanged.
 type FlexString string
 
 func (f *FlexString) UnmarshalJSON(data []byte) error {
@@ -29,6 +31,12 @@ func (f *FlexString) UnmarshalJSON(data []byte) error {
 			return err
 		}
 		*f = FlexString(s)
+	case bool:
+		if v {
+			*f = "true"
+		} else {
+			*f = ""
+		}
 	default:
 		return fmt.Errorf("cannot unmarshal %T into string", raw)
 	}

@@ -137,7 +137,7 @@ func inputsMonitorCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if _, ok := d.GetOk("acl"); ok {
-		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, client.EscapeSplunkPathPart(name), aclObject, "data", "inputs", "monitor")
+		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, client.LegacyInputACLName(name), aclObject, "data", "inputs", "monitor")
 		if err != nil {
 			return err
 		}
@@ -256,7 +256,7 @@ func inputsMonitorUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	//ACL update
-	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, client.EscapeSplunkPathPart(d.Id()), aclObject, "data", "inputs", "monitor")
+	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, client.LegacyInputACLName(d.Id()), aclObject, "data", "inputs", "monitor")
 	if err != nil {
 		return err
 	}

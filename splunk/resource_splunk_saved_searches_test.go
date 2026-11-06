@@ -18,6 +18,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/splunk/terraform-provider-splunk/client"
 	"github.com/splunk/terraform-provider-splunk/client/models"
+	ctyjson "github.com/zclconf/go-cty/cty/json"
 )
 
 const newSavedSearches = `
@@ -461,6 +462,34 @@ resource "splunk_saved_searches" "test" {
   }
 `
 
+const newSavedSearchesServiceNowEventToken = `
+resource "splunk_saved_searches" "test" {
+	name                                    = "Test ServiceNow Event"
+	actions                                 = "snow_event"
+	search                                  = "index=main"
+	action_snow_event_param_account         = "account-test"
+	action_snow_event_param_node            = "node-test"
+	action_snow_event_param_type            = "type-test"
+	action_snow_event_param_resource        = "resource-test"
+	action_snow_event_param_severity        = "$result.severity$"
+	action_snow_event_param_description     = "description-test"
+	action_snow_event_param_ci_identifier   = "ci_identifier-test"
+	action_snow_event_param_custom_fields   = "custom_fields-test"
+	action_snow_event_param_additional_info = "additional_info-test"
+	alert_digest_mode                       = true
+	alert_expires                           = "24h"
+	alert_severity                          = 4
+	alert_comparator                        = "greater than"
+	alert_threshold                         = "10"
+	alert_type                              = "number of events"
+	is_scheduled                            = true
+	is_visible                              = true
+	dispatch_earliest_time                  = "rt-15m"
+	dispatch_latest_time                    = "rt-0m"
+	cron_schedule                           = "*/15 * * * *"
+}
+`
+
 const newSavedSearchesRunAiagent = `
 resource "splunk_saved_searches" "test" {
 	name                                = "Test Run AI Agent Alert"
@@ -853,6 +882,13 @@ func TestAccSplunkSavedSearches(t *testing.T) {
 				),
 			},
 			{
+				Config: newSavedSearchesServiceNowEventToken,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(resourceName, "name", "Test ServiceNow Event"),
+					resource.TestCheckResourceAttr(resourceName, "action_snow_event_param_severity", "$result.severity$"),
+				),
+			},
+			{
 				Config: newSavedSearchesRunAiagent,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr(resourceName, "name", "Test Run AI Agent Alert"),
@@ -1061,8 +1097,72 @@ func TestGetSavedSearchesConfigByNameEmptySeverity(t *testing.T) {
 	if got, want := entry.Content.Search, "index=_internal | head 1"; got != want {
 		t.Errorf("Search: got %q, want %q", got, want)
 	}
-	if got := entry.Content.ActionSnowEventParamSeverity; got != 0 {
-		t.Errorf("ActionSnowEventParamSeverity: got %d, want 0", got)
+	if got := entry.Content.ActionSnowEventParamSeverity; got != "" {
+		t.Errorf("ActionSnowEventParamSeverity: got %q, want empty", got)
+	}
+}
+
+func TestGetSavedSearchesConfigByNameCloudBooleanSeverity(t *testing.T) {
+	body := `{
+		"entry": [{
+			"name": "test_alert",
+			"content": {
+				"action.snow_event.param.severity": false,
+				"search": "index=_internal | head 1"
+			}
+		}]
+	}`
+	resp := &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       io.NopCloser(strings.NewReader(body)),
+	}
+
+	entry, err := getSavedSearchesConfigByName("test_alert", resp)
+	if err != nil {
+		t.Fatalf("getSavedSearchesConfigByName: %v", err)
+	}
+	if got := entry.Content.ActionSnowEventParamSeverity; got != "" {
+		t.Errorf("ActionSnowEventParamSeverity: got %q, want empty", got)
+	}
+	if got, want := entry.Content.Search, "index=_internal | head 1"; got != want {
+		t.Errorf("Search: got %q, want %q", got, want)
+	}
+}
+
+func TestSavedSearchesSnowSeveritySchemaIsString(t *testing.T) {
+	if got := savedSearches().Schema["action_snow_event_param_severity"].Type; got != schema.TypeString {
+		t.Fatalf("action_snow_event_param_severity type = %v, want TypeString", got)
+	}
+}
+
+func TestGetSavedSearchesConfigSnowSeverity(t *testing.T) {
+	// A number literal in HCL reaches the provider as the string "3".
+	for _, want := range []string{"3", "0", "$result.severity$", ""} {
+		resourceData := schema.TestResourceDataRaw(t, savedSearches().Schema, map[string]interface{}{
+			"search":                           "index=main",
+			"action_snow_event_param_severity": want,
+		})
+		config := getSavedSearchesConfig(resourceData)
+		if got := string(config.ActionSnowEventParamSeverity); got != want {
+			t.Errorf("ActionSnowEventParamSeverity: got %q, want %q", got, want)
+		}
+	}
+}
+
+// TestSavedSearchesSnowSeverityStateFromInt guards the decision not to bump
+// the schema version: state written by earlier versions holds a JSON number.
+func TestSavedSearchesSnowSeverityStateFromInt(t *testing.T) {
+	ty := savedSearches().CoreConfigSchema().ImpliedType()
+	attrTy, ok := ty.AttributeTypes()["action_snow_event_param_severity"]
+	if !ok {
+		t.Fatal("action_snow_event_param_severity missing from schema")
+	}
+	val, err := ctyjson.Unmarshal([]byte(`3`), attrTy)
+	if err != nil {
+		t.Fatalf("decode numeric state: %v", err)
+	}
+	if got := val.AsString(); got != "3" {
+		t.Errorf("decoded state = %q, want %q", got, "3")
 	}
 }
 
@@ -1071,7 +1171,7 @@ func TestGetSavedSearchesConfigByNameDecodeError(t *testing.T) {
 		"entry": [{
 			"name": "test_alert",
 			"content": {
-				"action.snow_event.param.severity": "abc",
+				"action.email.sendcsv": "abc",
 				"search": "index=_internal | head 1"
 			}
 		}]

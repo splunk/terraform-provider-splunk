@@ -15,8 +15,7 @@ import (
 //
 // An empty or blank string decodes as 0 on every FlexInt. That includes
 // fields posted when the value is 0, such as HEC useACK and the saved
-// search action.email.include_* flags. action.snow_event.param.severity
-// is omitempty, so a decoded 0 is not posted. null leaves the value
+// search action.email.include_* flags. null leaves the value
 // unchanged, as encoding/json does for a plain int.
 // See: https://github.com/splunk/terraform-provider-splunk/issues/130
 type FlexInt int
@@ -234,7 +233,7 @@ type SavedSearchObject struct {
 	ActionSnowEventParamNode                           string       `json:"action.snow_event.param.node,omitempty" url:"action.snow_event.param.node,omitempty"`
 	ActionSnowEventParamType                           string       `json:"action.snow_event.param.type,omitempty" url:"action.snow_event.param.type,omitempty"`
 	ActionSnowEventParamResource                       string       `json:"action.snow_event.param.resource,omitempty" url:"action.snow_event.param.resource,omitempty"`
-	ActionSnowEventParamSeverity                       FlexInt      `json:"action.snow_event.param.severity,omitempty" url:"action.snow_event.param.severity,omitempty"`
+	ActionSnowEventParamSeverity                       FlexString   `json:"action.snow_event.param.severity,omitempty" url:"action.snow_event.param.severity,omitempty"`
 	ActionSnowEventParamDescription                    string       `json:"action.snow_event.param.description,omitempty" url:"action.snow_event.param.description,omitempty"`
 	ActionSnowEventParamCiIdentifier                   string       `json:"action.snow_event.param.ci_identifier,omitempty" url:"action.snow_event.param.ci_identifier,omitempty"`
 	ActionSnowEventParamCustomFields                   string       `json:"action.snow_event.param.custom_fields,omitempty" url:"action.snow_event.param.custom_fields,omitempty"`

@@ -94,8 +94,8 @@ func TestSavedSearchObject_CloudBooleanFields(t *testing.T) {
 	if obj.ActionEmailSendCSV != 0 {
 		t.Errorf("ActionEmailSendCSV: got %d, want 0", obj.ActionEmailSendCSV)
 	}
-	if obj.ActionSnowEventParamSeverity != 0 {
-		t.Errorf("ActionSnowEventParamSeverity: got %d, want 0", obj.ActionSnowEventParamSeverity)
+	if obj.ActionSnowEventParamSeverity != "" {
+		t.Errorf("ActionSnowEventParamSeverity: got %q, want empty", obj.ActionSnowEventParamSeverity)
 	}
 }
 
@@ -135,8 +135,8 @@ func TestSavedSearchObject_EnterpriseStringFields(t *testing.T) {
 	if obj.ActionEmailSendCSV != 0 {
 		t.Errorf("ActionEmailSendCSV: got %d, want 0", obj.ActionEmailSendCSV)
 	}
-	if obj.ActionSnowEventParamSeverity != 3 {
-		t.Errorf("ActionSnowEventParamSeverity: got %d, want 3", obj.ActionSnowEventParamSeverity)
+	if obj.ActionSnowEventParamSeverity != "3" {
+		t.Errorf("ActionSnowEventParamSeverity: got %q, want %q", obj.ActionSnowEventParamSeverity, "3")
 	}
 }
 
@@ -153,8 +153,8 @@ func TestSavedSearchObject_EmptySeverity(t *testing.T) {
 	if err := json.Unmarshal([]byte(enterpriseJSON), &obj); err != nil {
 		t.Fatalf("Unmarshal enterprise response: %v", err)
 	}
-	if obj.ActionSnowEventParamSeverity != 0 {
-		t.Errorf("ActionSnowEventParamSeverity: got %d, want 0", obj.ActionSnowEventParamSeverity)
+	if obj.ActionSnowEventParamSeverity != "" {
+		t.Errorf("ActionSnowEventParamSeverity: got %q, want empty", obj.ActionSnowEventParamSeverity)
 	}
 	if obj.Search != "index=_internal | head 1" {
 		t.Errorf("Search: got %q, want %q", obj.Search, "index=_internal | head 1")

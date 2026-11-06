@@ -24,7 +24,7 @@ func (client *Client) CreateScriptedInput(name string, owner string, app string,
 }
 
 func (client *Client) ReadScriptedInput(name, owner, app string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "script", EscapeSplunkPathPart(name))
+	endpoint := client.buildLegacyInputEndpoint(name, "servicesNS", owner, app, "data", "inputs", "script")
 	resp, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func (client *Client) UpdateScriptedInput(name string, owner string, app string,
 	if err != nil {
 		return err
 	}
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "script", EscapeSplunkPathPart(name))
+	endpoint := client.buildLegacyInputEndpoint(name, "servicesNS", owner, app, "data", "inputs", "script")
 	resp, err := client.Post(endpoint, values)
 	if err != nil {
 		return err
@@ -48,7 +48,7 @@ func (client *Client) UpdateScriptedInput(name string, owner string, app string,
 }
 
 func (client *Client) DeleteScriptedInput(name, owner, app string) (*http.Response, error) {
-	endpoint := client.BuildSplunkURL(nil, "servicesNS", owner, app, "data", "inputs", "script", EscapeSplunkPathPart(name))
+	endpoint := client.buildLegacyInputEndpoint(name, "servicesNS", owner, app, "data", "inputs", "script")
 	resp, err := client.Delete(endpoint)
 	if err != nil {
 		return nil, err

@@ -125,6 +125,37 @@ func EscapeSplunkPathPart(pathPart string) string {
 	return strings.ReplaceAll(url.PathEscape(pathPart), "+", "%2B")
 }
 
+// LegacyInputACLName prepares a monitor, script, or Splunk TCP token name for
+// UpdateAcl. UpdateAcl escapes the name once more. PathEscape leaves "+" in
+// place so that second escape encodes it once, as %2B.
+func LegacyInputACLName(name string) string {
+	return url.PathEscape(name)
+}
+
+// escapeLegacyInputRawPath is the path segment sent for those inputs.
+// The handler decodes the segment, then decodes "%2F" and "%20" again, so
+// "/" and space are encoded twice. A literal "+" is encoded only once:
+// encoding it twice leaves "%2B" in the object id.
+func escapeLegacyInputRawPath(name string) string {
+	return EscapeSplunkPathPart(LegacyInputACLName(name))
+}
+
+func (c *Client) buildLegacyInputEndpoint(name string, urlPathParts ...string) url.URL {
+	endpoint := c.BuildSplunkURL(nil, urlPathParts...)
+	rawName := escapeLegacyInputRawPath(name)
+	decodedName, err := url.PathUnescape(rawName)
+	if err != nil {
+		decodedName = name
+	}
+	rawPath := endpoint.RawPath
+	if rawPath == "" {
+		rawPath = endpoint.EscapedPath()
+	}
+	endpoint.Path = appendURLPathPart(endpoint.Path, decodedName)
+	endpoint.RawPath = appendURLPathPart(rawPath, rawName)
+	return endpoint
+}
+
 func appendURLPathPart(basePath, pathPart string) string {
 	if basePath == "" {
 		return pathPart

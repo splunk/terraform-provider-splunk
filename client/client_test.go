@@ -736,10 +736,9 @@ func TestSavedSearchNamesRoundTripThroughSplunkdDecoding(t *testing.T) {
 	}
 }
 
-// Monitor, script, and Splunk TCP token inputs pass the escaped name through
-// BuildSplunkURL, which writes url.URL.Path and encodes "%" a second time.
-// Slashes stay %252F and spaces stay %2520. A literal "+" is %252B so the same
-// two decodes restore it. Single encoding (%2F) would change existing paths.
+// Monitor, script, and Splunk TCP token inputs encode "/" and space twice,
+// because the handler decodes "%2F" and "%20" after the HTTP decode. A literal
+// "+" is encoded once: a second encode leaves "%2B" in the object id.
 func TestLegacyInputPathsKeepDoubleEncoding(t *testing.T) {
 	t.Setenv(envVarHTTPScheme, "http")
 
@@ -751,7 +750,7 @@ func TestLegacyInputPathsKeepDoubleEncoding(t *testing.T) {
 		{name: "/var/log/syslog", suffix: "%252Fvar%252Flog%252Fsyslog"},
 		{name: "opt/splunk/var/log/splunk/health.log", suffix: "opt%252Fsplunk%252Fvar%252Flog%252Fsplunk%252Fhealth.log"},
 		{name: "Test 30 days", suffix: "Test%252030%2520days"},
-		{name: "Test 30+ days", suffix: "Test%252030%252B%2520days"},
+		{name: "Test 30+ days", suffix: "Test%252030%2B%2520days"},
 		{name: "plain", suffix: "plain"},
 	}
 
@@ -799,7 +798,7 @@ func TestLegacyInputPathsKeepDoubleEncoding(t *testing.T) {
 
 	t.Run("splunktcptoken scheme prefix", func(t *testing.T) {
 		const name = "splunktcptoken://a+b"
-		assertLegacyInputPath(t, "/servicesNS/nobody/search/data/inputs/tcp/splunktcptoken/", "splunktcptoken:%252F%252Fa%252Bb", name, func(c *Client) error {
+		assertLegacyInputPath(t, "/servicesNS/nobody/search/data/inputs/tcp/splunktcptoken/", "splunktcptoken:%252F%252Fa%2Bb", name, func(c *Client) error {
 			resp, err := c.ReadSplunkTCPTokenInput(name, "nobody", "search")
 			if resp != nil {
 				defer resp.Body.Close()
@@ -834,19 +833,19 @@ func TestLegacyInputACLKeepsDoubleEncoding(t *testing.T) {
 		{
 			name:     "monitor plus",
 			object:   "Test 30+ days",
-			wantPath: "/servicesNS/nobody/search/data/inputs/monitor/Test%252030%252B%2520days/acl",
+			wantPath: "/servicesNS/nobody/search/data/inputs/monitor/Test%252030%2B%2520days/acl",
 			parts:    []string{"data", "inputs", "monitor"},
 		},
 		{
 			name:     "script plus",
 			object:   "a+b",
-			wantPath: "/servicesNS/nobody/search/data/inputs/script/a%252Bb/acl",
+			wantPath: "/servicesNS/nobody/search/data/inputs/script/a%2Bb/acl",
 			parts:    []string{"data", "inputs", "script"},
 		},
 		{
 			name:     "token id plus",
 			object:   "a+b",
-			wantPath: "/servicesNS/nobody/search/data/inputs/tcp/splunktcptoken/a%252Bb/acl",
+			wantPath: "/servicesNS/nobody/search/data/inputs/tcp/splunktcptoken/a%2Bb/acl",
 			parts:    []string{"data", "inputs", "tcp", "splunktcptoken"},
 		},
 	}
@@ -856,8 +855,8 @@ func TestLegacyInputACLKeepsDoubleEncoding(t *testing.T) {
 			client := splunkdPathClient(t, func(r *http.Request) {
 				got = r.URL.EscapedPath()
 			})
-			// Resources pass an already escaped name into UpdateAcl, which escapes once more.
-			err := client.UpdateAcl("nobody", "search", EscapeSplunkPathPart(tt.object), acl, tt.parts...)
+			// Resources pass LegacyInputACLName. UpdateAcl escapes that once more.
+			err := client.UpdateAcl("nobody", "search", LegacyInputACLName(tt.object), acl, tt.parts...)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -881,16 +880,15 @@ func assertLegacyInputPath(t *testing.T, prefix, suffix, name string, call func(
 	if got != want {
 		t.Fatalf("path %s, want %s", got, want)
 	}
-	once, err := url.QueryUnescape(suffix)
+	// HTTP decodes the segment once. The input handler then decodes %2F and %20
+	// and leaves a "+" that was sent as %2B.
+	once, err := url.PathUnescape(suffix)
 	if err != nil {
 		t.Fatal(err)
 	}
-	twice, err := url.QueryUnescape(once)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if twice != name {
-		t.Errorf("after two decodes %q, want %q", twice, name)
+	gotName := strings.NewReplacer("%2F", "/", "%2f", "/", "%20", " ").Replace(once)
+	if gotName != name {
+		t.Errorf("object id %q, want %q", gotName, name)
 	}
 }
 

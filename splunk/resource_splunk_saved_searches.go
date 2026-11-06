@@ -54,7 +54,7 @@ func savedSearches() *schema.Resource {
 				Description: "The resource, formatted to follow your organization's ITIL standards and mapping. For example, resource='CPU'.",
 			},
 			"action_snow_event_param_severity": {
-				Type:     schema.TypeInt,
+				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
 				Description: "The severity associated with the event. " +
@@ -62,7 +62,8 @@ func savedSearches() *schema.Resource {
 					"1 - Critical " +
 					"2 - Major " +
 					"3 - Minor " +
-					"4 - Warning",
+					"4 - Warning. " +
+					"A Splunk token such as $result.severity$ is also accepted; Splunk expands it when the alert triggers.",
 			},
 			"action_snow_event_param_description": {
 				Type:        schema.TypeString,
@@ -1414,7 +1415,7 @@ func savedSearchesRead(d *schema.ResourceData, meta interface{}) error {
 	if err = d.Set("action_snow_event_param_resource", entry.Content.ActionSnowEventParamResource); err != nil {
 		return err
 	}
-	if err = d.Set("action_snow_event_param_severity", entry.Content.ActionSnowEventParamSeverity); err != nil {
+	if err = d.Set("action_snow_event_param_severity", string(entry.Content.ActionSnowEventParamSeverity)); err != nil {
 		return err
 	}
 	if err = d.Set("action_snow_event_param_description", entry.Content.ActionSnowEventParamDescription); err != nil {
@@ -2117,7 +2118,7 @@ func getSavedSearchesConfig(d *schema.ResourceData) (savedSearchesObj *models.Sa
 		ActionSnowEventParamNode:                           d.Get("action_snow_event_param_node").(string),
 		ActionSnowEventParamType:                           d.Get("action_snow_event_param_type").(string),
 		ActionSnowEventParamResource:                       d.Get("action_snow_event_param_resource").(string),
-		ActionSnowEventParamSeverity:                       models.FlexInt(d.Get("action_snow_event_param_severity").(int)),
+		ActionSnowEventParamSeverity:                       models.FlexString(d.Get("action_snow_event_param_severity").(string)),
 		ActionSnowEventParamDescription:                    d.Get("action_snow_event_param_description").(string),
 		ActionSnowEventParamCiIdentifier:                   d.Get("action_snow_event_param_ci_identifier").(string),
 		ActionSnowEventParamCustomFields:                   d.Get("action_snow_event_param_custom_fields").(string),

@@ -102,7 +102,7 @@ func inputsScriptCreate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	if _, ok := d.GetOk("acl"); ok {
-		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, client.EscapeSplunkPathPart(name), aclObject, "data", "inputs", "script")
+		err := (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, client.LegacyInputACLName(name), aclObject, "data", "inputs", "script")
 		if err != nil {
 			return err
 		}
@@ -199,7 +199,7 @@ func inputsScriptUpdate(d *schema.ResourceData, meta interface{}) error {
 	}
 
 	//ACL update
-	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, client.EscapeSplunkPathPart(d.Id()), aclObject, "data", "inputs", "script")
+	err = (*provider.Client).UpdateAcl(aclObject.Owner, aclObject.App, client.LegacyInputACLName(d.Id()), aclObject, "data", "inputs", "script")
 	if err != nil {
 		return err
 	}
